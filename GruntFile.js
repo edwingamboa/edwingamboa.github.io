@@ -1,38 +1,237 @@
-module.exports = function (grunt) {
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-open');
-    grunt.loadNpmTasks('grunt-contrib-concat');
+	module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        connect: {
-            server: {
+
+        dir: {
+            deploy: {
+                root:   'deploy/',
+                js:     'deploy/js',
+                assets: 'deploy/assets',
+                images:  'deploy/assets/images',
+				sprites:  'deploy/assets/sprites',
+                css:    'deploy/css'
+            },
+            src: {
+                root:   'src/',
+                lib:    'src/lib/',
+                js:     'src/js/**/*.js',
+                assets: 'src/assets/',
+                css:    'src/css/',
+                index:  'src/index.html'
+            },
+            assets: {
+                root:   'assets/',
+                images:  'assets/images/',
+				sprites:  'assets/sprites',
+                maps:   'assets/maps/**/*.json',
+                audio:  'assets/audio/'
+            }
+        },
+
+        mkdir: {
+            all: {
                 options: {
-                    port: 8080,
-                    base: './deploy'
+                    mode: 0700,
+                    create: [
+                        'assets/images', 'assets/sprites', 'assets/maps', 'assets/audio',
+                        'deploy',
+                        'resources',
+                        'src/css', 'src/js', 'src/lib',
+                        'tasks'
+                    ]
+                },
+            },
+        },
+
+        clean: ['<%= dir.deploy.root %>'],
+
+        copy: {
+            lib: {
+                files: [{
+                    cwd: '<%= dir.src.lib %>',
+                    src: ['**'],
+                    dest: '<%= dir.deploy.js %>',
+                    expand: true
+                }]
+            },
+            assets: {
+                files: [
+                    {
+                        cwd: '<%= dir.assets.root %>',
+                        src: ['audio/**/*.*'],
+                        dest: '<%= dir.deploy.assets %>',
+                        expand: true
+                    },
+					{
+                        cwd: '<%= dir.assets.root %>',
+                        src: ['images/**/*.*'],
+                        dest: '<%= dir.deploy.assets %>',
+                        expand: true
+                    },
+					{
+                        cwd: '<%= dir.assets.root %>',
+                        src: ['sprites/**/*.*'],
+                        dest: '<%= dir.deploy.assets %>',
+                        expand: true
+                    },
+                    {
+                        cwd: '<%= dir.assets.root %>',
+                        src: ['maps/**/*.json'],
+                        dest: '<%= dir.deploy.assets %>',
+                        expand: true
+                    }
+                ]
+            },
+            css: {
+                files: [{
+                    cwd: '<%= dir.src.root %>',
+                    src: ['css/**/*.*'],
+                    dest: '<%= dir.deploy.root %>',
+                    expand: true
+                }]
+            }
+        },
+
+        replace: {
+            index: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'GameNamePretty',
+                            replacement: '<%= pkg.namePretty %>'
+                        },
+                        {
+                            match: 'GameName',
+                            replacement: '<%= pkg.name %>'
+                        }
+                    ]
+                },
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['<%= dir.src.index %>'],
+                        dest: '<%= dir.deploy.root %>'
+                    }
+                ]
+            }
+        },
+
+        concat: {
+            game: {
+                options: {
+                    process: {
+                        data: {
+                            version: '<%= pkg.version %>',
+                            buildDate: '<%= grunt.template.today() %>'
+                        }
+                    }
+                },
+                src: ['<%= dir.src.js %>'],
+                dest: '<%= dir.deploy.js %>/<%= pkg.name %>.js'
+            }
+        },
+
+        uglify: {
+            game: {
+                options: {
+                    banner: '/*! GameDevTemplateJS <%= pkg.version %> | ' +
+                            '(c) 2013 Thomas Viktil */ \n'
+                },
+                src: ['<%= concat.game.dest %>'],
+                dest: '<%= dir.deploy.js %>/<%= pkg.name %>.min.js'
+            }
+        },
+
+        /*texturepacker: {
+            misc: {
+                targetdir: '<%= dir.deploy.atlas %>',
+                dirs: [
+                    '<%= dir.assets.atlas %>boxes',
+                    '<%= dir.assets.atlas %>hud'
+                ]
+            }
+        },*/
+
+        watch: {
+            source: {
+                files: '<%= dir.src.js %>',
+                tasks: ['updatejs'],
+                options: {
+                    livereload: true
+                }
+            },
+            maps: {
+                files: '<%= dir.assets.maps %>',
+                tasks: ['copy:assets'],
+                options: {
+                    livereload: true
+                }
+            },
+            /*atlas: {
+                files: '<%= dir.assets.atlas %>** /*.*',
+                tasks: ['texturepacker'],
+                options: {
+                    livereload: true
+                }
+            },*/
+            index: {
+                files: '<%= dir.src.index %>',
+                tasks: ['replace'],
+                options: {
+                    livereload: true
                 }
             }
         },
-        concat: {
-            dist: {
-                src: [  "src/lib/**/*.js",
-                    "src/game/**/*.js"
-                     ],
-                dest: 'deploy/js/<%= pkg.name %>.js'
+
+        connect: {
+            root: {
+                options: {
+                    port: 80,
+                    base: './deploy',
+                    livereload: true
+                }
             }
         },
-        watch: {
-            files: 'src/**/*.js',
-            tasks: ['concat']
-        },
+
         open: {
             dev: {
-                path: 'http://localhost:8080/index.html'
+                path: 'http://localhost/index.html',
             }
         }
     });
 
-    grunt.registerTask('default', ['concat', 'connect', 'open', 'watch']);
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-open');
+    grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-mkdir');
+    grunt.loadTasks('./tasks');
 
+	grunt.registerTask('default', [
+        'clean',
+        //'texturepacker',
+        'build',
+        'connect',
+        'open',
+        'watch'
+    ]);
+    grunt.registerTask('build', [
+        'concat',
+        'uglify',
+        'replace',
+        'copy'
+    ]);
+    grunt.registerTask('updatejs', [
+        'concat',
+        'uglify'
+    ]);
+    
+    grunt.registerTask('init', ['mkdir']);
 }
