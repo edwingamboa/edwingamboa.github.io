@@ -9,10 +9,10 @@ var game = new Phaser.Game(1200, 600, Phaser.AUTO, 'game', {preload: preload,
 
 function preload() {
 
-    game.load.image('sky', '/assets/images/sky.png');
-    game.load.image('ground', '/assets/images/platform.png');
-    game.load.image('star', '/assets/images/star.png');
-    game.load.spritesheet('character', '/assets/sprites/character.png', 32, 48);
+    game.load.image('sky', 'assets/images/sky.png');
+    game.load.image('ground', 'assets/images/platform.png');
+    game.load.image('star', 'assets/images/star.png');
+    game.load.spritesheet('character', 'assets/sprites/character.png', 32, 48);
     game.stage.backgroundColor = '#82CAFA';
 
 }
