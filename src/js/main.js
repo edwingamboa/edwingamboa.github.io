@@ -13,7 +13,10 @@ function preload() {
     game.load.image('ground', 'assets/images/platform.png');
     game.load.image('star', 'assets/images/star.png');
     game.load.spritesheet('character', 'assets/sprites/character.png', 32, 48);
-    game.load.image('bullet', 'assets/images/bullet.png');
+    for (var i = 1; i <= 2; i++)
+    {
+        game.load.image('bullet' + i, 'assets/images/bullet' + i + '.png');
+    }
     game.stage.backgroundColor = '#82CAFA';
 
 }
@@ -33,9 +36,9 @@ var scoreText;
 var ammoText;
 var healthLevelText;
 
-var bullets;
-var bulletTime = 0;
-var fireButton;
+
+var weapons = [];
+var currentWeapon = 0;
 
 var xDirection = 1;
 
@@ -46,15 +49,15 @@ function create() {
     //  We're going to be using physics, so enable the Arcade Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-     //  Our bullet group
-    bullets = game.add.group();
-    bullets.enableBody = true;
-    bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    bullets.createMultiple(30, 'bullet');
-    bullets.setAll('anchor.x', 0.5);
-    bullets.setAll('anchor.y', 1);
-    bullets.setAll('outOfBoundsKill', true);
-    bullets.setAll('checkWorldBounds', true);
+    weapons.push(new Weapon(30, 'bullet1', 0, 400, 100));
+    weapons.push(new Weapon(40, 'bullet2', 0, 500, 100));
+    
+    currentWeapon = 0;
+    
+    for (var i = 1; i < weapons.length; i++)
+    {
+       weapons[i].visible = false;
+    }
     
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
@@ -128,7 +131,9 @@ function create() {
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
-    fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    
+    var changeKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    changeKey.onDown.add(nextWeapon, this);
     
     //To make camera follow the player
     game.renderer.renderSession.roundPixels = true;
@@ -200,40 +205,79 @@ function update() {
         
     }
     //Allow player to fire
-    if (fireButton.isDown)
+    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
     {
-        fireBullet();
+        weapons[currentWeapon].fire();
     }
-       
+//    //Allow plpayer to change Weapon
+//    if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
+//        nextWeapon();
+//    }
+
 }
 
+    function nextWeapon(){      
+        //  Activate the new one
+        currentWeapon++;
 
-function fireBullet () {
-
-    //  To avoid them being allowed to fire too fast we set a time limit
-    if (game.time.now > bulletTime)
-    {
-        //  Grab the first bullet we can from the pool
-        bullet = bullets.getFirstExists(false);
-
-        if (bullet)
+        if (currentWeapon === weapons.length)
         {
-            //  And fire it
-            bullet.reset(player.x, player.y+30);
-            bullet.body.velocity.x = 400*xDirection;
-            bulletTime = game.time.now + 200;
+            currentWeapon = 0;
         }
+
+        weapons[currentWeapon].visible = true;
+        
+        ammo = weapons[currentWeapon].numberOfBullets;
+        ammoText.text = 'Ammo: ' + ammo;
     }
 
-}
+    var Weapon = {};
+//  Our core Bullet class
+    //  This is a simple Sprite object that we set a few properties on
+    //  It is fired by all of the Weapon classes
 
-function resetBullet (bullet) {
+    var Weapon = function (numberOfBullets, imageName, nextFire, bulletSpeed, 
+    fireRate) {
+        
+        this.numberOfBullets = numberOfBullets; 
+        this.bullets = game.add.group();
+        this.bullets.enableBody = true;
+        this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        this.bullets.createMultiple(numberOfBullets, imageName);
+        this.nextFire = nextFire;
+        this.bulletSpeed = bulletSpeed;
+        this.fireRate = fireRate;
+        this.bullets.setAll('anchor.x', 0.5);
+        this.bullets.setAll('anchor.y', 1);
+        this.bullets.setAll('outOfBoundsKill', true);
+        this.bullets.setAll('checkWorldBounds', true);
+        this.bullets.setAll('texture.baseTexture.scaleMode', PIXI.scaleModes.NEAREST);
+        this.bullets.setAll('exists', false);  
+    };
+    
+    Weapon.prototype.constructor = Weapon;
 
-    //  Called if the bullet goes out of the screen
-    bullet.kill();
+    Weapon.prototype.fire = function () {
+        //  To avoid them being allowed to fire too fast we set a time limit
+        if (game.time.now > this.nextFire)
+        {
+            //  Grab the first bullet we can from the pool
+            currentBullet = this.bullets.getFirstExists(false);
 
-}
-
+            if (currentBullet && this.numberOfBullets > 0)
+            {
+                //  And fire it
+                currentBullet.reset(player.x, player.y+30);
+                currentBullet.body.velocity.x = player.body.velocity.x + this.bulletSpeed*xDirection;
+                this.nextFire = game.time.now + this.fireRate;
+                //currentBullet.scale.set(this.scaleSize);
+                //  Add and update the score
+                this.numberOfBullets--;
+                ammo = this.numberOfBullets;
+                ammoText.text = 'Ammo: ' + ammo;
+            }            
+        }        
+    };
 
 function collectStar(player, star) {
 
