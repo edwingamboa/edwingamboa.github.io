@@ -199,7 +199,19 @@
             dev: {
                 path: 'http://localhost/index.html',
             }
-        }
+        },
+        
+        jscs: {
+            src: ['src/js/*.js', 'src/js/**/*.js'],
+            options: {
+                config: '.jscsrc',
+                fix: true
+            }
+        },
+        
+        jshint: {
+            src: ['src/js/*.js', 'src/js/**/*.js']
+        }        
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -212,9 +224,11 @@
     grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-mkdir');
+    grunt.loadNpmTasks('grunt-jscs');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadTasks('./tasks');
 
-	grunt.registerTask('default', [
+    grunt.registerTask('default', [
         'clean',
         //'texturepacker',
         'build',
@@ -229,6 +243,8 @@
         'copy'
     ]);
     grunt.registerTask('updatejs', [
+        'jscs',
+        'jshint',
         'concat',
         'uglify'
     ]);
