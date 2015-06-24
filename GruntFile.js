@@ -144,6 +144,13 @@
             }
         },
 
+        browserify: {
+            build: {
+                src: ['<%= dir.src.js %>'],
+                dest: '<%= dir.deploy.js %>/<%= pkg.name %>.js'
+            }
+        },
+
         /*texturepacker: {
             misc: {
                 targetdir: '<%= dir.deploy.atlas %>',
@@ -215,7 +222,7 @@
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-concat');
+    //grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -226,6 +233,7 @@
     grunt.loadNpmTasks('grunt-mkdir');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-browserify')
     grunt.loadTasks('./tasks');
 
     grunt.registerTask('default', [
@@ -237,7 +245,7 @@
         'watch'
     ]);
     grunt.registerTask('build', [
-        'concat',
+        'browserify',
         'uglify',
         'replace',
         'copy'
@@ -245,7 +253,7 @@
     grunt.registerTask('updatejs', [
         'jscs',
         'jshint',
-        'concat',
+        'browserify',
         'uglify'
     ]);
     
