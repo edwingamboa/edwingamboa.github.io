@@ -209,17 +209,25 @@
         },
         
         jscs: {
-            src: ['src/js/*.js', 'src/js/**/*.js'],
+            src: ['src/js/**/*.js'],
             options: {
                 config: '.jscsrc',
                 fix: true
             }
         },
-        
+
+        'node-qunit': {
+            case1: {
+                deps: 'src/lib/pahser.min.js',
+                code: 'src/js/main.js',
+                tests: 'test/Level1Test.js'
+            },
+        },
+
         jshint: {
             src: ['src/js/*.js', 'src/js/**/*.js']
         }        
-    });
+    });;
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     //grunt.loadNpmTasks('grunt-contrib-concat');
@@ -233,7 +241,8 @@
     grunt.loadNpmTasks('grunt-mkdir');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-browserify')
+    grunt.loadNpmTasks('grunt-browserify'),
+    grunt.loadNpmTasks('grunt-node-qunit'),
     grunt.loadTasks('./tasks');
 
     grunt.registerTask('default', [
@@ -258,4 +267,5 @@
     ]);
     
     grunt.registerTask('init', ['mkdir']);
+    grunt.registerTask('test', 'node-qunit');
 }
