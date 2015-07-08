@@ -2,25 +2,31 @@
 var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
 
 //Game States
+var Boot = require('./states/boot');
+var Preloader = require('./states/preloader');
+var Menu = require('./states/menu');
 var LevelOneState = require('./states/levelOne');
 
-game.state.add('play', LevelOneState);
-game.state.start('play');
+game.state.add('boot', Boot);
+game.state.add('preloader', Preloader);
+game.state.add('menu', Menu);
+game.state.add('levelOne', LevelOneState);
+game.state.start('boot');
 
-},{"./states/levelOne":8}],2:[function(require,module,exports){
+},{"./states/boot":7,"./states/levelOne":8,"./states/menu":9,"./states/preloader":10}],2:[function(require,module,exports){
 var Item = require('./item');
 
 var HealthPack;
-HealthPack = function(game, key, maxIncreasing, gravity, bounce, xPos,
-                      yPos) {
-    Item.call(this, game, 'Health Pack');
-    Phaser.Sprite.call(this, game, xPos, yPos, key);
+HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
+    Item.call(this, level.game, 'Health Pack');
+    Phaser.Sprite.call(this, level.game, xPos, yPos, key);
     this.anchor.set(0.5);
     this.maxIncreasing = maxIncreasing;
-    this.game.physics.arcade.enable(this);
+    level.game.physics.arcade.enable(this);
     this.body.bounce.y = bounce;
     this.body.gravity.y = gravity;
     this.body.collideWorldBounds = true;
+    this.level = level;
     return this;
 };
 
@@ -31,17 +37,44 @@ HealthPack.prototype.pickUp = function() {
     this.kill();
 };
 
+HealthPack.prototype.use = function() {
+    this.level.addHealthPack(this);
+};
+
 module.exports = HealthPack;
 
 },{"./item":4}],3:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var Inventory = function(game) {
-    Phaser.Sprite.call(this, game, game.camera.width / 2,
-        game.camera.height / 2, 'inventory_background');
+var HealthPack = require('../prefabs/healthPack');
+
+var Inventory = function(level) {
+    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
+        level.game.camera.height / 2, 'inventory_background');
     this.anchor.set(0.5);
+
+    this.healthPackIcon = level.game.make.sprite(-this.width / 2 +
+        20, -this.height / 2 + 20, 'healthPack');
+    this.healthPackIcon.inputEnabled = true;
+    this.healthPackIcon.input.priorityID = 2;
+    this.healthPackIcon.events.onInputDown.add(this.useHealthPack, this);
+
+    this.closeButton = level.game.make.sprite(this.width / 2,
+        -this.height / 2, 'close');
+    this.closeButton.anchor.set(0.5);
+    this.closeButton.inputEnabled = true;
+    this.closeButton.input.priorityID = 2;
+    this.closeButton.events.onInputDown.add(this.close, this);
+
+    this.addChild(this.closeButton);
+    this.addChild(this.healthPackIcon);
+
+    this.fixedToCamera = true;
+    this.visible = false;
+
     this.items = [];
+    this.level = level;
 };
 
 Inventory.prototype = Object.create(Phaser.Sprite.prototype);
@@ -56,9 +89,25 @@ Inventory.prototype.addItem = function(item) {
 Inventory.prototype.showHealthPacks = function() {
     //TODO
 };
+
+Inventory.prototype.close = function() {
+    this.level.resume();
+    this.visible = false;
+};
+
+Inventory.prototype.open = function() {
+    this.level.pause();
+    this.visible = true;
+};
+
+Inventory.prototype.useHealthPack = function() {
+    this.close();
+    this.level.addHealthPack(new HealthPack('healthPack', 10, 300,
+        0.7 + Math.random() * 0.2, this.level.player.body.x, 100, this.level));
+};
 module.exports = Inventory;
 
-},{}],4:[function(require,module,exports){
+},{"../prefabs/healthPack":2}],4:[function(require,module,exports){
 var Item;
 Item = function(game, type) {
     this.type = type;
@@ -133,6 +182,13 @@ Player.prototype.crouch = function() {
     this.frame = 9;
 };
 
+Player.prototype.increaseHealthLevel = function(increase) {
+    this.healthLevel += increase;
+    if (this.healthLevel > 100) {
+        this.healthLevel = 100;
+    }
+};
+
 module.exports = Player;
 
 },{}],6:[function(require,module,exports){
@@ -178,8 +234,26 @@ module.exports = Weapon;
 
 },{}],7:[function(require,module,exports){
 /**
- * Created by Edwin Gamboa on 27/06/2015.
+ * Created by Edwin Gamboa on 07/07/2015.
  */
+var Boot;
+Boot = function(game) {};
+
+Boot.prototype = {
+    preload: function() {
+        this.load.image('loading', 'assets/images/loading.png');
+        this.load.image('load_progress_bar_dark',
+            'assets/images/progress_bar_bg.png');
+        this.load.image('load_progress_bar',
+            'assets/images/progress_bar_fg.png');
+    },
+    create: function() {
+        this.game.input.maxPointers = 1;
+        this.game.state.start('preloader');
+    }
+};
+
+module.exports = Boot;
 
 },{}],8:[function(require,module,exports){
 /**
@@ -195,18 +269,6 @@ LevelOne = function(game) {};
 
 LevelOne.prototype = {
     preload: function() {
-        this.game.load.image('ground', 'assets/images/platform.png');
-        this.game.load.image('healthPack', 'assets/images/healthPack.png');
-        this.game.load.image('inventory_button', 'assets/images/inventory.png');
-        this.game.load.image('inventory_background',
-            'assets/images/inventory_background.png');
-        this.game.load.image('close', 'assets/images/close.png');
-        this.game.load.spritesheet('character', 'assets/sprites/character.png',
-            32, 48);
-        for (var i = 1; i <= 2; i++) {
-            this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
-                '.png');
-        }
         this.game.stage.backgroundColor = '#82CAFA';
     },
 
@@ -219,43 +281,37 @@ LevelOne.prototype = {
         this.score = 0;
         this.currentWeapon = 0;
         this.ammo = 10;
-        this.healthLevel = 100;
         this.xDirection = 1;
 
-        this.platforms = this.game.add.group();
+        this.player = new Player(this.game, 250, 500, 10, 0.2, 300);
+        this.game.add.existing(this.player);
+        this.gameObjects.push(this.player);
 
+        this.healthPacks = this.game.add.group();
+        this.gameObjects.push(this.healthPacks);
+        this.addHealthPack(new HealthPack('healthPack', 10, 300,
+            0.7 + Math.random() * 0.2, 500, 100, this));
+
+        this.platforms = this.game.add.group();
         this.platforms.enableBody = true;
 
         this.ground = this.platforms.create(0, this.game.world.height - 64,
             'ground');
-
         this.ground.scale.setTo(10, 2);
-
         this.ground.body.immovable = true;
 
         this.ledge = this.platforms.create(400, 300, 'ground');
         this.ledge.body.immovable = true;
-
         this.ledge = this.platforms.create(-150, 200, 'ground');
         this.ledge.body.immovable = true;
-
-        this.player = new Player(this.game, 250, 500, 100, 0.2, 300);
-        this.game.add.existing(this.player);
-        this.gameObjects.push(this.player);
 
         this.weapons.push(new Weapon(this.game, this.player, 30, 'bullet1', 0,
             400, 100));
         this.weapons.push(new Weapon(this.game, this.player, 40, 'bullet2', 0,
             500, 100));
-
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
-
-        this.healthPack = new HealthPack(this.game, 'healthPack', 10, 300,
-            0.7 + Math.random() * 0.2, 500, 100);
-        this.game.add.existing(this.healthPack);
-        this.gameObjects.push(this.healthPack);
 
         //The score
         this.scoreText = this.game.add.text(this.game.camera.width - 300, 16,
@@ -270,7 +326,7 @@ LevelOne.prototype = {
 
         //The health level
         this.healthLevelText = this.game.add.text(16, 16, 'Health: ' +
-            this.healthLevel, {fontSize: '32px', fill: '#000'});
+            this.player.healthLevel, {fontSize: '32px', fill: '#000'});
         this.healthLevelText.fixedToCamera = true;
 
         //Controls
@@ -284,46 +340,21 @@ LevelOne.prototype = {
         this.game.camera.follow(this.player);
 
         //Inventory
-        this.inventoryButton = this.game.add.button(this.game.camera.width - 50,
-            100, 'inventory_button', this.displayInventory, this);
+        this.inventory = new Inventory(this);
+        this.game.add.existing(this.inventory);
 
-        this.inventoryButton.inputEnabled = true;
-        this.inventoryButton.events.onInputUp.add(this.displayInventory, this);
+        this.inventoryButton = this.game.add.button(this.game.camera.width - 50,
+            100, 'inventory_button', this.inventory.open, this.inventory);
         this.inventoryButton.anchor.setTo(0.5, 0.5);
         this.inventoryButton.fixedToCamera = true;
         this.inventoryButton.input.priorityID = 1;
-
-        this.inventory = new Inventory(this.game);
-        var healthPackIcon = this.game.make.sprite(20, 20, 'healthPack');
-        healthPackIcon.inputEnabled = true;
-        healthPackIcon.input.priorityID = 2;
-        //healthPackIcon.input.useHandCursor = true;
-        //healthPackIcon.events.onInputDown.add(this.inventory.showHealthPacks,
-        //    this);
-        healthPackIcon.input.enableDrag();
-
-        var closeButton = this.game.make.sprite((this.inventory.width / 2),
-            (-this.inventory.height / 2), 'close');
-        closeButton.anchor.set(0.5);
-        closeButton.inputEnabled = true;
-        closeButton.input.priorityID = 2;
-        closeButton.events.onInputDown.add(this.closeInventory, this);
-
-        this.inventory.addChild(closeButton);
-        this.inventory.addChild(healthPackIcon);
-
-        this.game.add.existing(this.inventory);
-
-        this.inventory.fixedToCamera = true;
-
-        this.inventory.visible = false;
     },
 
     update: function() {
         //Collisions
         this.game.physics.arcade.collide(this.gameObjects, this.platforms);
-        this.game.physics.arcade.overlap(this.healthPack, this.player,
-            this.collectItem, null, this);
+        this.game.physics.arcade.overlap(this.player, this.healthPacks,
+            this.collectHealthPack, null, this);
 
         if (this.cursors.left.isDown) {
             this.xDirection = -1;
@@ -371,36 +402,132 @@ LevelOne.prototype = {
         this.ammoText.text = 'Ammo: ' + this.ammo;
     },
 
-    collectItem: function(item) {
-        if (this.healthLevel !== 100) {
-            this.healthLevel += item.maxIncreasing;
-            if (this.healthLevel > 100) {
-                this.healthLevel = 100;
-            }
-            this.healthLevelText.text = 'Health: ' + this.healthLevel;
+    collectHealthPack: function(player , healthPack) {
+        if (this.player.healthLevel !== 100) {
+            this.increaseHealthLevel(healthPack.maxIncreasing);
         } else {
-            this.inventory.addItem(item);
+            this.inventory.addItem(healthPack);
         }
-        item.pickUp();
+        healthPack.pickUp();
+    },
+
+    increaseHealthLevel: function(increase) {
+        this.player.increaseHealthLevel(increase);
+        this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
     },
 
     render: function() {
         this.game.debug.cameraInfo(this.game.camera, 32, 32);
     },
 
-    displayInventory: function() {
-        //this.game.paused = true;
-        this.game.physics.arcade.isPaused = true;
-        this.inventory.visible = true;
+    addHealthPack: function(healthPack) {
+        this.healthPacks.add(healthPack);
     },
 
-    closeInventory: function() {
-        //this.game.paused = false;
+    pause: function() {
+        this.game.physics.arcade.isPaused = true;
+    },
+
+    resume: function() {
         this.game.physics.arcade.isPaused = false;
-        this.inventory.visible = false;
     }
 };
 
 module.exports = LevelOne;
 
-},{"../prefabs/healthPack":2,"../prefabs/inventory":3,"../prefabs/player":5,"../prefabs/weapon":6}]},{},[1,2,3,4,5,6,7,8]);
+},{"../prefabs/healthPack":2,"../prefabs/inventory":3,"../prefabs/player":5,"../prefabs/weapon":6}],9:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/07/2015.
+ */
+var Menu;
+Menu = function(game) {};
+
+Menu.prototype = {
+    create: function() {
+        var newGame = this.game.add.text(this.game.camera.width / 2,
+                this.game.camera.height / 2, 'New Game');
+        //Font style
+        newGame.font = 'Arial';
+        newGame.fontSize = 50;
+        newGame.fontWeight = 'bold';
+        newGame.fill = '#0040FF';
+        newGame.anchor.set(0.5);
+        newGame.inputEnabled = true;
+        newGame.events.onInputDown.add(this.newGame, this);
+    },
+
+    newGame: function() {
+        this.game.state.start('levelOne');
+    }
+};
+
+module.exports = Menu;
+
+},{}],10:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/07/2015.
+ */
+var Preloader;
+Preloader = function(game) {
+    this.ready = false;
+};
+
+Preloader.prototype = {
+    preload: function() {
+        this.displayLoadScreen();
+        this.loadAssets();
+    },
+
+    displayLoadScreen: function() {
+        var centerX = this.game.camera.width / 2;
+        var centerY = this.game.camera.height / 2;
+
+        this.loading = this.game.add.sprite(centerX, centerY - 20, 'loading');
+        this.loading.anchor.setTo(0.5, 0.5);
+
+        this.barBg = this.game.add.sprite(centerX, centerY + 40,
+            'load_progress_bar_dark');
+        this.barBg.anchor.setTo(0.5, 0.5);
+
+        this.bar = this.game.add.sprite(centerX - 192, centerY + 40,
+            'load_progress_bar');
+        this.bar.anchor.setTo(0, 0.5);
+        this.load.setPreloadSprite(this.bar);
+
+        // onLoadComplete is dispatched when the final file in the load queue
+        // has been loaded/failed. addOnce adds that function as a callback,
+        // but only to fire once.
+        this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
+    },
+
+    loadAssets: function() {
+        //Menu assets
+        //LevelOne assets
+        this.game.load.image('ground', 'assets/images/platform.png');
+        this.game.load.image('healthPack', 'assets/images/healthPack.png');
+        this.game.load.image('inventory_button', 'assets/images/inventory.png');
+        this.game.load.image('inventory_background',
+            'assets/images/inventory_background.png');
+        this.game.load.image('close', 'assets/images/close.png');
+        this.game.load.spritesheet('character', 'assets/sprites/character.png',
+            32, 48);
+        for (var i = 1; i <= 2; i++) {
+            this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
+                '.png');
+        }
+    },
+
+    update: function() {
+        if (!!this.ready) {
+            this.game.state.start('menu');
+        }
+    },
+
+    onLoadComplete: function() {
+        this.ready = true;
+    }
+};
+
+module.exports = Preloader;
+
+},{}]},{},[1,2,3,4,5,6,7,8,9,10]);
