@@ -1,12 +1,13 @@
-var Weapon = function(game, player, numberOfBullets, imageName, nextFire,
-                      bulletSpeed, fireRate) {
+var Weapon = function(game, player, numberOfBullets, imageKey, nextFire,
+                      bulletSpeed, fireRate, power) {
     this.game = game;
     this.player = player;
     this.numberOfBullets = numberOfBullets;
+    this.power = power;
     this.bullets = game.add.group();
     this.bullets.enableBody = true;
     this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    this.bullets.createMultiple(numberOfBullets, imageName);
+    this.bullets.createMultiple(numberOfBullets, imageKey);
     this.nextFire = nextFire;
     this.bulletSpeed = bulletSpeed;
     this.fireRate = fireRate;

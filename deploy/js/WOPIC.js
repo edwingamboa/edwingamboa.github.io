@@ -18,7 +18,7 @@ game.state.start('boot');
  * Created by Edwin Gamboa on 08/07/2015.
  */
 var Character;
-Character = function(game,  x, y, spriteKey, speed, runningSpeed,
+Character = function(game, x, y, spriteKey, speed, runningSpeed,
                       maxHealthLevel, bounce, gravity) {
     Phaser.Sprite.call(this, game, x, y, spriteKey);
     this.speed = speed;
@@ -65,6 +65,20 @@ Character.prototype.fullHealthLevel = function() {
     return this.healthLevel === this.maxHealthLevel;
 };
 
+Character.prototype.increaseHealthLevel = function(increase) {
+    this.healthLevel += increase;
+    if (this.healthLevel > this.maxHealthLevel) {
+        this.healthLevel = this.maxHealthLevel;
+    }
+};
+
+Character.prototype.decreaseHealthLevel = function(decrease) {
+    this.healthLevel -= decrease;
+    if (this.healthLevel <= 0) {
+        this.kill();
+    }
+};
+
 module.exports = Character;
 
 },{}],3:[function(require,module,exports){
@@ -76,13 +90,28 @@ var Character = require('../prefabs/character');
 var Enemy;
 Enemy = function(game, spriteKey, maxHealthLevel, x, y) {
     Character.call(this, game, x, y, spriteKey, 250,
-        500, 100, 0.2, 300);
+        500, maxHealthLevel, 0.2, 300);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
+    this.healthLevelText = this.game.add.text(this.body.x, this.body.y - 20,
+        '' + this.healthLevel, {fontSize: '12px', fill: '#000'});
 };
 
 Enemy.prototype = Object.create(Character.prototype);
 Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.update = function() {
+    this.healthLevelText.x = this.body.x;
+    this.healthLevelText.y = this.body.y - 20;
+};
+
+Enemy.prototype.updateHealhtLevel = function() {
+    if (this.healthLevel > 0) {
+        this.healthLevelText.text = '' + this.healthLevel;
+    }else {
+        this.healthLevelText.text = '';
+    }
+};
 
 module.exports = Enemy;
 
@@ -219,22 +248,19 @@ Player.prototype.crouch = function() {
     this.frame = 9;
 };
 
-Player.prototype.increaseHealthLevel = function(increase) {
-    this.healthLevel += increase;
-};
-
 module.exports = Player;
 
 },{"../prefabs/character":2}],8:[function(require,module,exports){
-var Weapon = function(game, player, numberOfBullets, imageName, nextFire,
-                      bulletSpeed, fireRate) {
+var Weapon = function(game, player, numberOfBullets, imageKey, nextFire,
+                      bulletSpeed, fireRate, power) {
     this.game = game;
     this.player = player;
     this.numberOfBullets = numberOfBullets;
+    this.power = power;
     this.bullets = game.add.group();
     this.bullets.enableBody = true;
     this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    this.bullets.createMultiple(numberOfBullets, imageName);
+    this.bullets.createMultiple(numberOfBullets, imageKey);
     this.nextFire = nextFire;
     this.bulletSpeed = bulletSpeed;
     this.fireRate = fireRate;
@@ -351,9 +377,9 @@ LevelOne.prototype = {
         this.ledge.body.immovable = true;
 
         this.weapons.push(new Weapon(this.game, this.player, 30, 'bullet1', 0,
-            400, 100));
+            400, 100, 10));
         this.weapons.push(new Weapon(this.game, this.player, 40, 'bullet2', 0,
-            500, 100));
+            500, 100, 50));
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
@@ -405,6 +431,16 @@ LevelOne.prototype = {
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
+        for (var i = 0; i < this.weapons.length; i++) {
+            this.game.physics.arcade.overlap(this.weapons[i].bullets,
+                this.simpleEnemy, this.bulletHitEnemy, null, this);
+            this.game.physics.arcade.overlap(this.weapons[i].bullets,
+                this.strongEnemy, this.bulletHitEnemy, null, this);
+        }
+
+        this.game.physics.arcade.overlap(this.player, this.healthPacks,
+            this.collectHealthPack, null, this);
+
         if (this.cursors.left.isDown) {
             this.xDirection = -1;
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.X)) {
@@ -437,6 +473,12 @@ LevelOne.prototype = {
         //if (this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
         //    this.nextWeapon();
         //}
+    },
+
+    bulletHitEnemy: function(enemy, bullet) {
+        enemy.decreaseHealthLevel(this.weapons[this.currentWeapon].power);
+        enemy.updateHealhtLevel();
+        bullet.kill();
     },
 
     nextWeapon: function() {

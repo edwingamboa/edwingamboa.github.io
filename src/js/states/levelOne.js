@@ -59,9 +59,9 @@ LevelOne.prototype = {
         this.ledge.body.immovable = true;
 
         this.weapons.push(new Weapon(this.game, this.player, 30, 'bullet1', 0,
-            400, 100));
+            400, 100, 10));
         this.weapons.push(new Weapon(this.game, this.player, 40, 'bullet2', 0,
-            500, 100));
+            500, 100, 50));
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
@@ -113,6 +113,16 @@ LevelOne.prototype = {
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
+        for (var i = 0; i < this.weapons.length; i++) {
+            this.game.physics.arcade.overlap(this.weapons[i].bullets,
+                this.simpleEnemy, this.bulletHitEnemy, null, this);
+            this.game.physics.arcade.overlap(this.weapons[i].bullets,
+                this.strongEnemy, this.bulletHitEnemy, null, this);
+        }
+
+        this.game.physics.arcade.overlap(this.player, this.healthPacks,
+            this.collectHealthPack, null, this);
+
         if (this.cursors.left.isDown) {
             this.xDirection = -1;
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.X)) {
@@ -145,6 +155,12 @@ LevelOne.prototype = {
         //if (this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
         //    this.nextWeapon();
         //}
+    },
+
+    bulletHitEnemy: function(enemy, bullet) {
+        enemy.decreaseHealthLevel(this.weapons[this.currentWeapon].power);
+        enemy.updateHealhtLevel();
+        bullet.kill();
     },
 
     nextWeapon: function() {

@@ -25,8 +25,4 @@ Player.prototype.crouch = function() {
     this.frame = 9;
 };
 
-Player.prototype.increaseHealthLevel = function(increase) {
-    this.healthLevel += increase;
-};
-
 module.exports = Player;

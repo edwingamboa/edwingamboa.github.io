@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 08/07/2015.
  */
 var Character;
-Character = function(game,  x, y, spriteKey, speed, runningSpeed,
+Character = function(game, x, y, spriteKey, speed, runningSpeed,
                       maxHealthLevel, bounce, gravity) {
     Phaser.Sprite.call(this, game, x, y, spriteKey);
     this.speed = speed;
@@ -47,6 +47,20 @@ Character.prototype.stop = function() {
 
 Character.prototype.fullHealthLevel = function() {
     return this.healthLevel === this.maxHealthLevel;
+};
+
+Character.prototype.increaseHealthLevel = function(increase) {
+    this.healthLevel += increase;
+    if (this.healthLevel > this.maxHealthLevel) {
+        this.healthLevel = this.maxHealthLevel;
+    }
+};
+
+Character.prototype.decreaseHealthLevel = function(decrease) {
+    this.healthLevel -= decrease;
+    if (this.healthLevel <= 0) {
+        this.kill();
+    }
 };
 
 module.exports = Character;
