@@ -13,7 +13,80 @@ game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOneState);
 game.state.start('boot');
 
-},{"./states/boot":7,"./states/levelOne":8,"./states/menu":9,"./states/preloader":10}],2:[function(require,module,exports){
+},{"./states/boot":9,"./states/levelOne":10,"./states/menu":11,"./states/preloader":12}],2:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/07/2015.
+ */
+var Character;
+Character = function(game,  x, y, spriteKey, speed, runningSpeed,
+                      maxHealthLevel, bounce, gravity) {
+    Phaser.Sprite.call(this, game, x, y, spriteKey);
+    this.speed = speed;
+    this.runningSpeed = runningSpeed;
+    this.healthLevel = maxHealthLevel;
+    this.maxHealthLevel = maxHealthLevel;
+
+    this.game.physics.arcade.enable(this);
+    this.body.bounce.y = bounce;
+    this.body.gravity.y = gravity;
+    this.body.collideWorldBounds = true;
+};
+
+Character.prototype = Object.create(Phaser.Sprite.prototype);
+Character.prototype.constructor = Character;
+
+Character.prototype.moveLeft = function() {
+    this.body.velocity.x = -this.speed;
+    this.animations.play('left');
+};
+
+Character.prototype.moveRight = function() {
+    this.body.velocity.x = this.speed;
+    this.animations.play('right');
+};
+
+Character.prototype.runLeft = function() {
+    this.body.velocity.x = -this.runningSpeed;
+    this.animations.play('left');
+};
+
+Character.prototype.runRight = function() {
+    this.body.velocity.x = this.runningSpeed;
+    this.animations.play('right');
+};
+
+Character.prototype.stop = function() {
+    this.body.velocity.x = 0;
+    this.animations.stop();
+    this.frame = 4;
+};
+
+Character.prototype.fullHealthLevel = function() {
+    return this.healthLevel === this.maxHealthLevel;
+};
+
+module.exports = Character;
+
+},{}],3:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/07/2015.
+ */
+var Character = require('../prefabs/character');
+
+var Enemy;
+Enemy = function(game, spriteKey, maxHealthLevel, x, y) {
+    Character.call(this, game, x, y, spriteKey, 250,
+        500, 100, 0.2, 300);
+    this.animations.add('left', [0, 1], 10, true);
+    this.animations.add('right', [2, 3], 10, true);
+};
+
+Enemy.prototype = Object.create(Character.prototype);
+Enemy.prototype.constructor = Enemy;
+
+module.exports = Enemy;
+
+},{"../prefabs/character":2}],4:[function(require,module,exports){
 var Item = require('./item');
 
 var HealthPack;
@@ -43,7 +116,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"./item":4}],3:[function(require,module,exports){
+},{"./item":6}],5:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -107,7 +180,7 @@ Inventory.prototype.useHealthPack = function() {
 };
 module.exports = Inventory;
 
-},{"../prefabs/healthPack":2}],4:[function(require,module,exports){
+},{"../prefabs/healthPack":4}],6:[function(require,module,exports){
 var Item;
 Item = function(game, type) {
     this.type = type;
@@ -118,60 +191,24 @@ Item.prototype.constructor = Item;
 
 module.exports = Item;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+var Character = require('../prefabs/character');
 
-var Player = function(game, speed, runningSpeed, healthLevel, bounce, gravity) {
-    Phaser.Sprite.call(this, game, 32, game.world.height - 150, 'character');
-    this.speed = speed;
-    this.runningSpeed = runningSpeed;
-    this.healthLevel = healthLevel;
-
-    this.game.physics.arcade.enable(this);
-    this.body.bounce.y = bounce;
-    this.body.gravity.y = gravity;
-    this.body.collideWorldBounds = true;
-
+var Player;
+Player = function(game) {
+    Character.call(this, game, 32, game.world.height - 150, 'character', 250,
+        500, 100, 0.2, 300);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
 };
 
-Player.prototype = Object.create(Phaser.Sprite.prototype);
+Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.update = function() {
-
-};
-
-Player.prototype.moveLeft = function() {
-    this.body.velocity.x = -this.speed;
-    this.animations.play('left');
-};
-
-Player.prototype.moveRight = function() {
-    this.body.velocity.x = this.speed;
-    this.animations.play('right');
-};
-
-Player.prototype.runLeft = function() {
-    this.body.velocity.x = -this.runningSpeed;
-    this.animations.play('left');
-};
-
-Player.prototype.runRight = function() {
-    this.body.velocity.x = this.runningSpeed;
-    this.animations.play('right');
-};
-
-Player.prototype.stop = function() {
-    this.body.velocity.x = 0;
-    this.animations.stop();
-    this.frame = 4;
-};
 
 Player.prototype.jump = function() {
     this.body.velocity.y = -350;
@@ -184,14 +221,11 @@ Player.prototype.crouch = function() {
 
 Player.prototype.increaseHealthLevel = function(increase) {
     this.healthLevel += increase;
-    if (this.healthLevel > 100) {
-        this.healthLevel = 100;
-    }
 };
 
 module.exports = Player;
 
-},{}],6:[function(require,module,exports){
+},{"../prefabs/character":2}],8:[function(require,module,exports){
 var Weapon = function(game, player, numberOfBullets, imageName, nextFire,
                       bulletSpeed, fireRate) {
     this.game = game;
@@ -232,7 +266,7 @@ Weapon.prototype.fire = function(direction) {
 
 module.exports = Weapon;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -255,7 +289,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -263,6 +297,7 @@ var Inventory = require('../prefabs/inventory');
 var HealthPack = require('../prefabs/healthPack');
 var Player = require('../prefabs/player');
 var Weapon = require('../prefabs/weapon');
+var Enemy = require('../prefabs/enemy');
 
 var LevelOne;
 LevelOne = function(game) {};
@@ -283,9 +318,19 @@ LevelOne.prototype = {
         this.ammo = 10;
         this.xDirection = 1;
 
-        this.player = new Player(this.game, 250, 500, 10, 0.2, 300);
+        this.player = new Player(this.game);
         this.game.add.existing(this.player);
         this.gameObjects.push(this.player);
+
+        this.simpleEnemy = new Enemy(this.game, 'simple_enemy', 70,
+            this.game.camera.width - 100, this.game.camera.height - 150);
+        this.game.add.existing(this.simpleEnemy);
+        this.gameObjects.push(this.simpleEnemy);
+
+        this.strongEnemy = new Enemy(this.game, 'strong_enemy', 150,
+            this.game.camera.width - 50, this.game.camera.height - 150);
+        this.game.add.existing(this.strongEnemy);
+        this.gameObjects.push(this.strongEnemy);
 
         this.healthPacks = this.game.add.group();
         this.gameObjects.push(this.healthPacks);
@@ -343,8 +388,9 @@ LevelOne.prototype = {
         this.inventory = new Inventory(this);
         this.game.add.existing(this.inventory);
 
-        this.inventoryButton = this.game.add.button(this.game.camera.width - 50,
-            100, 'inventory_button', this.inventory.open, this.inventory);
+        this.inventoryButton = this.game.add.button(50,
+            this.game.camera.height - 30, 'inventory_button',
+            this.inventory.open, this.inventory);
         this.inventoryButton.anchor.setTo(0.5, 0.5);
         this.inventoryButton.fixedToCamera = true;
         this.inventoryButton.input.priorityID = 1;
@@ -353,6 +399,9 @@ LevelOne.prototype = {
     update: function() {
         //Collisions
         this.game.physics.arcade.collide(this.gameObjects, this.platforms);
+        this.game.physics.arcade.collide(this.player, this.simpleEnemy);
+        this.game.physics.arcade.collide(this.player, this.strongEnemy);
+        this.game.physics.arcade.collide(this.simpleEnemy, this.strongEnemy);
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
@@ -403,7 +452,7 @@ LevelOne.prototype = {
     },
 
     collectHealthPack: function(player , healthPack) {
-        if (this.player.healthLevel !== 100) {
+        if (!this.player.fullHealthLevel()) {
             this.increaseHealthLevel(healthPack.maxIncreasing);
         } else {
             this.inventory.addItem(healthPack);
@@ -435,7 +484,7 @@ LevelOne.prototype = {
 
 module.exports = LevelOne;
 
-},{"../prefabs/healthPack":2,"../prefabs/inventory":3,"../prefabs/player":5,"../prefabs/weapon":6}],9:[function(require,module,exports){
+},{"../prefabs/enemy":3,"../prefabs/healthPack":4,"../prefabs/inventory":5,"../prefabs/player":7,"../prefabs/weapon":8}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -463,7 +512,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -511,6 +560,10 @@ Preloader.prototype = {
         this.game.load.image('close', 'assets/images/close.png');
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
             32, 48);
+        this.game.load.spritesheet('simple_enemy',
+            'assets/sprites/simple_enemy.png', 32, 32);
+        this.game.load.spritesheet('strong_enemy',
+            'assets/sprites/strong_enemy.png', 64, 64);
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
@@ -530,4 +583,4 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12]);

@@ -5,6 +5,7 @@ var Inventory = require('../prefabs/inventory');
 var HealthPack = require('../prefabs/healthPack');
 var Player = require('../prefabs/player');
 var Weapon = require('../prefabs/weapon');
+var Enemy = require('../prefabs/enemy');
 
 var LevelOne;
 LevelOne = function(game) {};
@@ -25,9 +26,19 @@ LevelOne.prototype = {
         this.ammo = 10;
         this.xDirection = 1;
 
-        this.player = new Player(this.game, 250, 500, 10, 0.2, 300);
+        this.player = new Player(this.game);
         this.game.add.existing(this.player);
         this.gameObjects.push(this.player);
+
+        this.simpleEnemy = new Enemy(this.game, 'simple_enemy', 70,
+            this.game.camera.width - 100, this.game.camera.height - 150);
+        this.game.add.existing(this.simpleEnemy);
+        this.gameObjects.push(this.simpleEnemy);
+
+        this.strongEnemy = new Enemy(this.game, 'strong_enemy', 150,
+            this.game.camera.width - 50, this.game.camera.height - 150);
+        this.game.add.existing(this.strongEnemy);
+        this.gameObjects.push(this.strongEnemy);
 
         this.healthPacks = this.game.add.group();
         this.gameObjects.push(this.healthPacks);
@@ -85,8 +96,9 @@ LevelOne.prototype = {
         this.inventory = new Inventory(this);
         this.game.add.existing(this.inventory);
 
-        this.inventoryButton = this.game.add.button(this.game.camera.width - 50,
-            100, 'inventory_button', this.inventory.open, this.inventory);
+        this.inventoryButton = this.game.add.button(50,
+            this.game.camera.height - 30, 'inventory_button',
+            this.inventory.open, this.inventory);
         this.inventoryButton.anchor.setTo(0.5, 0.5);
         this.inventoryButton.fixedToCamera = true;
         this.inventoryButton.input.priorityID = 1;
@@ -95,6 +107,9 @@ LevelOne.prototype = {
     update: function() {
         //Collisions
         this.game.physics.arcade.collide(this.gameObjects, this.platforms);
+        this.game.physics.arcade.collide(this.player, this.simpleEnemy);
+        this.game.physics.arcade.collide(this.player, this.strongEnemy);
+        this.game.physics.arcade.collide(this.simpleEnemy, this.strongEnemy);
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
@@ -145,7 +160,7 @@ LevelOne.prototype = {
     },
 
     collectHealthPack: function(player , healthPack) {
-        if (this.player.healthLevel !== 100) {
+        if (!this.player.fullHealthLevel()) {
             this.increaseHealthLevel(healthPack.maxIncreasing);
         } else {
             this.inventory.addItem(healthPack);

@@ -45,6 +45,10 @@ Preloader.prototype = {
         this.game.load.image('close', 'assets/images/close.png');
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
             32, 48);
+        this.game.load.spritesheet('simple_enemy',
+            'assets/sprites/simple_enemy.png', 32, 32);
+        this.game.load.spritesheet('strong_enemy',
+            'assets/sprites/strong_enemy.png', 64, 64);
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
