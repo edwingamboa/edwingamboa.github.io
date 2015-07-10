@@ -21,21 +21,20 @@ LevelOne.prototype = {
 
         this.gameObjects = [];
         this.weapons = [];
-        this.score = 0;
-        this.currentWeapon = 0;
+        this.currentWeaponIndex = 0;
         this.ammo = 10;
         this.xDirection = 1;
 
-        this.player = new Player(this.game);
+        this.player = new Player(this, 10); //global variable for minimum score
         this.game.add.existing(this.player);
         this.gameObjects.push(this.player);
 
-        this.simpleEnemy = new Enemy(this.game, 'simple_enemy', 70,
+        this.simpleEnemy = new Enemy(this, 'simple_enemy', 70,
             this.game.camera.width - 100, this.game.camera.height - 150);
         this.game.add.existing(this.simpleEnemy);
         this.gameObjects.push(this.simpleEnemy);
 
-        this.strongEnemy = new Enemy(this.game, 'strong_enemy', 150,
+        this.strongEnemy = new Enemy(this, 'strong_enemy', 150,
             this.game.camera.width - 50, this.game.camera.height - 150);
         this.game.add.existing(this.strongEnemy);
         this.gameObjects.push(this.strongEnemy);
@@ -65,10 +64,11 @@ LevelOne.prototype = {
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
+        this.currentWeapon = this.weapons[this.currentWeaponIndex];
 
         //The score
         this.scoreText = this.game.add.text(this.game.camera.width - 300, 16,
-            'Score: ' + this.score, {fontSize: '32px', fill: '#000'});
+            'Score: ' + this.player.score, {fontSize: '32px', fill: '#000'});
         this.scoreText.fixedToCamera = true;
 
         //The ammo
@@ -147,10 +147,9 @@ LevelOne.prototype = {
             //this.player.crouch();
         }
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-            this.weapons[this.currentWeapon].fire(this.xDirection);
+            this.currentWeapon.fire(this.xDirection);
             //  Add and update the score
-            this.ammo = this.weapons[this.currentWeapon].numberOfBullets;
-            this.ammoText.text = 'Ammo: ' + this.ammo;
+            this.updateAmmoText();
         }
         //if (this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
         //    this.nextWeapon();
@@ -158,21 +157,19 @@ LevelOne.prototype = {
     },
 
     bulletHitEnemy: function(enemy, bullet) {
-        enemy.decreaseHealthLevel(this.weapons[this.currentWeapon].power);
+        enemy.decreaseHealthLevel(this.currentWeapon.power);
         enemy.updateHealhtLevel();
         bullet.kill();
     },
 
     nextWeapon: function() {
-        this.currentWeapon++;
+        this.currentWeaponIndex++;
 
-        if (this.currentWeapon === this.weapons.length) {
-            this.currentWeapon = 0;
+        if (this.currentWeaponIndex === this.weapons.length) {
+            this.currentWeaponIndex = 0;
         }
-
-        this.weapons[this.currentWeapon].visible = true;
-        this.ammo = this.weapons[this.currentWeapon].numberOfBullets;
-        this.ammoText.text = 'Ammo: ' + this.ammo;
+        this.currentWeapon = this.weapons[this.currentWeaponIndex];
+        this.currentWeapon.visible = true;
     },
 
     collectHealthPack: function(player , healthPack) {
@@ -184,9 +181,27 @@ LevelOne.prototype = {
         healthPack.pickUp();
     },
 
+    updateAmmoText: function() {
+        this.ammoText.text = 'Ammo: ' +
+            this.currentWeapon.numberOfBullets;
+    },
+
+    updateScoreText: function() {
+        this.scoreText.text = 'Score: ' + this.player.score;
+    },
+
+    updateHealthLevelText: function() {
+        this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
+    },
+
     increaseHealthLevel: function(increase) {
         this.player.increaseHealthLevel(increase);
-        this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
+        this.updateHealthLevelText();
+    },
+
+    increaseScore: function(increase) {
+        this.player.increaseScore(increase);
+        this.updateScoreText();
     },
 
     render: function() {

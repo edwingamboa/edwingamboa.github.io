@@ -2,18 +2,19 @@
  * Created by Edwin Gamboa on 08/07/2015.
  */
 var Character;
-Character = function(game, x, y, spriteKey, speed, runningSpeed,
+Character = function(level, x, y, spriteKey, speed, runningSpeed,
                       maxHealthLevel, bounce, gravity) {
-    Phaser.Sprite.call(this, game, x, y, spriteKey);
+    Phaser.Sprite.call(this, level.game, x, y, spriteKey);
     this.speed = speed;
     this.runningSpeed = runningSpeed;
     this.healthLevel = maxHealthLevel;
     this.maxHealthLevel = maxHealthLevel;
 
-    this.game.physics.arcade.enable(this);
+    level.game.physics.arcade.enable(this);
     this.body.bounce.y = bounce;
     this.body.gravity.y = gravity;
     this.body.collideWorldBounds = true;
+    this.level = level;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -60,6 +61,7 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
     this.healthLevel -= decrease;
     if (this.healthLevel <= 0) {
         this.kill();
+        this.level.increaseScore(this.maxHealthLevel * 0.1);
     }
 };
 

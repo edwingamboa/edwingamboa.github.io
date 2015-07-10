@@ -4,12 +4,12 @@
 var Character = require('../prefabs/character');
 
 var Enemy;
-Enemy = function(game, spriteKey, maxHealthLevel, x, y) {
-    Character.call(this, game, x, y, spriteKey, 250,
+Enemy = function(level, spriteKey, maxHealthLevel, x, y) {
+    Character.call(this, level, x, y, spriteKey, 250,
         500, maxHealthLevel, 0.2, 300);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
-    this.healthLevelText = this.game.add.text(this.body.x, this.body.y - 20,
+    this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
         '' + this.healthLevel, {fontSize: '12px', fill: '#000'});
 };
 

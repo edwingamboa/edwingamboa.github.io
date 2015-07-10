@@ -6,11 +6,12 @@
 var Character = require('../prefabs/character');
 
 var Player;
-Player = function(game) {
-    Character.call(this, game, 32, game.world.height - 150, 'character', 250,
-        500, 100, 0.2, 300);
+Player = function(level, startingScore) {
+    Character.call(this, level, 32, level.game.world.height - 150,
+        'character', 250, 500, 100, 0.2, 300);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.score = startingScore;
 };
 
 Player.prototype = Object.create(Character.prototype);
@@ -23,6 +24,14 @@ Player.prototype.jump = function() {
 Player.prototype.crouch = function() {
     this.animations.stop();
     this.frame = 9;
+};
+
+Player.prototype.increaseScore = function(increase) {
+    this.score += increase;
+};
+
+Player.prototype.decreaseScore = function(decrease) {
+    this.score += decrease;
 };
 
 module.exports = Player;
