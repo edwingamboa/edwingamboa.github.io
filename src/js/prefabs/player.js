@@ -34,4 +34,8 @@ Player.prototype.decreaseScore = function(decrease) {
     this.score += decrease;
 };
 
+Player.prototype.updateHealhtLevel = function() {
+    this.level.updateHealthLevelText();
+};
+
 module.exports = Player;
