@@ -3,7 +3,7 @@
  */
 var Character;
 Character = function(level, x, y, spriteKey, speed, runningSpeed,
-                      maxHealthLevel, bounce, gravity) {
+                      maxHealthLevel, bounce, gravity, target) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
     this.speed = speed;
     this.runningSpeed = runningSpeed;
@@ -14,10 +14,12 @@ Character = function(level, x, y, spriteKey, speed, runningSpeed,
     this.body.bounce.y = bounce;
     this.body.gravity.y = gravity;
     this.body.collideWorldBounds = true;
-    this.level = level;
+    this.anchor.setTo(0.5, 0.5);
 
+    this.level = level;
     this.weapons = [];
     this.currentWeaponIndex = 0;
+    this.target = target;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -65,13 +67,21 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
     if (this.healthLevel <= 0) {
         for (var i = 0; i < this.weapons.length; i++) {
             this.weapons[i].bullets.removeAll();
+            this.weapons[i].kill();
         }
         this.kill();
     }
 };
 
 Character.prototype.updateCurrentWeapon = function() {
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.kill();
+    }
     this.currentWeapon = this.weapons[this.currentWeaponIndex];
+    if (!this.currentWeapon.alive) {
+        this.currentWeapon.revive();
+    }
+    this.level.game.add.existing(this.currentWeapon);
 };
 
 Character.prototype.nextWeapon = function() {
@@ -79,7 +89,7 @@ Character.prototype.nextWeapon = function() {
     if (this.currentWeaponIndex === this.weapons.length) {
         this.currentWeaponIndex = 0;
     }
-    this.currentWeapon = this.weapons[this.currentWeaponIndex];
+    this.updateCurrentWeapon();
 };
 
 module.exports = Character;

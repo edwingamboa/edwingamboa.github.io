@@ -7,7 +7,7 @@ Bullet = function(level, power, imageKey) {
     this.power = power;
 
     level.game.physics.arcade.enable(this);
-    this.anchor.setTo(0.5, 1);
+    this.anchor.setTo(0, 0.5);
     this.checkWorldBounds = true;
     this.outOfBoundsKill = true;
     this.exists = false;

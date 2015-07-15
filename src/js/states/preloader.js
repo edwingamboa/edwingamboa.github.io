@@ -53,6 +53,7 @@ Preloader.prototype = {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
         }
+        this.game.load.image('weapon', 'assets/images/weapon.png');
     },
 
     update: function() {
