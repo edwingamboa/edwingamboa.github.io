@@ -25,7 +25,7 @@ Weapon = function(level, owner, numberOfBullets, weaponKey, bulletKey, nextFire,
 Weapon.prototype = Object.create(Phaser.Sprite.prototype);
 Weapon.prototype.constructor = Weapon;
 
-Weapon.prototype.fire = function() {
+Weapon.prototype.fire = function(toX, toY) {
     if (this.level.game.time.now > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
@@ -33,7 +33,7 @@ Weapon.prototype.fire = function() {
             this.currentBullet.reset(this.x, this.y);
             this.currentBullet.rotation =
                 this.level.game.physics.arcade.angleToXY(this.currentBullet,
-                this.owner.target.x, this.owner.target.y);
+                toX, toY);
             this.currentBullet.body.velocity.x =
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =

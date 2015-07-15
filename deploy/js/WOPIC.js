@@ -360,7 +360,7 @@ Weapon = function(level, owner, numberOfBullets, weaponKey, bulletKey, nextFire,
 Weapon.prototype = Object.create(Phaser.Sprite.prototype);
 Weapon.prototype.constructor = Weapon;
 
-Weapon.prototype.fire = function() {
+Weapon.prototype.fire = function(toX, toY) {
     if (this.level.game.time.now > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
@@ -368,7 +368,7 @@ Weapon.prototype.fire = function() {
             this.currentBullet.reset(this.x, this.y);
             this.currentBullet.rotation =
                 this.level.game.physics.arcade.angleToXY(this.currentBullet,
-                this.owner.target.x, this.owner.target.y);
+                toX, toY);
             this.currentBullet.body.velocity.x =
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =
@@ -451,7 +451,7 @@ LevelOne.prototype = {
             var simpleEnemy = new Enemy(this, 'simple_enemy', 70,
                 this.game.camera.width - 100 + (i * 60),
                 this.game.camera.height - 100, this.player,
-                this.game.camera.width - 200, 200);
+                this.game.camera.width - 200, 300);
             simpleEnemy.weapons.push(new Weapon(this, simpleEnemy, 1, 'weapon',
                 'bullet1', 1, this.player.runningSpeed * 2, 100, 0.5, true));
             simpleEnemy.updateCurrentWeapon();
@@ -556,7 +556,7 @@ LevelOne.prototype = {
             }
             if (distanceToPlayer <= enemy.rangeAttack) {
                 enemy.stop();
-                enemy.currentWeapon.fire();
+                enemy.currentWeapon.fire(this.player.x, this.player.y);
             }
         }
 
@@ -587,7 +587,8 @@ LevelOne.prototype = {
             //this.player.crouch();
         }
         if (this.game.input.activePointer.isDown) {
-            this.player.currentWeapon.fire();
+            this.player.currentWeapon.fire(this.game.input.activePointer.worldX,
+                this.game.input.activePointer.worldY);
             //  Add and update the score
             this.updateAmmoText();
         }

@@ -39,7 +39,7 @@ LevelOne.prototype = {
             var simpleEnemy = new Enemy(this, 'simple_enemy', 70,
                 this.game.camera.width - 100 + (i * 60),
                 this.game.camera.height - 100, this.player,
-                this.game.camera.width - 200, 200);
+                this.game.camera.width - 200, 300);
             simpleEnemy.weapons.push(new Weapon(this, simpleEnemy, 1, 'weapon',
                 'bullet1', 1, this.player.runningSpeed * 2, 100, 0.5, true));
             simpleEnemy.updateCurrentWeapon();
@@ -144,7 +144,7 @@ LevelOne.prototype = {
             }
             if (distanceToPlayer <= enemy.rangeAttack) {
                 enemy.stop();
-                enemy.currentWeapon.fire();
+                enemy.currentWeapon.fire(this.player.x, this.player.y);
             }
         }
 
@@ -175,7 +175,8 @@ LevelOne.prototype = {
             //this.player.crouch();
         }
         if (this.game.input.activePointer.isDown) {
-            this.player.currentWeapon.fire();
+            this.player.currentWeapon.fire(this.game.input.activePointer.worldX,
+                this.game.input.activePointer.worldY);
             //  Add and update the score
             this.updateAmmoText();
         }
