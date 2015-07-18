@@ -44,9 +44,9 @@ Temporary Items
 
 
 # Netbeans
-nbproject/**/*
+nbproject/
 
 # Node modules
-node_modules/**/*
+node_modules/
 
-.idea/**/*
+.idea/

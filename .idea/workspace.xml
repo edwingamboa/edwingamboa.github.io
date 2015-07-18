@@ -2,19 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4006b10a-a010-443a-a1d7-0442570de311" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/js/prefabs/itemGroupView.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/js/prefabs/npc.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/js/prefabs/popUp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/images/close.png" afterPath="$PROJECT_DIR$/assets/images/close.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/deploy/assets/images/close.png" afterPath="$PROJECT_DIR$/deploy/assets/images/close.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/images/healthPack.png" afterPath="$PROJECT_DIR$/assets/images/healthPack.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/deploy/assets/images/healthPack.png" afterPath="$PROJECT_DIR$/deploy/assets/images/healthPack.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/deploy/js/WOPIC.js" afterPath="$PROJECT_DIR$/deploy/js/WOPIC.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/deploy/js/WOPIC.min.js" afterPath="$PROJECT_DIR$/deploy/js/WOPIC.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js/prefabs/healthPack.js" afterPath="$PROJECT_DIR$/src/js/prefabs/healthPack.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js/prefabs/inventory.js" afterPath="$PROJECT_DIR$/src/js/prefabs/inventory.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js/states/levelOne.js" afterPath="$PROJECT_DIR$/src/js/states/levelOne.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js/states/preloader.js" afterPath="$PROJECT_DIR$/src/js/states/preloader.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="edwingamboa.github.io.iws" />
@@ -469,7 +456,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="1" width="1364" height="726" extended-state="1" />
+    <frame x="1" y="1" width="1364" height="726" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2066365" sideWeight="0.5511222" order="0" side_tool="false" content_ui="combo" />
