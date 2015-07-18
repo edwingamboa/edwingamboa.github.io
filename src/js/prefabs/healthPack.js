@@ -1,8 +1,5 @@
-var Item = require('./item');
-
 var HealthPack;
 HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
-    Item.call(this, level.game, 'Health Pack');
     Phaser.Sprite.call(this, level.game, xPos, yPos, key);
     this.anchor.set(0.5);
     this.maxIncreasing = maxIncreasing;
@@ -14,7 +11,7 @@ HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
     return this;
 };
 
-HealthPack.prototype = Object.create(Item.prototype);
+HealthPack.prototype = Object.create(Phaser.Sprite.prototype);
 HealthPack.prototype.constructor = HealthPack;
 
 HealthPack.prototype.pickUp = function() {
@@ -22,6 +19,10 @@ HealthPack.prototype.pickUp = function() {
 };
 
 HealthPack.prototype.use = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.x = this.level.player.x;
     this.level.addHealthPack(this);
 };
 

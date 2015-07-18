@@ -39,11 +39,19 @@ Preloader.prototype = {
         //LevelOne assets
         this.game.load.image('ground', 'assets/images/platform.png');
         this.game.load.image('healthPack', 'assets/images/healthPack.png');
+        this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
+        this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
+        this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
+        this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
         this.game.load.image('inventory_background',
             'assets/images/inventory_background.png');
         this.game.load.image('close', 'assets/images/close.png');
+        this.game.load.image('itemGroupBackGround',
+            'assets/images/itemGroupBackGround.png');
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
+            32, 48);
+        this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
             32, 48);
         this.game.load.spritesheet('simple_enemy',
             'assets/sprites/simple_enemy.png', 32, 32);
@@ -54,6 +62,7 @@ Preloader.prototype = {
                 '.png');
         }
         this.game.load.image('weapon', 'assets/images/weapon.png');
+        this.game.load.image('comic1', 'assets/images/comic1.png');
     },
 
     update: function() {

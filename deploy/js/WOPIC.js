@@ -13,7 +13,7 @@ game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOneState);
 game.state.start('boot');
 
-},{"./states/boot":10,"./states/levelOne":11,"./states/menu":12,"./states/preloader":13}],2:[function(require,module,exports){
+},{"./states/boot":13,"./states/levelOne":14,"./states/menu":15,"./states/preloader":16}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -178,11 +178,8 @@ Enemy.prototype.updateHealhtLevel = function() {
 module.exports = Enemy;
 
 },{"../prefabs/character":3}],5:[function(require,module,exports){
-var Item = require('./item');
-
 var HealthPack;
 HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
-    Item.call(this, level.game, 'Health Pack');
     Phaser.Sprite.call(this, level.game, xPos, yPos, key);
     this.anchor.set(0.5);
     this.maxIncreasing = maxIncreasing;
@@ -194,7 +191,7 @@ HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
     return this;
 };
 
-HealthPack.prototype = Object.create(Item.prototype);
+HealthPack.prototype = Object.create(Phaser.Sprite.prototype);
 HealthPack.prototype.constructor = HealthPack;
 
 HealthPack.prototype.pickUp = function() {
@@ -202,76 +199,56 @@ HealthPack.prototype.pickUp = function() {
 };
 
 HealthPack.prototype.use = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.x = this.level.player.x;
     this.level.addHealthPack(this);
 };
 
 module.exports = HealthPack;
 
-},{"./item":7}],6:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
 var HealthPack = require('../prefabs/healthPack');
+var PopUp = require('../prefabs/popUp');
+var ItemGroupView = require('../prefabs/itemGroupView');
 
 var Inventory = function(level) {
-    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
-        level.game.camera.height / 2, 'inventory_background');
-    this.anchor.set(0.5);
+    PopUp.call(this, level, 'inventory_background');
+    this.anchor.set(0.5, 0.5);
+    var healthPack5 =  new HealthPack('healthPack', 5, 300,
+        0.7 + Math.random() * 0.2, this.level.player.body.x, 100, this.level);
+    this.healthPack5Group = new ItemGroupView(level , -this.width / 2 + 20,
+        -this.height / 2 + 20, 'healthPack5', healthPack5, this);
 
-    this.healthPackIcon = level.game.make.sprite(-this.width / 2 +
-        20, -this.height / 2 + 20, 'healthPack');
-    this.healthPackIcon.inputEnabled = true;
-    this.healthPackIcon.input.priorityID = 2;
-    this.healthPackIcon.events.onInputDown.add(this.useHealthPack, this);
+    this.addChild(this.healthPack5Group);
 
-    this.closeButton = level.game.make.sprite(this.width / 2,
-        -this.height / 2, 'close');
-    this.closeButton.anchor.set(0.5);
-    this.closeButton.inputEnabled = true;
-    this.closeButton.input.priorityID = 2;
-    this.closeButton.events.onInputDown.add(this.close, this);
-
-    this.addChild(this.closeButton);
-    this.addChild(this.healthPackIcon);
-
-    this.fixedToCamera = true;
-    this.visible = false;
-
-    this.items = [];
-    this.level = level;
+    this.healthPacks = [];
 };
 
-Inventory.prototype = Object.create(Phaser.Sprite.prototype);
+Inventory.prototype = Object.create(PopUp.prototype);
 Inventory.prototype.constructor = Inventory;
 
-Inventory.prototype.addItem = function(item) {
-    this.items.push(item);
-
-    //localStorage.setItem(item.name, foo);
+Inventory.prototype.addHealthPack = function(healthPack) {
+    if (healthPack.maxIncreasing == 5) {
+        this.healthPack5Group.amountAvailable ++;
+        this.healthPack5Group.updateAmountAvailableText();
+    }else if (healthPack.maxIncreasing == 20) {
+        this.healthPacks[1]++;
+    }else {
+        this.healthPacks[2]++;
+    }
 };
 
 Inventory.prototype.showHealthPacks = function() {
     //TODO
 };
-
-Inventory.prototype.close = function() {
-    this.level.resume();
-    this.visible = false;
-};
-
-Inventory.prototype.open = function() {
-    this.level.pause();
-    this.visible = true;
-};
-
-Inventory.prototype.useHealthPack = function() {
-    this.close();
-    this.level.addHealthPack(new HealthPack('healthPack', 10, 300,
-        0.7 + Math.random() * 0.2, this.level.player.body.x, 100, this.level));
-};
 module.exports = Inventory;
 
-},{"../prefabs/healthPack":5}],7:[function(require,module,exports){
+},{"../prefabs/healthPack":5,"../prefabs/itemGroupView":8,"../prefabs/popUp":11}],7:[function(require,module,exports){
 var Item;
 Item = function(game, type) {
     this.type = type;
@@ -283,6 +260,78 @@ Item.prototype.constructor = Item;
 module.exports = Item;
 
 },{}],8:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 17/07/2015.
+ */
+var ItemGroupView;
+ItemGroupView = function(level, x, y, imageKey, item, inventory) {
+    Phaser.Sprite.call(this, level.game, x, y, 'itemGroupBackGround');
+    this.healthPackIcon = level.game.make.sprite(this.width / 2,
+        this.height / 2, imageKey);
+    this.healthPackIcon.anchor.set(0.5, 0.5);
+    this.useOneButton = level.game.make.sprite(this.width - 10,
+        this.healthPackIcon.height + 20, 'useOneButton');
+    this.useOneButton.anchor.set(1, 0.5);
+    this.useOneButton.inputEnabled = true;
+    this.useOneButton.input.priorityID = 2;
+    this.useOneButton.events.onInputDown.add(this.useItem, this);
+
+    this.amountAvailable = 0;
+    this.amountAvailableText = level.game.make.text(10,
+        this.healthPackIcon.height + 20, '' + this.amountAvailable);
+    //Font style
+    this.amountAvailableText.font = 'Arial';
+    this.amountAvailableText.fontSize = 30;
+    this.amountAvailableText.fontWeight = 'bold';
+    this.amountAvailableText.fill = '#0040FF';
+    this.amountAvailableText.anchor.set(0, 0.5);
+
+    this.addChild(this.healthPackIcon);
+    this.addChild(this.useOneButton);
+    this.addChild(this.amountAvailableText);
+
+    this.item = item;
+    this.inventory = inventory;
+};
+
+ItemGroupView.prototype = Object.create(Phaser.Sprite.prototype);
+ItemGroupView.prototype.constructor = ItemGroupView;
+
+ItemGroupView.prototype.useItem = function() {
+    if (this.amountAvailable > 0) {
+        this.item.use();
+        this.amountAvailable --;
+        this.updateAmountAvailableText();
+        this.inventory.close();
+    }
+};
+
+ItemGroupView.prototype.updateAmountAvailableText = function() {
+    this.amountAvailableText.text = '' + this.amountAvailable;
+};
+
+module.exports = ItemGroupView;
+
+},{}],9:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var Character = require('../prefabs/character');
+
+var NPC;
+NPC = function(level, target) {
+    Character.call(this, level, level.game.camera.width / 2,
+        level.game.camera.height - 150, 'npc', 250, 500, 100, 0.2, 300, target);
+    this.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.animations.add('right', [5, 6, 7, 8], 10, true);
+};
+
+NPC.prototype = Object.create(Character.prototype);
+NPC.prototype.constructor = NPC;
+
+module.exports = NPC;
+
+},{"../prefabs/character":3}],10:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -332,7 +381,47 @@ Player.prototype.update = function() {
 
 module.exports = Player;
 
-},{"../prefabs/character":3}],9:[function(require,module,exports){
+},{"../prefabs/character":3}],11:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var PopUp;
+PopUp = function(level, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
+        level.game.camera.height / 2, backgroundKey);
+    this.anchor.set(0.5);
+
+    this.closeButton = level.game.make.sprite(this.width / 2,
+        -this.height / 2, 'close');
+    this.closeButton.anchor.set(0.5);
+    this.closeButton.inputEnabled = true;
+    this.closeButton.input.priorityID = 2;
+    this.closeButton.events.onInputDown.add(this.close, this);
+
+    this.addChild(this.closeButton);
+
+    this.fixedToCamera = true;
+    this.visible = false;
+
+    this.level = level;
+};
+
+PopUp.prototype = Object.create(Phaser.Sprite.prototype);
+PopUp.prototype.constructor = PopUp;
+
+PopUp.prototype.close = function() {
+    this.level.resume();
+    this.visible = false;
+};
+
+PopUp.prototype.open = function() {
+    this.level.pause();
+    this.visible = true;
+};
+
+module.exports = PopUp;
+
+},{}],12:[function(require,module,exports){
 var Bullet = require('../prefabs/bullet');
 var Weapon;
 Weapon = function(level, owner, numberOfBullets, weaponKey, bulletKey, nextFire,
@@ -386,7 +475,7 @@ Weapon.prototype.update = function() {
 
 module.exports = Weapon;
 
-},{"../prefabs/bullet":2}],10:[function(require,module,exports){
+},{"../prefabs/bullet":2}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -409,7 +498,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -418,6 +507,8 @@ var HealthPack = require('../prefabs/healthPack');
 var Player = require('../prefabs/player');
 var Weapon = require('../prefabs/weapon');
 var Enemy = require('../prefabs/enemy');
+var NPC = require('../prefabs/npc');
+var PopUp = require('../prefabs/popUp');
 
 var LevelOne;
 LevelOne = function(game) {};
@@ -444,14 +535,18 @@ LevelOne.prototype = {
             'bullet2', 1, this.player.runningSpeed * 2, 100, 50, false));
         this.player.updateCurrentWeapon();
 
+        this.neighbor = new NPC(this, this.player);
+        this.game.add.existing(this.neighbor);
+        this.gameObjects.push(this.neighbor);
+
         this.enemies = this.game.add.group();
         this.gameObjects.push(this.enemies);
 
         for (var i = 0; i < 6; i++) {
             var simpleEnemy = new Enemy(this, 'simple_enemy', 70,
-                this.game.camera.width - 100 + (i * 60),
+                this.game.camera.width + 200 + (i * 60),
                 this.game.camera.height - 100, this.player,
-                this.game.camera.width - 200, 300);
+                this.game.camera.width - 300, 300);
             simpleEnemy.weapons.push(new Weapon(this, simpleEnemy, 1, 'weapon',
                 'bullet1', 1, this.player.runningSpeed * 2, 100, 0.5, true));
             simpleEnemy.updateCurrentWeapon();
@@ -471,7 +566,7 @@ LevelOne.prototype = {
 
         this.healthPacks = this.game.add.group();
         this.gameObjects.push(this.healthPacks);
-        this.addHealthPack(new HealthPack('healthPack', 10, 300,
+        this.addHealthPack(new HealthPack('healthPack', 5, 300,
             0.7 + Math.random() * 0.2, 500, 100, this));
 
         this.platforms = this.game.add.group();
@@ -530,7 +625,6 @@ LevelOne.prototype = {
         //Collisions
         this.game.physics.arcade.collide(this.gameObjects, this.platforms);
         this.game.physics.arcade.collide(this.player, this.enemies);
-        this.game.physics.arcade.collide(this.player, this.strongEnemy);
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
@@ -547,17 +641,31 @@ LevelOne.prototype = {
                     enemy.weapons[k].bullets, this.bulletHitCharacter, null,
                     this);
             }
-            var distanceToPlayer = this.game.physics.arcade.distanceBetween(
+            var distanceEnemyPlayer = this.game.physics.arcade.distanceBetween(
                 this.player, enemy);
-            if (distanceToPlayer <= enemy.rangeDetection &&
-                distanceToPlayer > enemy.rangeAttack) {
+            if (distanceEnemyPlayer <= enemy.rangeDetection &&
+                distanceEnemyPlayer > enemy.rangeAttack) {
                 this.game.physics.arcade.moveToXY(enemy, this.player.x +
                     enemy.rangeAttack, enemy.y);
             }
-            if (distanceToPlayer <= enemy.rangeAttack) {
+            if (distanceEnemyPlayer <= enemy.rangeAttack) {
                 enemy.stop();
                 enemy.currentWeapon.fire(this.player.x, this.player.y);
             }
+        }
+
+        var distanceNeighborPlayer = this.game.physics.arcade.distanceBetween(
+            this.player, this.neighbor);
+        if (distanceNeighborPlayer <= this.neighbor.width) {
+            var comicOne = new PopUp(this, 'comic1');
+            this.game.add.existing(comicOne);
+            comicOne.open();
+            if (this.player.x < this.neighbor.x) {
+                this.player.x += 2 * this.neighbor.width;
+            }else {
+                this.player.x -= 2 * this.neighbor.width;
+            }
+
         }
 
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
@@ -604,7 +712,7 @@ LevelOne.prototype = {
         if (!this.player.fullHealthLevel()) {
             this.increaseHealthLevel(healthPack.maxIncreasing);
         } else {
-            this.inventory.addItem(healthPack);
+            this.inventory.addHealthPack(healthPack);
         }
         healthPack.pickUp();
     },
@@ -654,7 +762,7 @@ LevelOne.prototype = {
 
 module.exports = LevelOne;
 
-},{"../prefabs/enemy":4,"../prefabs/healthPack":5,"../prefabs/inventory":6,"../prefabs/player":8,"../prefabs/weapon":9}],12:[function(require,module,exports){
+},{"../prefabs/enemy":4,"../prefabs/healthPack":5,"../prefabs/inventory":6,"../prefabs/npc":9,"../prefabs/player":10,"../prefabs/popUp":11,"../prefabs/weapon":12}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -682,7 +790,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -724,11 +832,19 @@ Preloader.prototype = {
         //LevelOne assets
         this.game.load.image('ground', 'assets/images/platform.png');
         this.game.load.image('healthPack', 'assets/images/healthPack.png');
+        this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
+        this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
+        this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
+        this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
         this.game.load.image('inventory_background',
             'assets/images/inventory_background.png');
         this.game.load.image('close', 'assets/images/close.png');
+        this.game.load.image('itemGroupBackGround',
+            'assets/images/itemGroupBackGround.png');
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
+            32, 48);
+        this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
             32, 48);
         this.game.load.spritesheet('simple_enemy',
             'assets/sprites/simple_enemy.png', 32, 32);
@@ -739,6 +855,7 @@ Preloader.prototype = {
                 '.png');
         }
         this.game.load.image('weapon', 'assets/images/weapon.png');
+        this.game.load.image('comic1', 'assets/images/comic1.png');
     },
 
     update: function() {
@@ -754,4 +871,4 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);

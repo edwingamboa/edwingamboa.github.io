@@ -6,6 +6,8 @@ var HealthPack = require('../prefabs/healthPack');
 var Player = require('../prefabs/player');
 var Weapon = require('../prefabs/weapon');
 var Enemy = require('../prefabs/enemy');
+var NPC = require('../prefabs/npc');
+var PopUp = require('../prefabs/popUp');
 
 var LevelOne;
 LevelOne = function(game) {};
@@ -32,14 +34,18 @@ LevelOne.prototype = {
             'bullet2', 1, this.player.runningSpeed * 2, 100, 50, false));
         this.player.updateCurrentWeapon();
 
+        this.neighbor = new NPC(this, this.player);
+        this.game.add.existing(this.neighbor);
+        this.gameObjects.push(this.neighbor);
+
         this.enemies = this.game.add.group();
         this.gameObjects.push(this.enemies);
 
         for (var i = 0; i < 6; i++) {
             var simpleEnemy = new Enemy(this, 'simple_enemy', 70,
-                this.game.camera.width - 100 + (i * 60),
+                this.game.camera.width + 200 + (i * 60),
                 this.game.camera.height - 100, this.player,
-                this.game.camera.width - 200, 300);
+                this.game.camera.width - 300, 300);
             simpleEnemy.weapons.push(new Weapon(this, simpleEnemy, 1, 'weapon',
                 'bullet1', 1, this.player.runningSpeed * 2, 100, 0.5, true));
             simpleEnemy.updateCurrentWeapon();
@@ -59,7 +65,7 @@ LevelOne.prototype = {
 
         this.healthPacks = this.game.add.group();
         this.gameObjects.push(this.healthPacks);
-        this.addHealthPack(new HealthPack('healthPack', 10, 300,
+        this.addHealthPack(new HealthPack('healthPack', 5, 300,
             0.7 + Math.random() * 0.2, 500, 100, this));
 
         this.platforms = this.game.add.group();
@@ -118,7 +124,6 @@ LevelOne.prototype = {
         //Collisions
         this.game.physics.arcade.collide(this.gameObjects, this.platforms);
         this.game.physics.arcade.collide(this.player, this.enemies);
-        this.game.physics.arcade.collide(this.player, this.strongEnemy);
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
             this.collectHealthPack, null, this);
 
@@ -135,17 +140,31 @@ LevelOne.prototype = {
                     enemy.weapons[k].bullets, this.bulletHitCharacter, null,
                     this);
             }
-            var distanceToPlayer = this.game.physics.arcade.distanceBetween(
+            var distanceEnemyPlayer = this.game.physics.arcade.distanceBetween(
                 this.player, enemy);
-            if (distanceToPlayer <= enemy.rangeDetection &&
-                distanceToPlayer > enemy.rangeAttack) {
+            if (distanceEnemyPlayer <= enemy.rangeDetection &&
+                distanceEnemyPlayer > enemy.rangeAttack) {
                 this.game.physics.arcade.moveToXY(enemy, this.player.x +
                     enemy.rangeAttack, enemy.y);
             }
-            if (distanceToPlayer <= enemy.rangeAttack) {
+            if (distanceEnemyPlayer <= enemy.rangeAttack) {
                 enemy.stop();
                 enemy.currentWeapon.fire(this.player.x, this.player.y);
             }
+        }
+
+        var distanceNeighborPlayer = this.game.physics.arcade.distanceBetween(
+            this.player, this.neighbor);
+        if (distanceNeighborPlayer <= this.neighbor.width) {
+            var comicOne = new PopUp(this, 'comic1');
+            this.game.add.existing(comicOne);
+            comicOne.open();
+            if (this.player.x < this.neighbor.x) {
+                this.player.x += 2 * this.neighbor.width;
+            }else {
+                this.player.x -= 2 * this.neighbor.width;
+            }
+
         }
 
         this.game.physics.arcade.overlap(this.player, this.healthPacks,
@@ -192,7 +211,7 @@ LevelOne.prototype = {
         if (!this.player.fullHealthLevel()) {
             this.increaseHealthLevel(healthPack.maxIncreasing);
         } else {
-            this.inventory.addItem(healthPack);
+            this.inventory.addHealthPack(healthPack);
         }
         healthPack.pickUp();
     },
