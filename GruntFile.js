@@ -207,7 +207,7 @@
                 path: 'http://localhost/index.html',
             }
         },
-        
+
         jscs: {
             src: ['src/js/**/*.js'],
             options: {
@@ -216,22 +216,18 @@
             }
         },
 
-        'node-qunit': {
-            case1: {
-                deps: 'src/lib/pahser.min.js',
-                code: 'src/js/main.js',
-                tests: 'test/Level1Test.js'
-            },
-        },
+				qunit: {
+		      all: ['test/*.html']
+		    },
 
         jshint: {
             src: ['src/js/*.js', 'src/js/**/*.js']
-        }        
+        }
     });;
 
     grunt.loadNpmTasks('grunt-contrib-clean');
-    //grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-connect');
+		grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -242,12 +238,11 @@
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify'),
-    grunt.loadNpmTasks('grunt-node-qunit'),
+    grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadTasks('./tasks');
 
     grunt.registerTask('default', [
         'clean',
-        //'texturepacker',
         'build',
         'connect',
         'open',
@@ -265,7 +260,7 @@
         'browserify',
         'uglify'
     ]);
-    
+
     grunt.registerTask('init', ['mkdir']);
-    grunt.registerTask('test', 'node-qunit');
+    grunt.registerTask('test', ['qunit']);
 }

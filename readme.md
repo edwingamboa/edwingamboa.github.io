@@ -51,4 +51,5 @@ While I have included a version of Phaser to get you started, chances are very g
 
 <img border="0" width="333"id="Picture 3" src="http://jessefreeman.com/wp-content/uploads/2014/03/pt-src.png" />
 
-Also, if you are lost or need some point of reference I highly suggest going through <a target="_blank" href="http://gametest.mobi/phaser/">each of the tests</a> in the Phaser project to see how things work until more of the framework is documented.
+Also, if you are lost or need some point of reference I highly suggest going through <a target="_blank" href="http://gametest.mobi/phaser/">each of the tests</a> in the Phaser project to see how things work until more of the framework is documented.Also, if you are lost or need some point of reference I highly suggest going through <a target="_blank" href="http://gametest.mobi/phaser/">each of the tests</a> in the Phaser project to see how things work until more of the framework is documented.[![Build Status](https://travis-ci.org/edwingamboa/edwingamboa.github.io.svg?branch=master)](https://travis-ci.org/edwingamboa/edwingamboa.github.io)
+>>>>>>> 656f49723bcbefb5bdfb07b32676c71ac0835629
