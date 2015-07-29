@@ -1,9 +1,19 @@
-var Bullet = require('../prefabs/bullet');
-var Weapon;
-Weapon = function(level, owner, numberOfBullets, weaponKey, bulletKey, nextFire,
-                  bulletSpeed, fireRate, power, infinite) {
-    Phaser.Sprite.call(this, level.game, owner.x , owner.y, weaponKey);
+var Bullet = require('../weapons/Bullet');
+var Weapon = function(level,
+                  owner,
+                  x,
+                  y,
+                  numberOfBullets,
+                  weaponKey,
+                  bulletKey,
+                  nextFire,
+                  bulletSpeed,
+                  fireRate,
+                  power,
+                  infinite) {
+    Phaser.Sprite.call(this, level.game, x, y, weaponKey);
 
+    level.game.physics.arcade.enable(this);
     this.anchor.set(0.1, 0.5);
 
     this.numberOfBullets = numberOfBullets;
@@ -44,9 +54,26 @@ Weapon.prototype.fire = function(toX, toY) {
     }
 };
 
-Weapon.prototype.update = function() {
-    this.x = this.owner.x;
-    this.y = this.owner.y;
+Weapon.prototype.updateCoordinates = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Weapon.prototype.use = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    //this.level.addHealthPack(this);
+};
+
+Weapon.prototype.addBullets = function(amount) {
+    this.numberOfBullets += amount;
+};
+
+Weapon.prototype.killWeapon = function() {
+    this.bullets.removeAll();
+    this.kill();
+
 };
 
 module.exports = Weapon;

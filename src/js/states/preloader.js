@@ -36,9 +36,8 @@ Preloader.prototype = {
 
     loadAssets: function() {
         //Menu assets
-        //LevelOne assets
+        //Level assets
         this.game.load.image('ground', 'assets/images/platform.png');
-        this.game.load.image('healthPack', 'assets/images/healthPack.png');
         this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
         this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
         this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
@@ -61,7 +60,10 @@ Preloader.prototype = {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
         }
-        this.game.load.image('weapon', 'assets/images/weapon.png');
+        this.game.load.image('simpleWeapon',
+            'assets/images/simple_weapon.png');
+        this.game.load.image('strongWeapon',
+            'assets/images/strong_weapon.png');
         this.game.load.image('comic1', 'assets/images/comic1.png');
     },
 

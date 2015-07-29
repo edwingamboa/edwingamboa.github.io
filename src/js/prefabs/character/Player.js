@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-var Character = require('../prefabs/character');
+var Character = require('../character/Character');
 
+var MINIMUM_SCORE = 10;
 var Player;
-Player = function(level, startingScore, target) {
+Player = function(level, target) {
     Character.call(this, level, 32, level.game.world.height - 150,
-        'character', 250, 500, 100, 0.2, 300, target);
+        'character', target);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
-    this.score = startingScore;
+    this.score = MINIMUM_SCORE;
 };
 
 Player.prototype = Object.create(Character.prototype);
@@ -41,8 +42,21 @@ Player.prototype.updateHealhtLevel = function() {
 };
 
 Player.prototype.update = function() {
-    this.currentWeapon.rotation = this.level.game.physics.arcade.angleToPointer(
-        this);
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.rotation =
+            this.level.game.physics.arcade.angleToPointer(this);
+        this.currentWeapon.updateCoordinates(this.x, this.y + 10);
+    }
+};
+
+Player.prototype.pickUpWeapon = function(weapon) {
+    if (this.weapons[weapon.key] === undefined) {
+        this.addWeapon(weapon);
+        this.updateCurrentWeapon(weapon.key);
+    }else {
+        //weapon.kill();
+        this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
+    }
 };
 
 module.exports = Player;

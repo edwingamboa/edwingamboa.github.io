@@ -1,5 +1,11 @@
 var HealthPack;
-HealthPack = function(key, maxIncreasing, gravity, bounce, xPos, yPos, level) {
+HealthPack = function(key,
+                      maxIncreasing,
+                      gravity,
+                      bounce,
+                      xPos,
+                      yPos,
+                      level) {
     Phaser.Sprite.call(this, level.game, xPos, yPos, key);
     this.anchor.set(0.5);
     this.maxIncreasing = maxIncreasing;

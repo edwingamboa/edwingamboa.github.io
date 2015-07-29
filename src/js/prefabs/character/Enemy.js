@@ -1,13 +1,17 @@
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Character = require('../prefabs/character');
+var Character = require('../character/Character');
 
-var Enemy;
-Enemy = function(level, spriteKey, maxHealthLevel, x, y, target,
-                 rangeDetection, rangeAttack) {
-    Character.call(this, level, x, y, spriteKey, 250,
-        500, maxHealthLevel, 0.2, 300, target);
+var Enemy = function(level,
+                 spriteKey,
+                 maxHealthLevel,
+                 x,
+                 y,
+                 target,
+                 rangeDetection,
+                 rangeAttack) {
+    Character.call(this, level, x, y, spriteKey, target);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
@@ -30,6 +34,7 @@ Enemy.prototype.update = function() {
     this.healthLevelText.y = this.body.y - 20;
     this.currentWeapon.rotation = this.level.game.physics.arcade.angleBetween(
         this, this.target);
+    this.currentWeapon.updateCoordinates(this.x + 20, this.y + 20);
 };
 
 Enemy.prototype.updateHealhtLevel = function() {

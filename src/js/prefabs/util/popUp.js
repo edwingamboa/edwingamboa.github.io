@@ -5,6 +5,8 @@ var PopUp;
 PopUp = function(level, backgroundKey) {
     Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
         level.game.camera.height / 2, backgroundKey);
+
+    this.bringToTop();
     this.anchor.set(0.5);
 
     this.closeButton = level.game.make.sprite(this.width / 2,

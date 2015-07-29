@@ -43,7 +43,7 @@ It will launch a browser with the default screen which will look something like 
 
 <img border="0" width="624"id="Picture 3" src="http://jessefreeman.com/wp-content/uploads/2014/03/Phaser-Template.png" />
 
-You can start building a game with Phaser, simply modify the main.js file inside of the src/game directory. As long as you have the Grunt task running, your project will automatically recompile every time you make a change to any JavaScript file inside of the src directory. Once the project is recompiled, simply refresh your browser to see the changes. Also make sure you disable your browser's cache.
+You can start building a game with Phaser, simply modify the Main.js file inside of the src/game directory. As long as you have the Grunt task running, your project will automatically recompile every time you make a change to any JavaScript file inside of the src directory. Once the project is recompiled, simply refresh your browser to see the changes. Also make sure you disable your browser's cache.
 
 ## What Else?
 
