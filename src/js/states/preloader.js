@@ -44,7 +44,7 @@ Preloader.prototype = {
         this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
         this.game.load.image('inventory_background',
-            'assets/images/inventory_background.png');
+            'assets/images/inventoryBackground.png');
         this.game.load.image('close', 'assets/images/close.png');
         this.game.load.image('itemGroupBackGround',
             'assets/images/itemGroupBackGround.png');
@@ -61,9 +61,9 @@ Preloader.prototype = {
                 '.png');
         }
         this.game.load.image('simpleWeapon',
-            'assets/images/simple_weapon.png');
+            'assets/images/revolver.png');
         this.game.load.image('strongWeapon',
-            'assets/images/strong_weapon.png');
+            'assets/images/machineGun.png');
         this.game.load.image('comic1', 'assets/images/comic1.png');
     },
 
