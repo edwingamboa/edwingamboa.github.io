@@ -20,7 +20,7 @@ var StrongEnemy = function(level, x, y, target) {
         STRONG_ENEMY_RANGE_DETECTION,
         STRONG_ENEMY_RANGE_ATTACK);
 
-    this.addWeapon(new MachineGun(this, this, x, y, true));
+    this.addWeapon(new MachineGun(this, x, y, true));
     this.updateCurrentWeapon('strongWeapon');
 };
 

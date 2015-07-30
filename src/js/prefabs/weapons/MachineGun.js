@@ -11,10 +11,9 @@ var MACHINE_GUN_BULLET_SPEED = 700;
 var MACHINE_GUN_FIRE_RATE = 100;
 var MACHINE_GUN_BULLET_POWER = 10;
 
-var MachineGun = function(level, owner, x, y, inifinite) {
+var MachineGun = function(level, x, y, inifinite) {
     Weapon.call(this,
         level,
-        owner,
         x,
         y,
         MACHINE_GUN_NUMBER_OF_BULLETS,

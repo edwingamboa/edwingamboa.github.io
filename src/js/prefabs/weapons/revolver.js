@@ -11,10 +11,9 @@ var REVOLVER_BULLET_SPEED = 700;
 var REVOLVER_FIRE_RATE = 50;
 var REVOLVER_BULLET_POWER = 5;
 
-var Revolver = function(level, owner, x, y, inifinite) {
+var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,
         level,
-        owner,
         x,
         y,
         REVOLVER_NUMBER_OF_BULLETS,

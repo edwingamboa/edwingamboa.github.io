@@ -1,6 +1,5 @@
 var Bullet = require('../weapons/Bullet');
 var Weapon = function(level,
-                  owner,
                   x,
                   y,
                   numberOfBullets,
@@ -29,7 +28,6 @@ var Weapon = function(level,
     this.fireRate = fireRate;
     this.level = level;
     this.infinite = infinite;
-    this.owner = owner;
 };
 
 Weapon.prototype = Object.create(Phaser.Sprite.prototype);

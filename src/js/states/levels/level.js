@@ -171,7 +171,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this, this.game.input.activePointer);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.addWeapon(new Revolver(this, this.player, 700, 100, false));
+    this.player.addWeapon(new Revolver(this, 700, 100, false));
     this.player.updateCurrentWeapon('simpleWeapon');
 };
 
@@ -288,11 +288,11 @@ Level.prototype.addHealthPack = function(healthPack) {
 };
 
 Level.prototype.addRevolver = function(x, y, infiniteAmmo) {
-    this.weapons.add(new Revolver(this, this.player, x, y, infiniteAmmo));
+    this.weapons.add(new Revolver(this, x, y, infiniteAmmo));
 };
 
 Level.prototype.addMachineGun = function(x, y, infiniteAmmo) {
-    this.weapons.add(new MachineGun(this, this.player, x, y, infiniteAmmo));
+    this.weapons.add(new MachineGun(this, x, y, infiniteAmmo));
 };
 
 Level.prototype.pause = function() {

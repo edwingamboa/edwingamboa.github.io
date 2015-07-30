@@ -345,7 +345,7 @@ var SimpleEnemy = function(level, x, y, target) {
         SIMPLE_ENEMY_RANGE_DETECTION,
         SIMPLE_ENEMY_RANGE_ATTACK);
 
-    this.addWeapon(new Revolver(this, this, x, y, true));
+    this.addWeapon(new Revolver(this, x, y, true));
     this.updateCurrentWeapon('simpleWeapon');
 };
 
@@ -377,7 +377,7 @@ var StrongEnemy = function(level, x, y, target) {
         STRONG_ENEMY_RANGE_DETECTION,
         STRONG_ENEMY_RANGE_ATTACK);
 
-    this.addWeapon(new MachineGun(this, this, x, y, true));
+    this.addWeapon(new MachineGun(this, x, y, true));
     this.updateCurrentWeapon('strongWeapon');
 };
 
@@ -624,10 +624,9 @@ var MACHINE_GUN_BULLET_SPEED = 700;
 var MACHINE_GUN_FIRE_RATE = 100;
 var MACHINE_GUN_BULLET_POWER = 10;
 
-var MachineGun = function(level, owner, x, y, inifinite) {
+var MachineGun = function(level, x, y, inifinite) {
     Weapon.call(this,
         level,
-        owner,
         x,
         y,
         MACHINE_GUN_NUMBER_OF_BULLETS,
@@ -660,10 +659,9 @@ var REVOLVER_BULLET_SPEED = 700;
 var REVOLVER_FIRE_RATE = 50;
 var REVOLVER_BULLET_POWER = 5;
 
-var Revolver = function(level, owner, x, y, inifinite) {
+var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,
         level,
-        owner,
         x,
         y,
         REVOLVER_NUMBER_OF_BULLETS,
@@ -685,7 +683,6 @@ module.exports = Revolver;
 },{"../weapons/Weapon":16}],16:[function(require,module,exports){
 var Bullet = require('../weapons/Bullet');
 var Weapon = function(level,
-                  owner,
                   x,
                   y,
                   numberOfBullets,
@@ -714,7 +711,6 @@ var Weapon = function(level,
     this.fireRate = fireRate;
     this.level = level;
     this.infinite = infinite;
-    this.owner = owner;
 };
 
 Weapon.prototype = Object.create(Phaser.Sprite.prototype);
@@ -1071,7 +1067,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this, this.game.input.activePointer);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.addWeapon(new Revolver(this, this.player, 700, 100, false));
+    this.player.addWeapon(new Revolver(this, 700, 100, false));
     this.player.updateCurrentWeapon('simpleWeapon');
 };
 
@@ -1188,11 +1184,11 @@ Level.prototype.addHealthPack = function(healthPack) {
 };
 
 Level.prototype.addRevolver = function(x, y, infiniteAmmo) {
-    this.weapons.add(new Revolver(this, this.player, x, y, infiniteAmmo));
+    this.weapons.add(new Revolver(this, x, y, infiniteAmmo));
 };
 
 Level.prototype.addMachineGun = function(x, y, infiniteAmmo) {
-    this.weapons.add(new MachineGun(this, this.player, x, y, infiniteAmmo));
+    this.weapons.add(new MachineGun(this, x, y, infiniteAmmo));
 };
 
 Level.prototype.pause = function() {

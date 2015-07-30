@@ -20,7 +20,7 @@ var SimpleEnemy = function(level, x, y, target) {
         SIMPLE_ENEMY_RANGE_DETECTION,
         SIMPLE_ENEMY_RANGE_ATTACK);
 
-    this.addWeapon(new Revolver(this, this, x, y, true));
+    this.addWeapon(new Revolver(this, x, y, true));
     this.updateCurrentWeapon('simpleWeapon');
 };
 
