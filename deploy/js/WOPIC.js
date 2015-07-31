@@ -187,6 +187,15 @@ Character.prototype.addWeapon = function(newWeapon) {
     this.weaponsKeys.push(newWeapon.key);
 };
 
+/**
+ * Fires the current weapon if it is defined
+ * @param {number} x - x coordinate on the point to fire
+ * @param {number} y - y coordinate on the point to fire
+ */
+Character.prototype.fireToXY = function(x, y) {
+    this.currentWeapon.fire(x, y);
+};
+
 module.exports = Character;
 
 },{}],3:[function(require,module,exports){
@@ -200,10 +209,9 @@ var Enemy = function(level,
                  maxHealthLevel,
                  x,
                  y,
-                 target,
                  rangeDetection,
                  rangeAttack) {
-    Character.call(this, level, x, y, spriteKey, target);
+    Character.call(this, level, x, y, spriteKey);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
@@ -224,8 +232,6 @@ Enemy.prototype.update = function() {
     }
     this.healthLevelText.x = this.body.x;
     this.healthLevelText.y = this.body.y - 20;
-    this.currentWeapon.rotation = this.level.game.physics.arcade.angleBetween(
-        this, this.target);
     this.currentWeapon.updateCoordinates(this.x + 20, this.y + 20);
 };
 
@@ -238,6 +244,11 @@ Enemy.prototype.updateHealhtLevel = function() {
     }
 };
 
+Enemy.prototype.rotateWeapon = function(x, y) {
+    this.currentWeapon.rotation =
+        this.level.game.physics.arcade.angleToXY(this, x, y);
+};
+
 module.exports = Enemy;
 
 },{"../character/Character":2}],4:[function(require,module,exports){
@@ -247,8 +258,8 @@ module.exports = Enemy;
 var Character = require('../character/Character');
 
 var NPC;
-NPC = function(level, x, y, target) {
-    Character.call(this, level, x, y, 'npc', target);
+NPC = function(level, x, y) {
+    Character.call(this, level, x, y, 'npc');
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
 };
@@ -268,9 +279,9 @@ var Character = require('../character/Character');
 
 var MINIMUM_SCORE = 10;
 var Player;
-Player = function(level, target) {
+Player = function(level) {
     Character.call(this, level, 32, level.game.world.height - 150,
-        'character', target);
+        'character');
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.score = MINIMUM_SCORE;
@@ -334,14 +345,13 @@ var SIMPLE_ENEMY_MAX_HEALTH_LEVEL = 70;
 var SIMPLE_ENEMY_RANGE_DETECTION = 700;
 var SIMPLE_ENEMY_RANGE_ATTACK = 300;
 
-var SimpleEnemy = function(level, x, y, target) {
+var SimpleEnemy = function(level, x, y) {
     Enemy.call(this,
         level,
         SIMPLE_ENEMY_SPRITE_KEY,
         SIMPLE_ENEMY_MAX_HEALTH_LEVEL,
         x,
         y,
-        target,
         SIMPLE_ENEMY_RANGE_DETECTION,
         SIMPLE_ENEMY_RANGE_ATTACK);
 
@@ -363,17 +373,16 @@ var MachineGun = require('../weapons/MachineGun');
 
 var STRONG_ENEMY_SPRITE_KEY = 'strong_enemy';
 var STRONG_ENEMY_MAX_HEALTH_LEVEL = 150;
-var STRONG_ENEMY_RANGE_DETECTION = 1400;
+var STRONG_ENEMY_RANGE_DETECTION = 1000;
 var STRONG_ENEMY_RANGE_ATTACK = 600;
 
-var StrongEnemy = function(level, x, y, target) {
+var StrongEnemy = function(level, x, y) {
     Enemy.call(this,
         level,
         STRONG_ENEMY_SPRITE_KEY,
         STRONG_ENEMY_MAX_HEALTH_LEVEL,
         x,
         y,
-        target,
         STRONG_ENEMY_RANGE_DETECTION,
         STRONG_ENEMY_RANGE_ATTACK);
 
@@ -936,26 +945,7 @@ Level.prototype.create = function() {
     this.addCamera();
     this.createInventory();
 };
-
-Level.prototype.update = function() {
-    //Collisions
-    this.game.physics.arcade.collide(this.gameObjects, this.platforms);
-    this.game.physics.arcade.collide(this.player, this.enemies);
-    this.game.physics.arcade.overlap(this.player, this.healthPacks,
-        this.collectHealthPack, null, this);
-    this.game.physics.arcade.overlap(this.player, this.weapons,
-        this.collectWeapon, null, this);
-
-    for (var playerWeaponKey in this.player.weapons) {
-        this.game.physics.arcade.overlap(
-            this.enemies,
-            this.player.weapons[playerWeaponKey].bullets,
-            this.bulletHitCharacter,
-            null,
-            this
-        );
-    }
-
+Level.prototype.updateEnemies = function() {
     for (var i = 0; i < this.enemies.children.length; i++) {
         var enemy = this.enemies.children[i];
         for (var enemyWeaponKey in enemy.weapons) {
@@ -974,11 +964,34 @@ Level.prototype.update = function() {
                 enemy,
                 this.player.x + enemy.rangeAttack,
                 enemy.y);
+            enemy.rotateWeapon(this.player.x, this.player.y);
         }
         if (distanceEnemyPlayer <= enemy.rangeAttack) {
             enemy.stop();
-            enemy.currentWeapon.fire(this.player.x, this.player.y);
+            enemy.fireToXY(this.player.x, this.player.y);
         }
+    }
+};
+
+Level.prototype.update = function() {
+    //Collisions
+    this.updateEnemies();
+
+    this.game.physics.arcade.collide(this.gameObjects, this.platforms);
+    this.game.physics.arcade.collide(this.player, this.enemies);
+    this.game.physics.arcade.overlap(this.player, this.healthPacks,
+        this.collectHealthPack, null, this);
+    this.game.physics.arcade.overlap(this.player, this.weapons,
+        this.collectWeapon, null, this);
+
+    for (var playerWeaponKey in this.player.weapons) {
+        this.game.physics.arcade.overlap(
+            this.enemies,
+            this.player.weapons[playerWeaponKey].bullets,
+            this.bulletHitCharacter,
+            null,
+            this
+        );
     }
 
     var distanceNeighborPlayer = this.game.physics.arcade.distanceBetween(
@@ -1022,7 +1035,8 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.currentWeapon.fire(this.game.input.activePointer.worldX,
+        this.player.fireToXY(
+            this.game.input.activePointer.worldX,
             this.game.input.activePointer.worldY);
         //  Add and update the score
         this.updateAmmoText();
@@ -1035,15 +1049,15 @@ Level.prototype.createEnemiesGroup = function() {
 };
 
 Level.prototype.addSimpleEnemy = function(x) {
-    this.enemies.add(new SimpleEnemy(this, x, MIN_Y, this.player));
+    this.enemies.add(new SimpleEnemy(this, x, MIN_Y));
 };
 
 Level.prototype.addStrongEnemy = function(x) {
-    this.enemies.add(new StrongEnemy(this, x, MIN_Y, this.player));
+    this.enemies.add(new StrongEnemy(this, x, MIN_Y));
 };
 
 Level.prototype.addNPC = function(x, y) {
-    this.neighbor = new NPC(this, x, MIN_Y, this.player);
+    this.neighbor = new NPC(this, x, MIN_Y);
     this.game.add.existing(this.neighbor);
     this.gameObjects.push(this.neighbor);
 };
@@ -1064,7 +1078,7 @@ Level.prototype.addPlatforms = function() {
 };
 
 Level.prototype.addPlayer = function() {
-    this.player = new Player(this, this.game.input.activePointer);
+    this.player = new Player(this);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
     this.player.addWeapon(new Revolver(this, 700, 100, false));

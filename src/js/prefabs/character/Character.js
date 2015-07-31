@@ -171,4 +171,13 @@ Character.prototype.addWeapon = function(newWeapon) {
     this.weaponsKeys.push(newWeapon.key);
 };
 
+/**
+ * Fires the current weapon if it is defined
+ * @param {number} x - x coordinate on the point to fire
+ * @param {number} y - y coordinate on the point to fire
+ */
+Character.prototype.fireToXY = function(x, y) {
+    this.currentWeapon.fire(x, y);
+};
+
 module.exports = Character;

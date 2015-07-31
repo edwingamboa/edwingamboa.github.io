@@ -6,17 +6,16 @@ var MachineGun = require('../weapons/MachineGun');
 
 var STRONG_ENEMY_SPRITE_KEY = 'strong_enemy';
 var STRONG_ENEMY_MAX_HEALTH_LEVEL = 150;
-var STRONG_ENEMY_RANGE_DETECTION = 1400;
+var STRONG_ENEMY_RANGE_DETECTION = 1000;
 var STRONG_ENEMY_RANGE_ATTACK = 600;
 
-var StrongEnemy = function(level, x, y, target) {
+var StrongEnemy = function(level, x, y) {
     Enemy.call(this,
         level,
         STRONG_ENEMY_SPRITE_KEY,
         STRONG_ENEMY_MAX_HEALTH_LEVEL,
         x,
         y,
-        target,
         STRONG_ENEMY_RANGE_DETECTION,
         STRONG_ENEMY_RANGE_ATTACK);
 

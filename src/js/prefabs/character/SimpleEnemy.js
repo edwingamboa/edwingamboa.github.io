@@ -9,14 +9,13 @@ var SIMPLE_ENEMY_MAX_HEALTH_LEVEL = 70;
 var SIMPLE_ENEMY_RANGE_DETECTION = 700;
 var SIMPLE_ENEMY_RANGE_ATTACK = 300;
 
-var SimpleEnemy = function(level, x, y, target) {
+var SimpleEnemy = function(level, x, y) {
     Enemy.call(this,
         level,
         SIMPLE_ENEMY_SPRITE_KEY,
         SIMPLE_ENEMY_MAX_HEALTH_LEVEL,
         x,
         y,
-        target,
         SIMPLE_ENEMY_RANGE_DETECTION,
         SIMPLE_ENEMY_RANGE_ATTACK);
 

@@ -7,9 +7,9 @@ var Character = require('../character/Character');
 
 var MINIMUM_SCORE = 10;
 var Player;
-Player = function(level, target) {
+Player = function(level) {
     Character.call(this, level, 32, level.game.world.height - 150,
-        'character', target);
+        'character');
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.score = MINIMUM_SCORE;

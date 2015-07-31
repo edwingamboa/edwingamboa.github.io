@@ -8,10 +8,9 @@ var Enemy = function(level,
                  maxHealthLevel,
                  x,
                  y,
-                 target,
                  rangeDetection,
                  rangeAttack) {
-    Character.call(this, level, x, y, spriteKey, target);
+    Character.call(this, level, x, y, spriteKey);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
@@ -32,8 +31,6 @@ Enemy.prototype.update = function() {
     }
     this.healthLevelText.x = this.body.x;
     this.healthLevelText.y = this.body.y - 20;
-    this.currentWeapon.rotation = this.level.game.physics.arcade.angleBetween(
-        this, this.target);
     this.currentWeapon.updateCoordinates(this.x + 20, this.y + 20);
 };
 
@@ -44,6 +41,11 @@ Enemy.prototype.updateHealhtLevel = function() {
         this.healthLevelText.text = '';
         this.level.player.increaseScore(this.maxHealthLevel * 0.1);
     }
+};
+
+Enemy.prototype.rotateWeapon = function(x, y) {
+    this.currentWeapon.rotation =
+        this.level.game.physics.arcade.angleToXY(this, x, y);
 };
 
 module.exports = Enemy;

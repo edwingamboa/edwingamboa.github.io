@@ -4,8 +4,8 @@
 var Character = require('../character/Character');
 
 var NPC;
-NPC = function(level, x, y, target) {
-    Character.call(this, level, x, y, 'npc', target);
+NPC = function(level, x, y) {
+    Character.call(this, level, x, y, 'npc');
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
 };
