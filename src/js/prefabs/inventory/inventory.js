@@ -1,7 +1,6 @@
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var HealthPack = require('../inventory/HealthPack');
 var PopUp = require('../util/PopUp');
 var ItemGroupView = require('../inventory/ItemGroupView');
 

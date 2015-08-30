@@ -34,7 +34,8 @@
                 options: {
                     mode: 0700,
                     create: [
-                        'assets/images', 'assets/sprites', 'assets/maps', 'assets/audio',
+                        'assets/images', 'assets/sprites', 'assets/maps',
+                        'assets/audio',
                         'deploy',
                         'resources',
                         'src/css', 'src/js', 'src/lib',
@@ -137,7 +138,7 @@
             game: {
                 options: {
                     banner: '/*! GameDevTemplateJS <%= pkg.version %> | ' +
-                            '(c) 2013 Thomas Viktil */ \n'
+                            '(c) 2015 Edwin Gamboa */ \n'
                 },
                 src: ['<%= concat.game.dest %>'],
                 dest: '<%= dir.deploy.js %>/<%= pkg.name %>.min.js'
@@ -195,7 +196,7 @@
         connect: {
             root: {
                 options: {
-                    port: 80,
+                    port: 81,
                     base: './deploy',
                     livereload: true
                 }
@@ -216,18 +217,18 @@
             }
         },
 
-				qunit: {
+        qunit: {
 		      all: ['test/*.html']
-		    },
+		},
 
         jshint: {
             src: ['src/js/*.js', 'src/js/**/*.js']
         }
-    });;
+    });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-connect');
-		grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');

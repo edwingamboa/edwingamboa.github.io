@@ -2,8 +2,8 @@
  * Created by Edwin Gamboa on 08/07/2015.
  */
 
-var SPEED = 250;
-var RUNNING_SPEED = 500;
+var SPEED = 150;
+var MAX_SPEED = 250;
 var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
@@ -19,27 +19,26 @@ var GRAVITY = 300;
  * @param {object} optionsArgs - character's physic properties
  * @constructor
  */
-var Character = function(level, x, y, spriteKey, target, optionsArgs) {
+var Character = function(level, x, y, spriteKey, optionsArgs) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
     var options = optionsArgs || {};
-    this.speed = options.speed || SPEED;
-    this.runningSpeed = options.runningSpeed || RUNNING_SPEED;
     this.healthLevel = options.healthLevel || INITIAL_HEALTH_LEVEL;
     this.maxHealthLevel = options.maxHealthLevel || MAX_HEALTH_LEVEL;
+    this.speed = options.speed || SPEED;
+    this.maxSpeed = options.maxSpeed || MAX_SPEED;
 
     level.game.physics.arcade.enable(this);
     this.body.bounce.y = options.bounce || BOUNCE;
     this.body.gravity.y = options.gravity || GRAVITY;
     this.body.collideWorldBounds = true;
-    this.anchor.setTo(0.5, 0.5);
+    this.anchor.setTo(0.5, 1);
 
     this.currentWeaponIndex = 0;
 
     this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
-    this.target = target;
 };
 
 /**
@@ -70,7 +69,7 @@ Character.prototype.moveRight = function() {
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
-    this.body.velocity.x = -this.runningSpeed;
+    this.body.velocity.x = -this.maxSpeed;
     this.animations.play('left');
 };
 
@@ -78,7 +77,7 @@ Character.prototype.runLeft = function() {
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
-    this.body.velocity.x = this.runningSpeed;
+    this.body.velocity.x = this.maxSpeed;
     this.animations.play('right');
 };
 
@@ -124,11 +123,27 @@ Character.prototype.increaseHealthLevel = function(increase) {
 Character.prototype.decreaseHealthLevel = function(decrease) {
     this.healthLevel -= decrease;
     if (this.healthLevel <= 0) {
-        for (var weaponKey in this.weapons) {
-            this.weapons[weaponKey].killWeapon();
-        }
-        this.kill();
+        this.killCharacter();
     }
+};
+
+/**
+ * Kill the character and his elements.
+ */
+Character.prototype.killCharacter = function() {
+    for (var weaponKey in this.weapons) {
+        this.weapons[weaponKey].killWeapon();
+    }
+    this.kill();
+};
+
+/**
+ * Set the character health level.
+ *
+ * @param {number} healthLevel - the new caharacter's healthLevel.
+ */
+Character.prototype.setHealthLevel = function(healthLevel) {
+    this.healthLevel = healthLevel;
 };
 
 /**
@@ -178,6 +193,16 @@ Character.prototype.addWeapon = function(newWeapon) {
  */
 Character.prototype.fireToXY = function(x, y) {
     this.currentWeapon.fire(x, y);
+};
+
+/**
+ * Lets to relocate the character on the given coordinates
+ * @param {number} x - x coordinate to be relocated
+ * @param {number} y - y coordinate to be relocated
+ */
+Character.prototype.relocate = function(x, y) {
+    this.x = x;
+    this.y = y;
 };
 
 module.exports = Character;

@@ -1,22 +1,21 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var PopUp;
-PopUp = function(level, backgroundKey) {
+var PopUp = function(level, backgroundKey) {
     Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
         level.game.camera.height / 2, backgroundKey);
 
     this.bringToTop();
     this.anchor.set(0.5);
 
-    this.closeButton = level.game.make.sprite(this.width / 2,
+    this.openDoorButton = level.game.make.sprite(this.width / 2,
         -this.height / 2, 'close');
-    this.closeButton.anchor.set(0.5);
-    this.closeButton.inputEnabled = true;
-    this.closeButton.input.priorityID = 2;
-    this.closeButton.events.onInputDown.add(this.close, this);
+    this.openDoorButton.anchor.set(0.5);
+    this.openDoorButton.inputEnabled = true;
+    this.openDoorButton.input.priorityID = 2;
+    this.openDoorButton.events.onInputDown.add(this.close, this);
 
-    this.addChild(this.closeButton);
+    this.addChild(this.openDoorButton);
 
     this.fixedToCamera = true;
     this.visible = false;

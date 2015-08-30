@@ -10,10 +10,7 @@ var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
 var StrongEnemy = require('../../prefabs/character/StrongEnemy');
 var NPC = require('../../prefabs/character/NPC');
 var PopUp = require('../../prefabs/util/PopUp');
-
-var WORLD_WIDTH = 3000;
-var WORLD_HEIGHT = 500;
-var MIN_Y = WORLD_HEIGHT - 100;
+var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 
 var Level = function(game) {
     this.game = game;
@@ -23,16 +20,21 @@ Level.prototype.constructor = Level;
 
 Level.prototype.preload = function() {
     this.game.stage.backgroundColor = '#82CAFA';
+    this.WORLD_WIDTH = 8000;
+    this.WORLD_HEIGHT = 500;
+    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
 };
 
 Level.prototype.create = function() {
-    this.game.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
 
     this.createHealthPacksGroup();
     this.createWeaponsGroup();
     this.createEnemiesGroup();
+    this.createNpcsGroup();
+    this.createCarsGroup();
     this.addPlayer();
     this.addPlatforms();
     this.addTexts();
@@ -40,6 +42,7 @@ Level.prototype.create = function() {
     this.addCamera();
     this.createInventory();
 };
+
 Level.prototype.updateEnemies = function() {
     for (var i = 0; i < this.enemies.children.length; i++) {
         var enemy = this.enemies.children[i];
@@ -68,9 +71,30 @@ Level.prototype.updateEnemies = function() {
     }
 };
 
+Level.prototype.updateNpcs = function() {
+    for (var i = 0; i < this.npcs.children.length; i++) {
+        var npc = this.npcs.children[i];
+
+        var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
+            this.player, npc);
+        if (distanceNpcPlayer <= npc.width) {
+            var comic = new PopUp(this, npc.comicKey);
+            this.game.add.existing(comic);
+            comic.open();
+            if (this.player.x < npc.x) {
+                this.player.x += 2 * npc.width;
+            } else {
+                this.player.x -= 2 * npc.width;
+            }
+
+        }
+    }
+};
+
 Level.prototype.update = function() {
     //Collisions
     this.updateEnemies();
+    this.updateNpcs();
 
     this.game.physics.arcade.collide(this.gameObjects, this.platforms);
     this.game.physics.arcade.collide(this.player, this.enemies);
@@ -78,6 +102,8 @@ Level.prototype.update = function() {
         this.collectHealthPack, null, this);
     this.game.physics.arcade.overlap(this.player, this.weapons,
         this.collectWeapon, null, this);
+    this.game.physics.arcade.overlap(this.cars, this.enemies,
+        this.crashEnemy, null, this);
 
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
@@ -87,20 +113,6 @@ Level.prototype.update = function() {
             null,
             this
         );
-    }
-
-    var distanceNeighborPlayer = this.game.physics.arcade.distanceBetween(
-        this.player, this.neighbor);
-    if (distanceNeighborPlayer <= this.neighbor.width) {
-        var comicOne = new PopUp(this, 'comic1');
-        this.game.add.existing(comicOne);
-        comicOne.open();
-        if (this.player.x < this.neighbor.x) {
-            this.player.x += 2 * this.neighbor.width;
-        } else {
-            this.player.x -= 2 * this.neighbor.width;
-        }
-
     }
 
     this.game.physics.arcade.overlap(this.player, this.healthPacks,
@@ -143,18 +155,30 @@ Level.prototype.createEnemiesGroup = function() {
     this.gameObjects.push(this.enemies);
 };
 
+Level.prototype.createNpcsGroup = function() {
+    this.npcs = this.game.add.group();
+    this.gameObjects.push(this.npcs);
+};
+
+Level.prototype.createCarsGroup = function() {
+    this.cars = this.game.add.group();
+    this.gameObjects.push(this.cars);
+};
+
 Level.prototype.addSimpleEnemy = function(x) {
-    this.enemies.add(new SimpleEnemy(this, x, MIN_Y));
+    this.enemies.add(new SimpleEnemy(this, x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addStrongEnemy = function(x) {
-    this.enemies.add(new StrongEnemy(this, x, MIN_Y));
+    this.enemies.add(new StrongEnemy(this, x, this.GROUND_HEIGHT - 100));
 };
 
-Level.prototype.addNPC = function(x, y) {
-    this.neighbor = new NPC(this, x, MIN_Y);
-    this.game.add.existing(this.neighbor);
-    this.gameObjects.push(this.neighbor);
+Level.prototype.addNPC = function(x, key, comicKey) {
+    this.npcs.add(new NPC(this, x, this.GROUND_HEIGHT - 100, key, comicKey));
+};
+
+Level.prototype.addCar = function(x, key) {
+    this.cars.add(new InteractiveCar(this, x, this.GROUND_HEIGHT, key));
 };
 
 Level.prototype.addPlatforms = function() {
@@ -163,13 +187,19 @@ Level.prototype.addPlatforms = function() {
 
     this.ground = this.platforms.create(0, this.game.world.height - 64,
         'ground');
-    this.ground.scale.setTo(10, 2);
+    this.ground.scale.setTo(40, 2);
     this.ground.body.immovable = true;
 
     this.ledge = this.platforms.create(400, 300, 'ground');
     this.ledge.body.immovable = true;
     this.ledge = this.platforms.create(-150, 200, 'ground');
     this.ledge.body.immovable = true;
+};
+
+Level.prototype.addObject = function(object) {
+    //var object = this.game.add.sprite(x, y, key);
+    //object.anchor.setTo(0, 0);
+    this.game.add.existing(object);
 };
 
 Level.prototype.addPlayer = function() {
@@ -239,7 +269,7 @@ Level.prototype.createInventory = function() {
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevel();
+    character.updateHealhtLevelText();
     bullet.kill();
 };
 
@@ -247,6 +277,10 @@ Level.prototype.collectWeapon = function(player, weapon) {
     this.weapons.remove(weapon);
     this.player.pickUpWeapon(weapon);
     this.updateAmmoText();
+};
+
+Level.prototype.crashEnemy = function(car, enemy) {
+    enemy.killCharacter();
 };
 
 Level.prototype.collectHealthPack = function(player, healthPack) {

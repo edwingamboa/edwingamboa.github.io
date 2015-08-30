@@ -4,10 +4,12 @@ var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
 var Boot = require('./states/Boot');
 var Preloader = require('./states/Preloader');
 var Menu = require('./states/Menu');
-var LevelOneState = require('./states/levels/LevelOne');
+var LevelOne = require('./states/levels/LevelOne');
+var LevelOneIntro = require('./states/levels/LevelOneIntro');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
-game.state.add('levelOne', LevelOneState);
+game.state.add('levelOne', LevelOne);
+game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');

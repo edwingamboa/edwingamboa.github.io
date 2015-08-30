@@ -52,6 +52,8 @@ Preloader.prototype = {
             32, 48);
         this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
             32, 48);
+        this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
+            32, 48);
         this.game.load.spritesheet('simple_enemy',
             'assets/sprites/simple_enemy.png', 32, 32);
         this.game.load.spritesheet('strong_enemy',
@@ -65,11 +67,19 @@ Preloader.prototype = {
         this.game.load.image('strongWeapon',
             'assets/images/machineGun.png');
         this.game.load.image('comic1', 'assets/images/comic1.png');
+        this.game.load.image('comic2', 'assets/images/comic2.png');
+        this.game.load.image('introLevelOne',
+            'assets/images/introLevelOne.png');
+        this.game.load.image('house', 'assets/images/house.png');
+        this.game.load.image('openDoor', 'assets/images/openDoor.png');
+        this.game.load.image('working', 'assets/images/working.png');
+        this.game.load.image('jeep', 'assets/images/jeep.png');
     },
 
     update: function() {
         if (!!this.ready) {
-            this.game.state.start('menu');
+            //this.game.state.start('menu');
+            this.game.state.start('levelOne');
         }
     },
 

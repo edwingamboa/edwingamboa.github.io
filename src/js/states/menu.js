@@ -19,7 +19,7 @@ Menu.prototype = {
     },
 
     newGame: function() {
-        this.game.state.start('levelOne');
+        this.game.state.start('levelOneIntro');
     }
 };
 

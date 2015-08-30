@@ -3,13 +3,13 @@
  */
 var Weapon = require('../weapons/Weapon');
 
-var REVOLVER_NUMBER_OF_BULLETS = 10;
+var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'simpleWeapon';
 var REVOLVER_BULLET_KEY = 'bullet1';
-var REVOLVER_NEXT_FIRE = 10;
+var REVOLVER_NEXT_FIRE = 50;
 var REVOLVER_BULLET_SPEED = 700;
 var REVOLVER_FIRE_RATE = 50;
-var REVOLVER_BULLET_POWER = 5;
+var REVOLVER_BULLET_POWER = 1;
 
 var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,

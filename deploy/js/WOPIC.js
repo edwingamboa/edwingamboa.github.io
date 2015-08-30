@@ -5,21 +5,23 @@ var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
 var Boot = require('./states/Boot');
 var Preloader = require('./states/Preloader');
 var Menu = require('./states/Menu');
-var LevelOneState = require('./states/levels/LevelOne');
+var LevelOne = require('./states/levels/LevelOne');
+var LevelOneIntro = require('./states/levels/LevelOneIntro');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
-game.state.add('levelOne', LevelOneState);
+game.state.add('levelOne', LevelOne);
+game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":17,"./states/Menu":18,"./states/Preloader":19,"./states/levels/LevelOne":21}],2:[function(require,module,exports){
+},{"./states/Boot":19,"./states/Menu":20,"./states/Preloader":21,"./states/levels/LevelOne":23,"./states/levels/LevelOneIntro":24}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
 
-var SPEED = 250;
-var RUNNING_SPEED = 500;
+var SPEED = 150;
+var MAX_SPEED = 250;
 var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
@@ -35,27 +37,26 @@ var GRAVITY = 300;
  * @param {object} optionsArgs - character's physic properties
  * @constructor
  */
-var Character = function(level, x, y, spriteKey, target, optionsArgs) {
+var Character = function(level, x, y, spriteKey, optionsArgs) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
     var options = optionsArgs || {};
-    this.speed = options.speed || SPEED;
-    this.runningSpeed = options.runningSpeed || RUNNING_SPEED;
     this.healthLevel = options.healthLevel || INITIAL_HEALTH_LEVEL;
     this.maxHealthLevel = options.maxHealthLevel || MAX_HEALTH_LEVEL;
+    this.speed = options.speed || SPEED;
+    this.maxSpeed = options.maxSpeed || MAX_SPEED;
 
     level.game.physics.arcade.enable(this);
     this.body.bounce.y = options.bounce || BOUNCE;
     this.body.gravity.y = options.gravity || GRAVITY;
     this.body.collideWorldBounds = true;
-    this.anchor.setTo(0.5, 0.5);
+    this.anchor.setTo(0.5, 1);
 
     this.currentWeaponIndex = 0;
 
     this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
-    this.target = target;
 };
 
 /**
@@ -86,7 +87,7 @@ Character.prototype.moveRight = function() {
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
-    this.body.velocity.x = -this.runningSpeed;
+    this.body.velocity.x = -this.maxSpeed;
     this.animations.play('left');
 };
 
@@ -94,7 +95,7 @@ Character.prototype.runLeft = function() {
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
-    this.body.velocity.x = this.runningSpeed;
+    this.body.velocity.x = this.maxSpeed;
     this.animations.play('right');
 };
 
@@ -140,11 +141,27 @@ Character.prototype.increaseHealthLevel = function(increase) {
 Character.prototype.decreaseHealthLevel = function(decrease) {
     this.healthLevel -= decrease;
     if (this.healthLevel <= 0) {
-        for (var weaponKey in this.weapons) {
-            this.weapons[weaponKey].killWeapon();
-        }
-        this.kill();
+        this.killCharacter();
     }
+};
+
+/**
+ * Kill the character and his elements.
+ */
+Character.prototype.killCharacter = function() {
+    for (var weaponKey in this.weapons) {
+        this.weapons[weaponKey].killWeapon();
+    }
+    this.kill();
+};
+
+/**
+ * Set the character health level.
+ *
+ * @param {number} healthLevel - the new caharacter's healthLevel.
+ */
+Character.prototype.setHealthLevel = function(healthLevel) {
+    this.healthLevel = healthLevel;
 };
 
 /**
@@ -196,6 +213,16 @@ Character.prototype.fireToXY = function(x, y) {
     this.currentWeapon.fire(x, y);
 };
 
+/**
+ * Lets to relocate the character on the given coordinates
+ * @param {number} x - x coordinate to be relocated
+ * @param {number} y - y coordinate to be relocated
+ */
+Character.prototype.relocate = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
 module.exports = Character;
 
 },{}],3:[function(require,module,exports){
@@ -205,19 +232,27 @@ module.exports = Character;
 var Character = require('../character/Character');
 
 var Enemy = function(level,
-                 spriteKey,
-                 maxHealthLevel,
-                 x,
-                 y,
-                 rangeDetection,
-                 rangeAttack) {
-    Character.call(this, level, x, y, spriteKey);
+                     spriteKey,
+                     maxHealthLevel,
+                     x,
+                     y,
+                     minRangeDetection,
+                     maxRangeDetection,
+                     minRangeAttack,
+                     maxRangeAttack) {
+    var options = {
+        healthLevel : maxHealthLevel,
+        maxHealthLevel : maxHealthLevel
+    };
+    Character.call(this, level, x, y, spriteKey, options);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
         '' + this.healthLevel, {fontSize: '12px', fill: '#000'});
-    this.rangeDetection = rangeDetection;
-    this.rangeAttack = rangeAttack;
+    this.rangeDetection = level.game.rnd.integerInRange(minRangeDetection,
+        maxRangeDetection);
+    this.rangeAttack = level.game.rnd.integerInRange(minRangeAttack,
+        maxRangeAttack);
 };
 
 Enemy.prototype = Object.create(Character.prototype);
@@ -232,16 +267,20 @@ Enemy.prototype.update = function() {
     }
     this.healthLevelText.x = this.body.x;
     this.healthLevelText.y = this.body.y - 20;
-    this.currentWeapon.updateCoordinates(this.x + 20, this.y + 20);
+    this.currentWeapon.updateCoordinates(this.x + 20, this.y - 20);
 };
 
-Enemy.prototype.updateHealhtLevel = function() {
+Enemy.prototype.updateHealhtLevelText = function() {
     if (this.healthLevel > 0) {
         this.healthLevelText.text = '' + this.healthLevel;
-    }else {
-        this.healthLevelText.text = '';
-        this.level.player.increaseScore(this.maxHealthLevel * 0.1);
     }
+};
+
+Enemy.prototype.killCharacter = function() {
+    this.healthLevel = 0;
+    this.healthLevelText.text = '';
+    this.level.player.increaseScore(this.maxHealthLevel * 0.1);
+    Character.prototype.killCharacter.call(this);
 };
 
 Enemy.prototype.rotateWeapon = function(x, y) {
@@ -258,8 +297,9 @@ module.exports = Enemy;
 var Character = require('../character/Character');
 
 var NPC;
-NPC = function(level, x, y) {
-    Character.call(this, level, x, y, 'npc');
+NPC = function(level, x, y, key, comicKey) {
+    Character.call(this, level, x, y, key);
+    this.comicKey = comicKey;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
 };
@@ -275,13 +315,17 @@ module.exports = NPC;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+var SPEED = 250;
+var MAX_SPEED = 300;
+var GRAVITY = 300;
 var Character = require('../character/Character');
 
 var MINIMUM_SCORE = 10;
 var Player;
 Player = function(level) {
+    var options = {speed : SPEED, maxSpeed : MAX_SPEED};
     Character.call(this, level, 32, level.game.world.height - 150,
-        'character');
+        'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.score = MINIMUM_SCORE;
@@ -309,7 +353,7 @@ Player.prototype.decreaseScore = function(decrease) {
     this.level.updateScoreText();
 };
 
-Player.prototype.updateHealhtLevel = function() {
+Player.prototype.updateHealhtLevelText = function() {
     this.level.updateHealthLevelText();
 };
 
@@ -317,8 +361,13 @@ Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.rotation =
             this.level.game.physics.arcade.angleToPointer(this);
-        this.currentWeapon.updateCoordinates(this.x, this.y + 10);
+        this.currentWeapon.updateCoordinates(this.x, this.y - 10);
     }
+};
+
+Player.prototype.killCharacter = function() {
+
+    Character.prototype.killCharacter.call(this);
 };
 
 Player.prototype.pickUpWeapon = function(weapon) {
@@ -331,6 +380,24 @@ Player.prototype.pickUpWeapon = function(weapon) {
     }
 };
 
+Player.prototype.changeSpeed = function(speed, maxSpeed) {
+    this.speed = speed;
+    this.maxSpeed = maxSpeed;
+};
+
+Player.prototype.resetSpeed = function() {
+    this.speed = SPEED;
+    this.maxSpeed = MAX_SPEED;
+};
+
+Player.prototype.changeGravity = function(gravity) {
+    this.body.gravity.y = gravity;
+};
+
+Player.prototype.resetGravity = function() {
+    this.body.gravity.y = GRAVITY;
+};
+
 module.exports = Player;
 
 },{"../character/Character":2}],6:[function(require,module,exports){
@@ -340,20 +407,24 @@ module.exports = Player;
 var Enemy = require('../character/Enemy');
 var Revolver = require('../weapons/Revolver');
 
-var SIMPLE_ENEMY_SPRITE_KEY = 'simple_enemy';
-var SIMPLE_ENEMY_MAX_HEALTH_LEVEL = 70;
-var SIMPLE_ENEMY_RANGE_DETECTION = 700;
-var SIMPLE_ENEMY_RANGE_ATTACK = 300;
+var SPRITE_KEY = 'simple_enemy';
+var MAX_HEALTH_LEVEL = 5;
+var MIN_RANGE_DETECTION = 500;
+var MIN_RANGE_ATTACK = 100;
+var MAX_RANGE_DETECTION = 700;
+var MAX_RANGE_ATTACK = 300;
 
 var SimpleEnemy = function(level, x, y) {
     Enemy.call(this,
         level,
-        SIMPLE_ENEMY_SPRITE_KEY,
-        SIMPLE_ENEMY_MAX_HEALTH_LEVEL,
+        SPRITE_KEY,
+        MAX_HEALTH_LEVEL,
         x,
         y,
-        SIMPLE_ENEMY_RANGE_DETECTION,
-        SIMPLE_ENEMY_RANGE_ATTACK);
+        MIN_RANGE_DETECTION,
+        MAX_RANGE_DETECTION,
+        MIN_RANGE_ATTACK,
+        MAX_RANGE_ATTACK);
 
     this.addWeapon(new Revolver(this, x, y, true));
     this.updateCurrentWeapon('simpleWeapon');
@@ -371,20 +442,26 @@ module.exports = SimpleEnemy;
 var Enemy = require('../character/Enemy');
 var MachineGun = require('../weapons/MachineGun');
 
-var STRONG_ENEMY_SPRITE_KEY = 'strong_enemy';
-var STRONG_ENEMY_MAX_HEALTH_LEVEL = 150;
-var STRONG_ENEMY_RANGE_DETECTION = 1000;
-var STRONG_ENEMY_RANGE_ATTACK = 600;
+var SPRITE_KEY = 'strong_enemy';
+var MAX_HEALTH_LEVEL = 150;
+var MIN_RANGE_DETECTION = 1000;
+var MIN_RANGE_ATTACK = 600;
+var MAX_RANGE_DETECTION = 1000;
+var MAX_RANGE_ATTACK = 600;
 
 var StrongEnemy = function(level, x, y) {
-    Enemy.call(this,
+    Enemy.call(
+        this,
         level,
-        STRONG_ENEMY_SPRITE_KEY,
-        STRONG_ENEMY_MAX_HEALTH_LEVEL,
+        SPRITE_KEY,
+        MAX_HEALTH_LEVEL,
         x,
         y,
-        STRONG_ENEMY_RANGE_DETECTION,
-        STRONG_ENEMY_RANGE_ATTACK);
+        MIN_RANGE_DETECTION,
+        MAX_RANGE_DETECTION,
+        MIN_RANGE_ATTACK,
+        MAX_RANGE_ATTACK
+    );
 
     this.addWeapon(new MachineGun(this, x, y, true));
     this.updateCurrentWeapon('strongWeapon');
@@ -436,7 +513,6 @@ module.exports = HealthPack;
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var HealthPack = require('../inventory/HealthPack');
 var PopUp = require('../util/PopUp');
 var ItemGroupView = require('../inventory/ItemGroupView');
 
@@ -489,7 +565,7 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../inventory/HealthPack":8,"../inventory/ItemGroupView":11,"../util/PopUp":12}],10:[function(require,module,exports){
+},{"../inventory/ItemGroupView":11,"../util/PopUp":12}],10:[function(require,module,exports){
 var Item;
 Item = function(game, type) {
     this.type = type;
@@ -560,22 +636,21 @@ module.exports = ItemGroupView;
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var PopUp;
-PopUp = function(level, backgroundKey) {
+var PopUp = function(level, backgroundKey) {
     Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
         level.game.camera.height / 2, backgroundKey);
 
     this.bringToTop();
     this.anchor.set(0.5);
 
-    this.closeButton = level.game.make.sprite(this.width / 2,
+    this.openDoorButton = level.game.make.sprite(this.width / 2,
         -this.height / 2, 'close');
-    this.closeButton.anchor.set(0.5);
-    this.closeButton.inputEnabled = true;
-    this.closeButton.input.priorityID = 2;
-    this.closeButton.events.onInputDown.add(this.close, this);
+    this.openDoorButton.anchor.set(0.5);
+    this.openDoorButton.inputEnabled = true;
+    this.openDoorButton.input.priorityID = 2;
+    this.openDoorButton.events.onInputDown.add(this.close, this);
 
-    this.addChild(this.closeButton);
+    this.addChild(this.openDoorButton);
 
     this.fixedToCamera = true;
     this.visible = false;
@@ -625,7 +700,7 @@ module.exports = Bullet;
  */
 var Weapon = require('../weapons/Weapon');
 
-var MACHINE_GUN_NUMBER_OF_BULLETS = 30; //No matter, it's infinite
+var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
 var MACHINE_GUN_KEY = 'strongWeapon';
 var MACHINE_GUN_BULLET_KEY = 'bullet2';
 var MACHINE_GUN_NEXT_FIRE = 1;
@@ -660,13 +735,13 @@ module.exports = MachineGun;
  */
 var Weapon = require('../weapons/Weapon');
 
-var REVOLVER_NUMBER_OF_BULLETS = 10;
+var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'simpleWeapon';
 var REVOLVER_BULLET_KEY = 'bullet1';
-var REVOLVER_NEXT_FIRE = 10;
+var REVOLVER_NEXT_FIRE = 50;
 var REVOLVER_BULLET_SPEED = 700;
 var REVOLVER_FIRE_RATE = 50;
-var REVOLVER_BULLET_POWER = 5;
+var REVOLVER_BULLET_POWER = 1;
 
 var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,
@@ -770,6 +845,89 @@ module.exports = Weapon;
 
 },{"../weapons/Bullet":13}],17:[function(require,module,exports){
 /**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+var PopUp = require('../util/PopUp');
+
+var DEFAULT_CAR_SPEED = 400;
+var DEFAULT_CAR_MAX_SPEED = 500;
+var CAR_GRAVITY = 30000;
+
+var InteractiveCar = function(level, x, y, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+
+    this.anchor.set(0, 0);
+
+    this.getOnButton = level.game.make.sprite(this.width / 2,
+        -this.height, 'openDoor');
+    this.getOnButton.anchor.set(0.5);
+    this.getOnButton.inputEnabled = true;
+    this.getOnButton.input.priorityID = 2;
+    this.getOnButton.events.onInputDown.add(this.getOn, this);
+
+    this.addChild(this.getOnButton);
+
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    this.anchor.set(0, 1);
+
+    this.level = level;
+    this.occupied = false;
+};
+
+InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveCar.prototype.constructor = InteractiveCar;
+
+InteractiveCar.prototype.getOn = function() {
+    this.level.player.relocate(this.x, this.y - 10);
+    this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
+    this.level.player.changeGravity(CAR_GRAVITY);
+    this.occupied = true;
+};
+
+InteractiveCar.prototype.update = function() {
+    if (this.occupied) {
+        this.x = this.level.player.x;
+        //this.y = this.level.player.y;
+    }
+};
+
+module.exports = InteractiveCar;
+
+},{"../util/PopUp":12}],18:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+var PopUp = require('../util/PopUp');
+var InteractiveHouse = function(level, x, y, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+
+    this.anchor.set(0, 0);
+
+    this.openDoorButton = level.game.make.sprite(this.width / 2,
+        -this.height / 2, 'openDoor');
+    this.openDoorButton.anchor.set(0.5);
+    this.openDoorButton.inputEnabled = true;
+    this.openDoorButton.input.priorityID = 2;
+    this.openDoorButton.events.onInputDown.add(this.openActivity, this);
+
+    this.addChild(this.openDoorButton);
+    this.level = level;
+};
+
+InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveHouse.prototype.constructor = InteractiveHouse;
+
+InteractiveHouse.prototype.openActivity = function() {
+    var popUp = new PopUp(this.level, 'working');
+    this.level.game.add.existing(popUp);
+    popUp.open();
+};
+
+module.exports = InteractiveHouse;
+
+},{"../util/PopUp":12}],19:[function(require,module,exports){
+/**
  * Created by Edwin Gamboa on 07/07/2015.
  */
 var Boot;
@@ -791,7 +949,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -813,13 +971,13 @@ Menu.prototype = {
     },
 
     newGame: function() {
-        this.game.state.start('levelOne');
+        this.game.state.start('levelOneIntro');
     }
 };
 
 module.exports = Menu;
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -874,6 +1032,8 @@ Preloader.prototype = {
             32, 48);
         this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
             32, 48);
+        this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
+            32, 48);
         this.game.load.spritesheet('simple_enemy',
             'assets/sprites/simple_enemy.png', 32, 32);
         this.game.load.spritesheet('strong_enemy',
@@ -887,11 +1047,19 @@ Preloader.prototype = {
         this.game.load.image('strongWeapon',
             'assets/images/machineGun.png');
         this.game.load.image('comic1', 'assets/images/comic1.png');
+        this.game.load.image('comic2', 'assets/images/comic2.png');
+        this.game.load.image('introLevelOne',
+            'assets/images/introLevelOne.png');
+        this.game.load.image('house', 'assets/images/house.png');
+        this.game.load.image('openDoor', 'assets/images/openDoor.png');
+        this.game.load.image('working', 'assets/images/working.png');
+        this.game.load.image('jeep', 'assets/images/jeep.png');
     },
 
     update: function() {
         if (!!this.ready) {
-            this.game.state.start('menu');
+            //this.game.state.start('menu');
+            this.game.state.start('levelOne');
         }
     },
 
@@ -902,7 +1070,7 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -915,10 +1083,7 @@ var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
 var StrongEnemy = require('../../prefabs/character/StrongEnemy');
 var NPC = require('../../prefabs/character/NPC');
 var PopUp = require('../../prefabs/util/PopUp');
-
-var WORLD_WIDTH = 3000;
-var WORLD_HEIGHT = 500;
-var MIN_Y = WORLD_HEIGHT - 100;
+var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 
 var Level = function(game) {
     this.game = game;
@@ -928,16 +1093,21 @@ Level.prototype.constructor = Level;
 
 Level.prototype.preload = function() {
     this.game.stage.backgroundColor = '#82CAFA';
+    this.WORLD_WIDTH = 8000;
+    this.WORLD_HEIGHT = 500;
+    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
 };
 
 Level.prototype.create = function() {
-    this.game.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
 
     this.createHealthPacksGroup();
     this.createWeaponsGroup();
     this.createEnemiesGroup();
+    this.createNpcsGroup();
+    this.createCarsGroup();
     this.addPlayer();
     this.addPlatforms();
     this.addTexts();
@@ -945,6 +1115,7 @@ Level.prototype.create = function() {
     this.addCamera();
     this.createInventory();
 };
+
 Level.prototype.updateEnemies = function() {
     for (var i = 0; i < this.enemies.children.length; i++) {
         var enemy = this.enemies.children[i];
@@ -973,9 +1144,30 @@ Level.prototype.updateEnemies = function() {
     }
 };
 
+Level.prototype.updateNpcs = function() {
+    for (var i = 0; i < this.npcs.children.length; i++) {
+        var npc = this.npcs.children[i];
+
+        var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
+            this.player, npc);
+        if (distanceNpcPlayer <= npc.width) {
+            var comic = new PopUp(this, npc.comicKey);
+            this.game.add.existing(comic);
+            comic.open();
+            if (this.player.x < npc.x) {
+                this.player.x += 2 * npc.width;
+            } else {
+                this.player.x -= 2 * npc.width;
+            }
+
+        }
+    }
+};
+
 Level.prototype.update = function() {
     //Collisions
     this.updateEnemies();
+    this.updateNpcs();
 
     this.game.physics.arcade.collide(this.gameObjects, this.platforms);
     this.game.physics.arcade.collide(this.player, this.enemies);
@@ -983,6 +1175,8 @@ Level.prototype.update = function() {
         this.collectHealthPack, null, this);
     this.game.physics.arcade.overlap(this.player, this.weapons,
         this.collectWeapon, null, this);
+    this.game.physics.arcade.overlap(this.cars, this.enemies,
+        this.crashEnemy, null, this);
 
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
@@ -992,20 +1186,6 @@ Level.prototype.update = function() {
             null,
             this
         );
-    }
-
-    var distanceNeighborPlayer = this.game.physics.arcade.distanceBetween(
-        this.player, this.neighbor);
-    if (distanceNeighborPlayer <= this.neighbor.width) {
-        var comicOne = new PopUp(this, 'comic1');
-        this.game.add.existing(comicOne);
-        comicOne.open();
-        if (this.player.x < this.neighbor.x) {
-            this.player.x += 2 * this.neighbor.width;
-        } else {
-            this.player.x -= 2 * this.neighbor.width;
-        }
-
     }
 
     this.game.physics.arcade.overlap(this.player, this.healthPacks,
@@ -1048,18 +1228,30 @@ Level.prototype.createEnemiesGroup = function() {
     this.gameObjects.push(this.enemies);
 };
 
+Level.prototype.createNpcsGroup = function() {
+    this.npcs = this.game.add.group();
+    this.gameObjects.push(this.npcs);
+};
+
+Level.prototype.createCarsGroup = function() {
+    this.cars = this.game.add.group();
+    this.gameObjects.push(this.cars);
+};
+
 Level.prototype.addSimpleEnemy = function(x) {
-    this.enemies.add(new SimpleEnemy(this, x, MIN_Y));
+    this.enemies.add(new SimpleEnemy(this, x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addStrongEnemy = function(x) {
-    this.enemies.add(new StrongEnemy(this, x, MIN_Y));
+    this.enemies.add(new StrongEnemy(this, x, this.GROUND_HEIGHT - 100));
 };
 
-Level.prototype.addNPC = function(x, y) {
-    this.neighbor = new NPC(this, x, MIN_Y);
-    this.game.add.existing(this.neighbor);
-    this.gameObjects.push(this.neighbor);
+Level.prototype.addNPC = function(x, key, comicKey) {
+    this.npcs.add(new NPC(this, x, this.GROUND_HEIGHT - 100, key, comicKey));
+};
+
+Level.prototype.addCar = function(x, key) {
+    this.cars.add(new InteractiveCar(this, x, this.GROUND_HEIGHT, key));
 };
 
 Level.prototype.addPlatforms = function() {
@@ -1068,13 +1260,19 @@ Level.prototype.addPlatforms = function() {
 
     this.ground = this.platforms.create(0, this.game.world.height - 64,
         'ground');
-    this.ground.scale.setTo(10, 2);
+    this.ground.scale.setTo(40, 2);
     this.ground.body.immovable = true;
 
     this.ledge = this.platforms.create(400, 300, 'ground');
     this.ledge.body.immovable = true;
     this.ledge = this.platforms.create(-150, 200, 'ground');
     this.ledge.body.immovable = true;
+};
+
+Level.prototype.addObject = function(object) {
+    //var object = this.game.add.sprite(x, y, key);
+    //object.anchor.setTo(0, 0);
+    this.game.add.existing(object);
 };
 
 Level.prototype.addPlayer = function() {
@@ -1144,7 +1342,7 @@ Level.prototype.createInventory = function() {
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevel();
+    character.updateHealhtLevelText();
     bullet.kill();
 };
 
@@ -1152,6 +1350,10 @@ Level.prototype.collectWeapon = function(player, weapon) {
     this.weapons.remove(weapon);
     this.player.pickUpWeapon(weapon);
     this.updateAmmoText();
+};
+
+Level.prototype.crashEnemy = function(car, enemy) {
+    enemy.killCharacter();
 };
 
 Level.prototype.collectHealthPack = function(player, healthPack) {
@@ -1215,11 +1417,15 @@ Level.prototype.resume = function() {
 
 module.exports = Level;
 
-},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/inventory/HealthPack":8,"../../prefabs/inventory/Inventory":9,"../../prefabs/util/PopUp":12,"../../prefabs/weapons/MachineGun":14,"../../prefabs/weapons/Revolver":15}],21:[function(require,module,exports){
+},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/inventory/HealthPack":8,"../../prefabs/inventory/Inventory":9,"../../prefabs/util/PopUp":12,"../../prefabs/weapons/MachineGun":14,"../../prefabs/weapons/Revolver":15,"../../prefabs/worldElements/InteractiveCar":17}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
+var InteractiveHouse = require ('../../prefabs/worldElements/InteractiveHouse');
+
+var CHECK_POINT_X_ONE;
+var CHECK_POINTS_DISTANCE;
 
 var LevelOne = function(game) {
     Level.call(this, game);
@@ -1230,29 +1436,81 @@ LevelOne.prototype.constructor = LevelOne;
 
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
+    CHECK_POINT_X_ONE = this.game.camera.width * 1.7;
+    CHECK_POINTS_DISTANCE = this.game.camera.width;
     this.addNPCs();
     this.addEnemies();
+    this.addObjects();
     this.addRevolver(2000, 400, false);
     this.addMachineGun(2400, 400, false);
+    this.player.bringToTop();
+};
+
+LevelOne.prototype.addObjects = function() {
+    var friendsHouse = new InteractiveHouse(
+        this,
+        CHECK_POINT_X_ONE + 1.5 * CHECK_POINTS_DISTANCE,
+        this.GROUND_HEIGHT,
+        'house'
+    );
+    friendsHouse.anchor.set(0, 1);
+    this.addObject(friendsHouse);
+    this.addCar(CHECK_POINT_X_ONE + 2 * CHECK_POINTS_DISTANCE, 'jeep');
 };
 
 LevelOne.prototype.addNPCs = function() {
-    this.addNPC(this.game.camera.width / 2, 350);
+    this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
+    this.addNPC(CHECK_POINT_X_ONE + CHECK_POINTS_DISTANCE, 'friend', 'comic2');
 };
 
 LevelOne.prototype.addEnemies = function() {
-    var x = this.game.camera.width;
+    var x = CHECK_POINT_X_ONE;
     var y = 350;
     for (var i = 0; i < 5; i++) {
         x += 30;
         this.addSimpleEnemy(x, y);
     }
-    for (var j = 0; j < 2; j++) {
-        x += 50;
-        this.addStrongEnemy(x, y);
-    }
 };
 
 module.exports = LevelOne;
 
-},{"../levels/Level":20}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]);
+},{"../../prefabs/worldElements/InteractiveHouse":18,"../levels/Level":22}],24:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+/**
+ * Created by Edwin Gamboa on 22/07/2015.
+ */
+var LevelOneIntro = function(game) {};
+
+LevelOneIntro.prototype = {
+    create: function() {
+        var centerX = this.game.camera.width / 2;
+        var centerY = this.game.camera.height / 2;
+
+        this.background = this.game.add.sprite(centerX, centerY,
+            'introLevelOne');
+        this.background.anchor.setTo(0.5, 0.5);
+
+        var continueButton = this.game.add.text(
+            this.game.camera.width - 80,
+            this.game.camera.height - 30,
+            'Continue');
+        //Font style
+        continueButton.font = 'Arial';
+        continueButton.fontSize = 30;
+        continueButton.fontWeight = 'bold';
+        continueButton.fill = '#0040FF';
+        continueButton.anchor.set(0.5);
+        continueButton.inputEnabled = true;
+        continueButton.events.onInputDown.add(this.continue, this);
+    },
+
+    continue: function() {
+        this.game.state.start('levelOne');
+    }
+};
+
+module.exports = LevelOneIntro;
+
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);

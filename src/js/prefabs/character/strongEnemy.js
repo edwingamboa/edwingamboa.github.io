@@ -4,20 +4,26 @@
 var Enemy = require('../character/Enemy');
 var MachineGun = require('../weapons/MachineGun');
 
-var STRONG_ENEMY_SPRITE_KEY = 'strong_enemy';
-var STRONG_ENEMY_MAX_HEALTH_LEVEL = 150;
-var STRONG_ENEMY_RANGE_DETECTION = 1000;
-var STRONG_ENEMY_RANGE_ATTACK = 600;
+var SPRITE_KEY = 'strong_enemy';
+var MAX_HEALTH_LEVEL = 150;
+var MIN_RANGE_DETECTION = 1000;
+var MIN_RANGE_ATTACK = 600;
+var MAX_RANGE_DETECTION = 1000;
+var MAX_RANGE_ATTACK = 600;
 
 var StrongEnemy = function(level, x, y) {
-    Enemy.call(this,
+    Enemy.call(
+        this,
         level,
-        STRONG_ENEMY_SPRITE_KEY,
-        STRONG_ENEMY_MAX_HEALTH_LEVEL,
+        SPRITE_KEY,
+        MAX_HEALTH_LEVEL,
         x,
         y,
-        STRONG_ENEMY_RANGE_DETECTION,
-        STRONG_ENEMY_RANGE_ATTACK);
+        MIN_RANGE_DETECTION,
+        MAX_RANGE_DETECTION,
+        MIN_RANGE_ATTACK,
+        MAX_RANGE_ATTACK
+    );
 
     this.addWeapon(new MachineGun(this, x, y, true));
     this.updateCurrentWeapon('strongWeapon');
