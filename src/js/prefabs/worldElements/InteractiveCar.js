@@ -24,6 +24,8 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.anchor.set(0, 1);
+    this.animations.add('left', [0], 10, true);
+    this.animations.add('right', [1], 10, true);
 
     this.level = level;
     this.occupied = false;
@@ -41,9 +43,17 @@ InteractiveCar.prototype.getOn = function() {
 
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
-        this.x = this.level.player.x;
-        //this.y = this.level.player.y;
+        this.body.velocity.x = this.level.player.body.velocity.x;
+        if (this.body.velocity.x < 0) {
+            this.animations.play('left');
+        }else {
+            this.animations.play('right');
+        }
     }
+};
+
+InteractiveCar.prototype.isStopped = function() {
+    return this.body.velocity.x === 0;
 };
 
 module.exports = InteractiveCar;

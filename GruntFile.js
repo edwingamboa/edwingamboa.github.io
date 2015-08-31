@@ -196,7 +196,7 @@
         connect: {
             root: {
                 options: {
-                    port: 81,
+                    port: 80,
                     base: './deploy',
                     livereload: true
                 }

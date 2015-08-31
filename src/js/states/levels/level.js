@@ -280,7 +280,9 @@ Level.prototype.collectWeapon = function(player, weapon) {
 };
 
 Level.prototype.crashEnemy = function(car, enemy) {
-    enemy.killCharacter();
+    if (!car.isStopped()) {
+        enemy.killCharacter();
+    }
 };
 
 Level.prototype.collectHealthPack = function(player, healthPack) {

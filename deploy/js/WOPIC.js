@@ -409,9 +409,9 @@ var Revolver = require('../weapons/Revolver');
 
 var SPRITE_KEY = 'simple_enemy';
 var MAX_HEALTH_LEVEL = 5;
-var MIN_RANGE_DETECTION = 500;
-var MIN_RANGE_ATTACK = 100;
+var MIN_RANGE_DETECTION = 200;
 var MAX_RANGE_DETECTION = 700;
+var MIN_RANGE_ATTACK = 50;
 var MAX_RANGE_ATTACK = 300;
 
 var SimpleEnemy = function(level, x, y) {
@@ -870,6 +870,8 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.anchor.set(0, 1);
+    this.animations.add('left', [0], 10, true);
+    this.animations.add('right', [1], 10, true);
 
     this.level = level;
     this.occupied = false;
@@ -887,9 +889,17 @@ InteractiveCar.prototype.getOn = function() {
 
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
-        this.x = this.level.player.x;
-        //this.y = this.level.player.y;
+        this.body.velocity.x = this.level.player.body.velocity.x;
+        if (this.body.velocity.x < 0) {
+            this.animations.play('left');
+        }else {
+            this.animations.play('right');
+        }
     }
+};
+
+InteractiveCar.prototype.isStopped = function() {
+    return this.body.velocity.x === 0;
 };
 
 module.exports = InteractiveCar;
@@ -1038,6 +1048,7 @@ Preloader.prototype = {
             'assets/sprites/simple_enemy.png', 32, 32);
         this.game.load.spritesheet('strong_enemy',
             'assets/sprites/strong_enemy.png', 64, 64);
+        this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 145, 99);
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
@@ -1053,7 +1064,6 @@ Preloader.prototype = {
         this.game.load.image('house', 'assets/images/house.png');
         this.game.load.image('openDoor', 'assets/images/openDoor.png');
         this.game.load.image('working', 'assets/images/working.png');
-        this.game.load.image('jeep', 'assets/images/jeep.png');
     },
 
     update: function() {
@@ -1353,7 +1363,9 @@ Level.prototype.collectWeapon = function(player, weapon) {
 };
 
 Level.prototype.crashEnemy = function(car, enemy) {
-    enemy.killCharacter();
+    if (!car.isStopped()) {
+        enemy.killCharacter();
+    }
 };
 
 Level.prototype.collectHealthPack = function(player, healthPack) {
@@ -1437,7 +1449,7 @@ LevelOne.prototype.constructor = LevelOne;
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
     CHECK_POINT_X_ONE = this.game.camera.width * 1.7;
-    CHECK_POINTS_DISTANCE = this.game.camera.width;
+    CHECK_POINTS_DISTANCE = this.game.camera.width + 200;
     this.addNPCs();
     this.addEnemies();
     this.addObjects();
@@ -1447,15 +1459,25 @@ LevelOne.prototype.create = function() {
 };
 
 LevelOne.prototype.addObjects = function() {
-    var friendsHouse = new InteractiveHouse(
+    var gunsStore = new InteractiveHouse(
         this,
         CHECK_POINT_X_ONE + 1.5 * CHECK_POINTS_DISTANCE,
         this.GROUND_HEIGHT,
         'house'
     );
+    gunsStore.anchor.set(0, 1);
+    this.addObject(gunsStore);
+
+    var friendsHouse = new InteractiveHouse(
+        this,
+        CHECK_POINT_X_ONE + 5 * CHECK_POINTS_DISTANCE,
+        this.GROUND_HEIGHT,
+        'house'
+    );
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
-    this.addCar(CHECK_POINT_X_ONE + 2 * CHECK_POINTS_DISTANCE, 'jeep');
+
+    this.addCar(CHECK_POINT_X_ONE + 3 * CHECK_POINTS_DISTANCE, 'jeep');
 };
 
 LevelOne.prototype.addNPCs = function() {
@@ -1466,9 +1488,12 @@ LevelOne.prototype.addNPCs = function() {
 LevelOne.prototype.addEnemies = function() {
     var x = CHECK_POINT_X_ONE;
     var y = 350;
-    for (var i = 0; i < 5; i++) {
-        x += 30;
-        this.addSimpleEnemy(x, y);
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 5; j++) {
+            x += 30;
+            this.addSimpleEnemy(x, y);
+        }
+        x += 2 * CHECK_POINTS_DISTANCE;
     }
 };
 

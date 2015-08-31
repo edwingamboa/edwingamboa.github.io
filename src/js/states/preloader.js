@@ -58,6 +58,7 @@ Preloader.prototype = {
             'assets/sprites/simple_enemy.png', 32, 32);
         this.game.load.spritesheet('strong_enemy',
             'assets/sprites/strong_enemy.png', 64, 64);
+        this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 145, 99);
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
@@ -73,7 +74,6 @@ Preloader.prototype = {
         this.game.load.image('house', 'assets/images/house.png');
         this.game.load.image('openDoor', 'assets/images/openDoor.png');
         this.game.load.image('working', 'assets/images/working.png');
-        this.game.load.image('jeep', 'assets/images/jeep.png');
     },
 
     update: function() {
