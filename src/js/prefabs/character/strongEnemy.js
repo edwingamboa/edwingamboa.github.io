@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('../character/Enemy');
-var MachineGun = require('../weapons/MachineGun');
+var MachineGun = require('../items/weapons/MachineGun');
 
 var SPRITE_KEY = 'strong_enemy';
 var MAX_HEALTH_LEVEL = 150;

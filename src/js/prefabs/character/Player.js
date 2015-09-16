@@ -58,7 +58,7 @@ Player.prototype.killCharacter = function() {
     Character.prototype.killCharacter.call(this);
 };
 
-Player.prototype.pickUpWeapon = function(weapon) {
+Player.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
         this.updateCurrentWeapon(weapon.key);
@@ -84,6 +84,15 @@ Player.prototype.changeGravity = function(gravity) {
 
 Player.prototype.resetGravity = function() {
     this.body.gravity.y = GRAVITY;
+};
+
+Player.prototype.buyItem = function(item) {
+    if (this.score >= item.price) {
+        this.score -= item.price;
+        return true;
+    }else {
+        return false;
+    }
 };
 
 module.exports = Player;

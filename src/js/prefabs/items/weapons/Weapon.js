@@ -1,18 +1,20 @@
+var Item = require('../Item');
 var Bullet = require('../weapons/Bullet');
-var Weapon = function(level,
-                  x,
-                  y,
-                  numberOfBullets,
-                  weaponKey,
-                  bulletKey,
-                  nextFire,
-                  bulletSpeed,
-                  fireRate,
-                  power,
-                  infinite) {
-    Phaser.Sprite.call(this, level.game, x, y, weaponKey);
 
-    level.game.physics.arcade.enable(this);
+var Weapon = function(level,
+                      x,
+                      y,
+                      numberOfBullets,
+                      weaponKey,
+                      bulletKey,
+                      nextFire,
+                      bulletSpeed,
+                      fireRate,
+                      power,
+                      infinite,
+                      price) {
+    Item.call(this, level, x, y, weaponKey, price);
+
     this.anchor.set(0.1, 0.5);
 
     this.numberOfBullets = numberOfBullets;
@@ -30,7 +32,7 @@ var Weapon = function(level,
     this.infinite = infinite;
 };
 
-Weapon.prototype = Object.create(Phaser.Sprite.prototype);
+Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
@@ -61,7 +63,8 @@ Weapon.prototype.use = function() {
     if (!this.alive) {
         this.revive();
     }
-    //this.level.addHealthPack(this);
+    this.level.player.useWeapon(this);
+    this.level.updateAmmoText();
 };
 
 Weapon.prototype.addBullets = function(amount) {
@@ -71,7 +74,6 @@ Weapon.prototype.addBullets = function(amount) {
 Weapon.prototype.killWeapon = function() {
     this.bullets.removeAll();
     this.kill();
-
 };
 
 module.exports = Weapon;

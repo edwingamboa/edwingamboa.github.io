@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('../character/Enemy');
-var Revolver = require('../weapons/Revolver');
+var Revolver = require('../items/weapons/Revolver');
 
 var SPRITE_KEY = 'simple_enemy';
 var MAX_HEALTH_LEVEL = 5;

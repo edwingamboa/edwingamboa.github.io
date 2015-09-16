@@ -1,16 +1,18 @@
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var Inventory = require('../../prefabs/inventory/Inventory');
-var HealthPack = require('../../prefabs/inventory/HealthPack');
+var Inventory = require('../../prefabs/items/inventory/Inventory');
+var Store = require('../../prefabs/items/store/Store');
+var HealthPack = require('../../prefabs/items/HealthPack');
 var Player = require('../../prefabs/character/Player');
-var Revolver = require('../../prefabs/weapons/Revolver');
-var MachineGun = require('../../prefabs/weapons/MachineGun');
+var Revolver = require('../../prefabs/items/weapons/Revolver');
+var MachineGun = require('../../prefabs/items/weapons/MachineGun');
 var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
 var StrongEnemy = require('../../prefabs/character/StrongEnemy');
 var NPC = require('../../prefabs/character/NPC');
 var PopUp = require('../../prefabs/util/PopUp');
 var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
+var Dialog = require('../../prefabs/util/Dialog');
 
 var Level = function(game) {
     this.game = game;
@@ -41,6 +43,8 @@ Level.prototype.create = function() {
     this.addControls();
     this.addCamera();
     this.createInventory();
+    this.createDialogs();
+    this.createStore();
 };
 
 Level.prototype.updateEnemies = function() {
@@ -246,8 +250,7 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack('healthPack5', 5, 300,
-        0.7 + Math.random() * 0.2, 500, 100, this));
+    this.addHealthPack(new HealthPack(this, 500, 10, 5, this));
 };
 
 Level.prototype.createWeaponsGroup = function() {
@@ -267,6 +270,25 @@ Level.prototype.createInventory = function() {
     this.inventoryButton.input.priorityID = 1;
 };
 
+Level.prototype.createStore = function() {
+    this.store = new Store(this);
+    this.game.add.existing(this.store);
+
+    this.storeButton = this.game.add.button(110,
+        this.game.camera.height - 30, 'storeButton',
+        this.store.open, this.store);
+    this.storeButton.anchor.setTo(0.5, 0.5);
+    this.storeButton.fixedToCamera = true;
+    this.storeButton.input.priorityID = 1;
+};
+
+Level.prototype.createDialogs = function() {
+    this.errorDialog = new Dialog(this, 'errorIcon');
+    this.successDialog = new Dialog(this, 'successIcon');
+    this.game.add.existing(this.errorDialog);
+    this.game.add.existing(this.successDialog);
+};
+
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
     character.updateHealhtLevelText();
@@ -275,7 +297,7 @@ Level.prototype.bulletHitCharacter = function(character, bullet) {
 
 Level.prototype.collectWeapon = function(player, weapon) {
     this.weapons.remove(weapon);
-    this.player.pickUpWeapon(weapon);
+    this.player.useWeapon(weapon);
     this.updateAmmoText();
 };
 
@@ -342,6 +364,16 @@ Level.prototype.pause = function() {
 
 Level.prototype.resume = function() {
     this.game.physics.arcade.isPaused = false;
+};
+
+Level.prototype.showErrorMessage = function(errorMessage) {
+    this.errorDialog.setText(errorMessage);
+    this.errorDialog.open();
+};
+
+Level.prototype.showSuccessMessage = function(successMessage) {
+    this.successDialog.setText(successMessage);
+    this.successDialog.open();
 };
 
 module.exports = Level;

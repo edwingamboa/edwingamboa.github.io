@@ -15,7 +15,7 @@ game.state.add('levelOne', LevelOne);
 game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":19,"./states/Menu":20,"./states/Preloader":21,"./states/levels/LevelOne":23,"./states/levels/LevelOneIntro":24}],2:[function(require,module,exports){
+},{"./states/Boot":24,"./states/Menu":25,"./states/Preloader":26,"./states/levels/LevelOne":28,"./states/levels/LevelOneIntro":29}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -370,7 +370,7 @@ Player.prototype.killCharacter = function() {
     Character.prototype.killCharacter.call(this);
 };
 
-Player.prototype.pickUpWeapon = function(weapon) {
+Player.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
         this.updateCurrentWeapon(weapon.key);
@@ -398,6 +398,15 @@ Player.prototype.resetGravity = function() {
     this.body.gravity.y = GRAVITY;
 };
 
+Player.prototype.buyItem = function(item) {
+    if (this.score >= item.price) {
+        this.score -= item.price;
+        return true;
+    }else {
+        return false;
+    }
+};
+
 module.exports = Player;
 
 },{"../character/Character":2}],6:[function(require,module,exports){
@@ -405,7 +414,7 @@ module.exports = Player;
  * Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('../character/Enemy');
-var Revolver = require('../weapons/Revolver');
+var Revolver = require('../items/weapons/Revolver');
 
 var SPRITE_KEY = 'simple_enemy';
 var MAX_HEALTH_LEVEL = 5;
@@ -435,12 +444,12 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../character/Enemy":3,"../weapons/Revolver":15}],7:[function(require,module,exports){
+},{"../character/Enemy":3,"../items/weapons/Revolver":18}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('../character/Enemy');
-var MachineGun = require('../weapons/MachineGun');
+var MachineGun = require('../items/weapons/MachineGun');
 
 var SPRITE_KEY = 'strong_enemy';
 var MAX_HEALTH_LEVEL = 150;
@@ -472,27 +481,23 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../character/Enemy":3,"../weapons/MachineGun":14}],8:[function(require,module,exports){
-var HealthPack;
-HealthPack = function(key,
-                      maxIncreasing,
-                      gravity,
-                      bounce,
-                      xPos,
-                      yPos,
-                      level) {
-    Phaser.Sprite.call(this, level.game, xPos, yPos, key);
-    this.anchor.set(0.5);
+},{"../character/Enemy":3,"../items/weapons/MachineGun":17}],8:[function(require,module,exports){
+var Item = require('../items/Item');
+
+var PRCE_INCREASE_RATE = 10;
+var GRAVITY = 300;
+
+var HealthPack = function(level,
+                          x,
+                          y,
+                          maxIncreasing) {
+    Item.call(this, level, x, y, 'healthPack' + maxIncreasing,
+        maxIncreasing * PRCE_INCREASE_RATE);
+    this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
-    level.game.physics.arcade.enable(this);
-    this.body.bounce.y = bounce;
-    this.body.gravity.y = gravity;
-    this.body.collideWorldBounds = true;
-    this.level = level;
-    return this;
 };
 
-HealthPack.prototype = Object.create(Phaser.Sprite.prototype);
+HealthPack.prototype = Object.create(Item.prototype);
 HealthPack.prototype.constructor = HealthPack;
 
 HealthPack.prototype.pickUp = function() {
@@ -504,21 +509,130 @@ HealthPack.prototype.use = function() {
         this.revive();
     }
     this.x = this.level.player.x;
+    this.y = 50;
     this.level.addHealthPack(this);
 };
 
 module.exports = HealthPack;
 
-},{}],9:[function(require,module,exports){
+},{"../items/Item":9}],9:[function(require,module,exports){
+var BOUNCE = 0.7 + Math.random() * 0.2;
+
+var Item = function(level, x, y, key, price) {
+    Phaser.Sprite.call(this, level.game, x, y, key);
+    this.anchor.set(0.5, 0.5);
+    level.game.physics.arcade.enable(this);
+    this.body.bounce.y = BOUNCE;
+    this.body.collideWorldBounds = true;
+    this.level = level;
+    this.price = price;
+};
+
+Item.prototype = Object.create(Phaser.Sprite.prototype);
+Item.prototype.constructor = Item;
+
+module.exports = Item;
+
+},{}],10:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 17/07/2015.
+ */
+var ItemGroupView = function(level,
+                             item,
+                             buttonKey,
+                             parentView) {
+    Phaser.Sprite.call(this, level.game, 0, 0, 'itemGroupBackGround');
+    this.icon = level.game.make.sprite(this.width / 2,
+        this.height / 2, item.key);
+    this.icon.anchor.set(0.5, 0.5);
+    this.button = level.game.make.sprite(this.width - 10,
+        this.height - 20, buttonKey);
+    this.button.anchor.set(1, 0.5);
+    this.button.inputEnabled = true;
+    this.button.input.priorityID = 2;
+    this.button.events.onInputDown.add(this.buttonAction, this);
+
+    this.message = level.game.make.text(10,
+        this.height - 20, '' + this.amountAvailable);
+    //Font style
+    this.message.font = 'Arial';
+    this.message.fontSize = 30;
+    this.message.fontWeight = 'bold';
+    this.message.fill = '#0040FF';
+    this.message.anchor.set(0, 0.5);
+
+    this.addChild(this.icon);
+    this.addChild(this.message);
+    this.addChild(this.button);
+    this.parent = parentView;
+    this.item = item;
+    this.level = level;
+};
+
+ItemGroupView.prototype = Object.create(Phaser.Sprite.prototype);
+ItemGroupView.prototype.constructor = ItemGroupView;
+
+ItemGroupView.prototype.buttonAction = function() {
+
+};
+
+module.exports = ItemGroupView;
+
+},{}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
+var NUMBER_OF_COLUMNS = 5;
+var ITEMS_SPACE_LENGTH = 10;
 var PopUp = require('../util/PopUp');
-var ItemGroupView = require('../inventory/ItemGroupView');
+var ItemGroupView = require('../items/ItemGroupView');
+
+var ItemsGridView = function(level, backgroundKey) {
+    PopUp.call(this, level, backgroundKey);
+
+    this.level = level;
+
+    this.healthPacks = [];
+    this.items = [];
+    this.currentRow = 0;
+    this.currentColumn = 0;
+};
+
+ItemsGridView.prototype = Object.create(PopUp.prototype);
+ItemsGridView.prototype.constructor = ItemsGridView;
+
+ItemsGridView.prototype.addItemGroup = function(itemGroup) {
+    if (this.currentColumn >= NUMBER_OF_COLUMNS) {
+        this.currentColumn = 0;
+        this.currentRow++;
+    }
+
+    itemGroup.x = this.xOrigin + (itemGroup.width + ITEMS_SPACE_LENGTH) *
+        this.currentColumn;
+    itemGroup.y = this.yOrigin + (itemGroup.height + ITEMS_SPACE_LENGTH) *
+        this.currentRow;
+
+    this.addChild(itemGroup);
+    this.currentColumn ++;
+};
+
+ItemsGridView.prototype.showHealthPacks = function() {
+    //TODO
+};
+
+module.exports = ItemsGridView;
+
+},{"../items/ItemGroupView":10,"../util/PopUp":21}],12:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 22/06/2015.
+ */
+var ItemsGridView = require('../../items/ItemsGridView');
+var InventoryItem = require ('../inventory/InventoryItem');
+var HealthPack = require('../HealthPack');
+var Revolver = require('../weapons/Revolver');
 
 var Inventory = function(level) {
-    PopUp.call(this, level, 'inventory_background');
-    this.anchor.set(0.5, 0.5);
+    ItemsGridView.call(this, level, 'inventory_background');
 
     this.level = level;
 
@@ -527,7 +641,7 @@ var Inventory = function(level) {
     this.createItemGroups();
 };
 
-Inventory.prototype = Object.create(PopUp.prototype);
+Inventory.prototype = Object.create(ItemsGridView.prototype);
 Inventory.prototype.constructor = Inventory;
 
 Inventory.prototype.addHealthPack = function(healthPack) {
@@ -550,13 +664,15 @@ Inventory.prototype.addItem = function(item) {
 };
 
 Inventory.prototype.createItemGroups = function() {
-    this.items.healthPack5 = new ItemGroupView(this.level,
-        -this.width / 2 + 20, -this.height / 2 + 20, 'healthPack5', this);
-    this.addChild(this.items.healthPack5);
+    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
+    this.items.healthPack5 = new InventoryItem(this.level, healthPackItem,
+        this);
+    this.addItemGroup(this.items.healthPack5);
 
-    this.items.simpleWeapon = new ItemGroupView(this.level,
-        -this.width / 2 + 20, -this.height / 2 + 200, 'simpleWeapon', this);
-    this.addChild(this.items.simpleWeapon);
+    var revolverItem = new Revolver(this.level, 0, 0, false);
+    this.items.simpleWeapon = new InventoryItem(this.level, revolverItem,
+        this);
+    this.addItemGroup(this.items.simpleWeapon);
 };
 
 Inventory.prototype.showHealthPacks = function() {
@@ -565,115 +681,129 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../inventory/ItemGroupView":11,"../util/PopUp":12}],10:[function(require,module,exports){
-var Item;
-Item = function(game, type) {
-    this.type = type;
-};
-
-Item.prototype = Object.create(Phaser.Sprite.prototype);
-Item.prototype.constructor = Item;
-
-module.exports = Item;
-
-},{}],11:[function(require,module,exports){
+},{"../../items/ItemsGridView":11,"../HealthPack":8,"../inventory/InventoryItem":13,"../weapons/Revolver":18}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
-var ItemGroupView;
-ItemGroupView = function(level, x, y, imageKey, inventory) {
-    Phaser.Sprite.call(this, level.game, x, y, 'itemGroupBackGround');
-    this.healthPackIcon = level.game.make.sprite(this.width / 2,
-        this.height / 2, imageKey);
-    this.healthPackIcon.anchor.set(0.5, 0.5);
-    this.useOneButton = level.game.make.sprite(this.width - 10,
-        this.height - 20, 'useOneButton');
-    this.useOneButton.anchor.set(1, 0.5);
-    this.useOneButton.inputEnabled = true;
-    this.useOneButton.input.priorityID = 2;
-    this.useOneButton.events.onInputDown.add(this.useItem, this);
+var ItemGroupView = require('../../items/ItemGroupView');
+
+var InventoryItem = function(level, item, parentView) {
+    ItemGroupView.call(this, level, item, 'useOneButton', parentView);
 
     this.amountAvailable = 0;
-    this.amountAvailableText = level.game.make.text(10,
-        this.height - 20, '' + this.amountAvailable);
-    //Font style
-    this.amountAvailableText.font = 'Arial';
-    this.amountAvailableText.fontSize = 30;
-    this.amountAvailableText.fontWeight = 'bold';
-    this.amountAvailableText.fill = '#0040FF';
-    this.amountAvailableText.anchor.set(0, 0.5);
-
-    this.addChild(this.healthPackIcon);
-    this.addChild(this.useOneButton);
-    this.addChild(this.amountAvailableText);
-
-    this.inventory = inventory;
+    this.updateAmountAvailableText();
 };
 
-ItemGroupView.prototype = Object.create(Phaser.Sprite.prototype);
-ItemGroupView.prototype.constructor = ItemGroupView;
+InventoryItem.prototype = Object.create(ItemGroupView.prototype);
+InventoryItem.prototype.constructor = InventoryItem;
 
-ItemGroupView.prototype.setItem = function(item) {
-    this.item = item;
-};
-
-ItemGroupView.prototype.useItem = function() {
+InventoryItem.prototype.buttonAction = function() {
     if (this.amountAvailable > 0) {
         this.item.use();
         this.amountAvailable --;
         this.updateAmountAvailableText();
-        this.inventory.close();
+        this.parent.close();
     }
 };
 
-ItemGroupView.prototype.updateAmountAvailableText = function() {
-    this.amountAvailableText.text = '' + this.amountAvailable;
+InventoryItem.prototype.updateAmountAvailableText = function() {
+    this.message.text = '' + this.amountAvailable;
 };
 
-module.exports = ItemGroupView;
+module.exports = InventoryItem;
 
-},{}],12:[function(require,module,exports){
+},{"../../items/ItemGroupView":10}],14:[function(require,module,exports){
 /**
- * Created by Edwin Gamboa on 16/07/2015.
+ * Created by Edwin Gamboa on 22/06/2015.
  */
-var PopUp = function(level, backgroundKey) {
-    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
-        level.game.camera.height / 2, backgroundKey);
+var ItemsGridView = require('../../items/ItemsGridView');
+var StoreItem = require ('../store/StoreItem');
+var HealthPack = require('../HealthPack');
+var Revolver = require('../weapons/Revolver');
 
-    this.bringToTop();
-    this.anchor.set(0.5);
-
-    this.openDoorButton = level.game.make.sprite(this.width / 2,
-        -this.height / 2, 'close');
-    this.openDoorButton.anchor.set(0.5);
-    this.openDoorButton.inputEnabled = true;
-    this.openDoorButton.input.priorityID = 2;
-    this.openDoorButton.events.onInputDown.add(this.close, this);
-
-    this.addChild(this.openDoorButton);
-
-    this.fixedToCamera = true;
-    this.visible = false;
+var Store = function(level) {
+    ItemsGridView.call(this, level, 'inventory_background');
 
     this.level = level;
+
+    this.healthPacks = [];
+    this.items = [];
+    this.createItemGroups();
 };
 
-PopUp.prototype = Object.create(Phaser.Sprite.prototype);
-PopUp.prototype.constructor = PopUp;
+Store.prototype = Object.create(ItemsGridView.prototype);
+Store.prototype.constructor = Store;
 
-PopUp.prototype.close = function() {
-    this.level.resume();
-    this.visible = false;
+Store.prototype.addHealthPack = function(healthPack) {
+    if (healthPack.maxIncreasing == 5) {
+        this.healthPack5Group.amountAvailable ++;
+        this.healthPack5Group.updateAmountAvailableText();
+    }else if (healthPack.maxIncreasing == 20) {
+        this.healthPacks[1]++;
+    }else {
+        this.healthPacks[2]++;
+    }
 };
 
-PopUp.prototype.open = function() {
-    this.level.pause();
-    this.visible = true;
+Store.prototype.addItem = function(item) {
+    if (this.items[item.key].item === undefined) {
+        this.items[item.key].setItem(item);
+    }
+    this.items[item.key].amountAvailable ++;
+    this.items[item.key].updateAmountAvailableText();
 };
 
-module.exports = PopUp;
+Store.prototype.createItemGroups = function() {
+    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
+    this.items.healthPack5 = new StoreItem(this.level, healthPackItem,
+        this);
+    this.addItemGroup(this.items.healthPack5);
 
-},{}],13:[function(require,module,exports){
+    var revolverItem = new Revolver(this.level, 0, 0, false);
+    this.items.simpleWeapon = new StoreItem(this.level, revolverItem,
+        this);
+    this.addItemGroup(this.items.simpleWeapon);
+};
+
+Store.prototype.showHealthPacks = function() {
+    //TODO
+};
+
+module.exports = Store;
+
+},{"../../items/ItemsGridView":11,"../HealthPack":8,"../store/StoreItem":15,"../weapons/Revolver":18}],15:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 17/07/2015.
+ */
+var ItemGroupView = require('../../items/ItemGroupView');
+
+var StoreItem = function(level, item, parentView) {
+    ItemGroupView.call(this, level, item, 'buyButton', parentView);
+    this.updatePriceText();
+};
+
+StoreItem.prototype = Object.create(ItemGroupView.prototype);
+StoreItem.prototype.constructor = StoreItem;
+
+StoreItem.prototype.updatePriceText = function() {
+    this.message.text = this.item.price;
+};
+
+StoreItem.prototype.buttonAction = function() {
+    var succesfulPurchase = this.level.player.buyItem(this.item);
+    if (succesfulPurchase) {
+        this.item.use();
+        this.level.updateScoreText();
+        this.level.showSuccessMessage('Successful Purchase!');
+        this.parent.close();
+    }else {
+        this.level.showErrorMessage('Not enough money.');
+    }
+};
+
+module.exports = StoreItem;
+
+},{"../../items/ItemGroupView":10}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -694,7 +824,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -707,6 +837,7 @@ var MACHINE_GUN_NEXT_FIRE = 1;
 var MACHINE_GUN_BULLET_SPEED = 700;
 var MACHINE_GUN_FIRE_RATE = 100;
 var MACHINE_GUN_BULLET_POWER = 10;
+var PRICE = 100;
 
 var MachineGun = function(level, x, y, inifinite) {
     Weapon.call(this,
@@ -720,7 +851,8 @@ var MachineGun = function(level, x, y, inifinite) {
         MACHINE_GUN_BULLET_SPEED,
         MACHINE_GUN_FIRE_RATE,
         MACHINE_GUN_BULLET_POWER,
-        inifinite
+        inifinite,
+        PRICE
     );
 };
 
@@ -729,7 +861,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"../weapons/Weapon":16}],15:[function(require,module,exports){
+},{"../weapons/Weapon":19}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -738,10 +870,11 @@ var Weapon = require('../weapons/Weapon');
 var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'simpleWeapon';
 var REVOLVER_BULLET_KEY = 'bullet1';
-var REVOLVER_NEXT_FIRE = 50;
+var REVOLVER_NEXT_FIRE = 1;
 var REVOLVER_BULLET_SPEED = 700;
-var REVOLVER_FIRE_RATE = 50;
+var REVOLVER_FIRE_RATE = 0.1;
 var REVOLVER_BULLET_POWER = 1;
+var PRICE = 10;
 
 var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,
@@ -755,7 +888,8 @@ var Revolver = function(level, x, y, inifinite) {
         REVOLVER_BULLET_SPEED,
         REVOLVER_FIRE_RATE,
         REVOLVER_BULLET_POWER,
-        inifinite
+        inifinite,
+        PRICE
     );
 };
 
@@ -764,22 +898,24 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"../weapons/Weapon":16}],16:[function(require,module,exports){
+},{"../weapons/Weapon":19}],19:[function(require,module,exports){
+var Item = require('../Item');
 var Bullet = require('../weapons/Bullet');
-var Weapon = function(level,
-                  x,
-                  y,
-                  numberOfBullets,
-                  weaponKey,
-                  bulletKey,
-                  nextFire,
-                  bulletSpeed,
-                  fireRate,
-                  power,
-                  infinite) {
-    Phaser.Sprite.call(this, level.game, x, y, weaponKey);
 
-    level.game.physics.arcade.enable(this);
+var Weapon = function(level,
+                      x,
+                      y,
+                      numberOfBullets,
+                      weaponKey,
+                      bulletKey,
+                      nextFire,
+                      bulletSpeed,
+                      fireRate,
+                      power,
+                      infinite,
+                      price) {
+    Item.call(this, level, x, y, weaponKey, price);
+
     this.anchor.set(0.1, 0.5);
 
     this.numberOfBullets = numberOfBullets;
@@ -797,7 +933,7 @@ var Weapon = function(level,
     this.infinite = infinite;
 };
 
-Weapon.prototype = Object.create(Phaser.Sprite.prototype);
+Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
@@ -828,7 +964,8 @@ Weapon.prototype.use = function() {
     if (!this.alive) {
         this.revive();
     }
-    //this.level.addHealthPack(this);
+    this.level.player.useWeapon(this);
+    this.level.updateAmmoText();
 };
 
 Weapon.prototype.addBullets = function(amount) {
@@ -838,12 +975,92 @@ Weapon.prototype.addBullets = function(amount) {
 Weapon.prototype.killWeapon = function() {
     this.bullets.removeAll();
     this.kill();
-
 };
 
 module.exports = Weapon;
 
-},{"../weapons/Bullet":13}],17:[function(require,module,exports){
+},{"../Item":9,"../weapons/Bullet":16}],20:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var PopUp = require('../util/PopUp');
+
+var Dialog = function(level, iconKey) {
+    PopUp.call(this, level, 'dialog');
+
+    this.icon = level.game.make.sprite(this.xOrigin, this.yCenter, iconKey);
+    this.icon.anchor.set(0, 0.5);
+
+    this.message = level.game.make.text(this.xOrigin + this.icon.width + 10,
+        this.yCenter, '');
+    //Font style
+    this.message.font = 'Arial';
+    this.message.fontSize = 20;
+    this.message.fill = '#000000';
+    this.message.anchor.set(0, 0.5);
+
+    this.addChild(this.message);
+    this.addChild(this.icon);
+};
+
+Dialog.prototype = Object.create(PopUp.prototype);
+Dialog.prototype.constructor = Dialog;
+
+Dialog.prototype.setText = function(text) {
+    this.message.text = text;
+};
+
+module.exports = Dialog;
+
+},{"../util/PopUp":21}],21:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var MARGIN = 10;
+var PopUp = function(level, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
+        level.game.camera.height / 2, backgroundKey);
+
+    this.anchor.set(0.5, 0.5);
+
+    this.xOrigin = -this.width / 2 + MARGIN;
+    this.yOrigin = -this.height / 2 + MARGIN;
+
+    this.xCenter = 0;
+    this.yCenter = 0;
+
+    this.closeButton = level.game.make.sprite(-this.xOrigin,
+        this.yOrigin, 'close');
+    this.closeButton.anchor.set(0.5);
+    this.closeButton.inputEnabled = true;
+    this.closeButton.input.priorityID = 2;
+    this.closeButton.events.onInputDown.add(this.close, this);
+
+    this.addChild(this.closeButton);
+
+    this.fixedToCamera = true;
+    this.visible = false;
+
+    this.level = level;
+};
+
+PopUp.prototype = Object.create(Phaser.Sprite.prototype);
+PopUp.prototype.constructor = PopUp;
+
+PopUp.prototype.close = function() {
+    this.level.resume();
+    this.visible = false;
+};
+
+PopUp.prototype.open = function() {
+    this.bringToTop();
+    this.level.pause();
+    this.visible = true;
+};
+
+module.exports = PopUp;
+
+},{}],22:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -904,11 +1121,11 @@ InteractiveCar.prototype.isStopped = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":12}],18:[function(require,module,exports){
+},{"../util/PopUp":21}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
-var PopUp = require('../util/PopUp');
+var Store = require('../items/store/Store');
 var InteractiveHouse = function(level, x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -929,14 +1146,14 @@ InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new PopUp(this.level, 'working');
+    var popUp = new Store(this.level);
     this.level.game.add.existing(popUp);
     popUp.open();
 };
 
 module.exports = InteractiveHouse;
 
-},{"../util/PopUp":12}],19:[function(require,module,exports){
+},{"../items/store/Store":14}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -959,7 +1176,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],20:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -987,7 +1204,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],21:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1032,12 +1249,18 @@ Preloader.prototype = {
         this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
         this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
         this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
+        this.game.load.image('buyButton', 'assets/images/buyButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
+        this.game.load.image('storeButton', 'assets/images/store.png');
         this.game.load.image('inventory_background',
             'assets/images/inventoryBackground.png');
         this.game.load.image('close', 'assets/images/close.png');
         this.game.load.image('itemGroupBackGround',
             'assets/images/itemGroupBackGround.png');
+        this.game.load.image('dialog', 'assets/images/dialog.png');
+        this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
+        this.game.load.image('successIcon', 'assets/images/successIcon.png');
+
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
             32, 48);
         this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
@@ -1080,20 +1303,22 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var Inventory = require('../../prefabs/inventory/Inventory');
-var HealthPack = require('../../prefabs/inventory/HealthPack');
+var Inventory = require('../../prefabs/items/inventory/Inventory');
+var Store = require('../../prefabs/items/store/Store');
+var HealthPack = require('../../prefabs/items/HealthPack');
 var Player = require('../../prefabs/character/Player');
-var Revolver = require('../../prefabs/weapons/Revolver');
-var MachineGun = require('../../prefabs/weapons/MachineGun');
+var Revolver = require('../../prefabs/items/weapons/Revolver');
+var MachineGun = require('../../prefabs/items/weapons/MachineGun');
 var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
 var StrongEnemy = require('../../prefabs/character/StrongEnemy');
 var NPC = require('../../prefabs/character/NPC');
 var PopUp = require('../../prefabs/util/PopUp');
 var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
+var Dialog = require('../../prefabs/util/Dialog');
 
 var Level = function(game) {
     this.game = game;
@@ -1124,6 +1349,8 @@ Level.prototype.create = function() {
     this.addControls();
     this.addCamera();
     this.createInventory();
+    this.createDialogs();
+    this.createStore();
 };
 
 Level.prototype.updateEnemies = function() {
@@ -1329,8 +1556,7 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack('healthPack5', 5, 300,
-        0.7 + Math.random() * 0.2, 500, 100, this));
+    this.addHealthPack(new HealthPack(this, 500, 10, 5, this));
 };
 
 Level.prototype.createWeaponsGroup = function() {
@@ -1350,6 +1576,25 @@ Level.prototype.createInventory = function() {
     this.inventoryButton.input.priorityID = 1;
 };
 
+Level.prototype.createStore = function() {
+    this.store = new Store(this);
+    this.game.add.existing(this.store);
+
+    this.storeButton = this.game.add.button(110,
+        this.game.camera.height - 30, 'storeButton',
+        this.store.open, this.store);
+    this.storeButton.anchor.setTo(0.5, 0.5);
+    this.storeButton.fixedToCamera = true;
+    this.storeButton.input.priorityID = 1;
+};
+
+Level.prototype.createDialogs = function() {
+    this.errorDialog = new Dialog(this, 'errorIcon');
+    this.successDialog = new Dialog(this, 'successIcon');
+    this.game.add.existing(this.errorDialog);
+    this.game.add.existing(this.successDialog);
+};
+
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
     character.updateHealhtLevelText();
@@ -1358,7 +1603,7 @@ Level.prototype.bulletHitCharacter = function(character, bullet) {
 
 Level.prototype.collectWeapon = function(player, weapon) {
     this.weapons.remove(weapon);
-    this.player.pickUpWeapon(weapon);
+    this.player.useWeapon(weapon);
     this.updateAmmoText();
 };
 
@@ -1427,9 +1672,19 @@ Level.prototype.resume = function() {
     this.game.physics.arcade.isPaused = false;
 };
 
+Level.prototype.showErrorMessage = function(errorMessage) {
+    this.errorDialog.setText(errorMessage);
+    this.errorDialog.open();
+};
+
+Level.prototype.showSuccessMessage = function(successMessage) {
+    this.successDialog.setText(successMessage);
+    this.successDialog.open();
+};
+
 module.exports = Level;
 
-},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/inventory/HealthPack":8,"../../prefabs/inventory/Inventory":9,"../../prefabs/util/PopUp":12,"../../prefabs/weapons/MachineGun":14,"../../prefabs/weapons/Revolver":15,"../../prefabs/worldElements/InteractiveCar":17}],23:[function(require,module,exports){
+},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/items/HealthPack":8,"../../prefabs/items/inventory/Inventory":12,"../../prefabs/items/store/Store":14,"../../prefabs/items/weapons/MachineGun":17,"../../prefabs/items/weapons/Revolver":18,"../../prefabs/util/Dialog":20,"../../prefabs/util/PopUp":21,"../../prefabs/worldElements/InteractiveCar":22}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -1499,7 +1754,7 @@ LevelOne.prototype.addEnemies = function() {
 
 module.exports = LevelOne;
 
-},{"../../prefabs/worldElements/InteractiveHouse":18,"../levels/Level":22}],24:[function(require,module,exports){
+},{"../../prefabs/worldElements/InteractiveHouse":23,"../levels/Level":27}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -1538,4 +1793,4 @@ LevelOneIntro.prototype = {
 
 module.exports = LevelOneIntro;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]);

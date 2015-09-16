@@ -42,12 +42,18 @@ Preloader.prototype = {
         this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
         this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
         this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
+        this.game.load.image('buyButton', 'assets/images/buyButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
+        this.game.load.image('storeButton', 'assets/images/store.png');
         this.game.load.image('inventory_background',
             'assets/images/inventoryBackground.png');
         this.game.load.image('close', 'assets/images/close.png');
         this.game.load.image('itemGroupBackGround',
             'assets/images/itemGroupBackGround.png');
+        this.game.load.image('dialog', 'assets/images/dialog.png');
+        this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
+        this.game.load.image('successIcon', 'assets/images/successIcon.png');
+
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
             32, 48);
         this.game.load.spritesheet('npc', 'assets/sprites/npc.png',

@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
-var PopUp = require('../util/PopUp');
+var Store = require('../items/store/Store');
 var InteractiveHouse = function(level, x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -22,7 +22,7 @@ InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new PopUp(this.level, 'working');
+    var popUp = new Store(this.level);
     this.level.game.add.existing(popUp);
     popUp.open();
 };
