@@ -43,7 +43,6 @@ Level.prototype.create = function() {
     this.addControls();
     this.addCamera();
     this.createInventory();
-    this.createDialogs();
     this.createStore();
 };
 
@@ -282,13 +281,6 @@ Level.prototype.createStore = function() {
     this.storeButton.input.priorityID = 1;
 };
 
-Level.prototype.createDialogs = function() {
-    this.errorDialog = new Dialog(this, 'errorIcon');
-    this.successDialog = new Dialog(this, 'successIcon');
-    this.game.add.existing(this.errorDialog);
-    this.game.add.existing(this.successDialog);
-};
-
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
     character.updateHealhtLevelText();
@@ -366,14 +358,16 @@ Level.prototype.resume = function() {
     this.game.physics.arcade.isPaused = false;
 };
 
-Level.prototype.showErrorMessage = function(errorMessage) {
-    this.errorDialog.setText(errorMessage);
-    this.errorDialog.open();
+Level.prototype.showErrorMessage = function(errorMessage, parent) {
+    var errorDialog = new Dialog(this, 'errorIcon', errorMessage, parent);
+    this.game.add.existing(errorDialog);
+    errorDialog.open();
 };
 
-Level.prototype.showSuccessMessage = function(successMessage) {
-    this.successDialog.setText(successMessage);
-    this.successDialog.open();
+Level.prototype.showSuccessMessage = function(successMessage, parent) {
+    var successDialog = new Dialog(this, 'successIcon', successMessage, parent);
+    this.game.add.existing(successDialog);
+    successDialog.open();
 };
 
 module.exports = Level;

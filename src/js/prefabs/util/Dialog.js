@@ -3,8 +3,8 @@
  */
 var PopUp = require('../util/PopUp');
 
-var Dialog = function(level, iconKey) {
-    PopUp.call(this, level, 'dialog');
+var Dialog = function(level, iconKey, text, parent) {
+    PopUp.call(this, level, 'dialog', parent);
 
     this.icon = level.game.make.sprite(this.xOrigin, this.yCenter, iconKey);
     this.icon.anchor.set(0, 0.5);
@@ -16,6 +16,8 @@ var Dialog = function(level, iconKey) {
     this.message.fontSize = 20;
     this.message.fill = '#000000';
     this.message.anchor.set(0, 0.5);
+
+    this.message.text = text;
 
     this.addChild(this.message);
     this.addChild(this.icon);

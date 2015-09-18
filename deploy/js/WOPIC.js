@@ -794,10 +794,9 @@ StoreItem.prototype.buttonAction = function() {
     if (succesfulPurchase) {
         this.item.use();
         this.level.updateScoreText();
-        this.level.showSuccessMessage('Successful Purchase!');
-        this.parent.close();
+        this.level.showSuccessMessage('Successful Purchase!', this.parent);
     }else {
-        this.level.showErrorMessage('Not enough money.');
+        this.level.showErrorMessage('Not enough money.', this.parent);
     }
 };
 
@@ -985,8 +984,8 @@ module.exports = Weapon;
  */
 var PopUp = require('../util/PopUp');
 
-var Dialog = function(level, iconKey) {
-    PopUp.call(this, level, 'dialog');
+var Dialog = function(level, iconKey, text, parent) {
+    PopUp.call(this, level, 'dialog', parent);
 
     this.icon = level.game.make.sprite(this.xOrigin, this.yCenter, iconKey);
     this.icon.anchor.set(0, 0.5);
@@ -998,6 +997,8 @@ var Dialog = function(level, iconKey) {
     this.message.fontSize = 20;
     this.message.fill = '#000000';
     this.message.anchor.set(0, 0.5);
+
+    this.message.text = text;
 
     this.addChild(this.message);
     this.addChild(this.icon);
@@ -1017,7 +1018,7 @@ module.exports = Dialog;
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
-var PopUp = function(level, backgroundKey) {
+var PopUp = function(level, backgroundKey, parent) {
     Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
         level.game.camera.height / 2, backgroundKey);
 
@@ -1041,6 +1042,13 @@ var PopUp = function(level, backgroundKey) {
     this.fixedToCamera = true;
     this.visible = false;
 
+    if (parent === undefined) {
+        this.withoutParent = true;
+    }else {
+        this.withoutParent = false;
+        this.parent = parent;
+    }
+
     this.level = level;
 };
 
@@ -1048,13 +1056,19 @@ PopUp.prototype = Object.create(Phaser.Sprite.prototype);
 PopUp.prototype.constructor = PopUp;
 
 PopUp.prototype.close = function() {
-    this.level.resume();
     this.visible = false;
+    if (this.withoutParent) {
+        this.level.resume();
+    }
+    this.kill();
 };
 
 PopUp.prototype.open = function() {
-    this.bringToTop();
+    if (!this.alive) {
+        this.revive();
+    }
     this.level.pause();
+    this.bringToTop();
     this.visible = true;
 };
 
@@ -1349,7 +1363,6 @@ Level.prototype.create = function() {
     this.addControls();
     this.addCamera();
     this.createInventory();
-    this.createDialogs();
     this.createStore();
 };
 
@@ -1588,13 +1601,6 @@ Level.prototype.createStore = function() {
     this.storeButton.input.priorityID = 1;
 };
 
-Level.prototype.createDialogs = function() {
-    this.errorDialog = new Dialog(this, 'errorIcon');
-    this.successDialog = new Dialog(this, 'successIcon');
-    this.game.add.existing(this.errorDialog);
-    this.game.add.existing(this.successDialog);
-};
-
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
     character.updateHealhtLevelText();
@@ -1672,14 +1678,16 @@ Level.prototype.resume = function() {
     this.game.physics.arcade.isPaused = false;
 };
 
-Level.prototype.showErrorMessage = function(errorMessage) {
-    this.errorDialog.setText(errorMessage);
-    this.errorDialog.open();
+Level.prototype.showErrorMessage = function(errorMessage, parent) {
+    var errorDialog = new Dialog(this, 'errorIcon', errorMessage, parent);
+    this.game.add.existing(errorDialog);
+    errorDialog.open();
 };
 
-Level.prototype.showSuccessMessage = function(successMessage) {
-    this.successDialog.setText(successMessage);
-    this.successDialog.open();
+Level.prototype.showSuccessMessage = function(successMessage, parent) {
+    var successDialog = new Dialog(this, 'successIcon', successMessage, parent);
+    this.game.add.existing(successDialog);
+    successDialog.open();
 };
 
 module.exports = Level;

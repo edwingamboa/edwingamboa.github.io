@@ -20,10 +20,9 @@ StoreItem.prototype.buttonAction = function() {
     if (succesfulPurchase) {
         this.item.use();
         this.level.updateScoreText();
-        this.level.showSuccessMessage('Successful Purchase!');
-        this.parent.close();
+        this.level.showSuccessMessage('Successful Purchase!', this.parent);
     }else {
-        this.level.showErrorMessage('Not enough money.');
+        this.level.showErrorMessage('Not enough money.', this.parent);
     }
 };
 
