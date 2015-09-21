@@ -36,7 +36,7 @@ Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
-    if (this.level.game.time.now > this.nextFire &&
+    if (this.level.game.time.time > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
         if (this.currentBullet) {
@@ -48,7 +48,7 @@ Weapon.prototype.fire = function(toX, toY) {
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =
                 Math.sin(this.currentBullet.rotation) * this.bulletSpeed;
-            this.nextFire = this.level.game.time.now + this.fireRate;
+            this.nextFire = this.level.game.time.time + this.fireRate;
             this.numberOfBullets--;
         }
     }

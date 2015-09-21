@@ -869,11 +869,11 @@ var Weapon = require('../weapons/Weapon');
 var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'simpleWeapon';
 var REVOLVER_BULLET_KEY = 'bullet1';
-var REVOLVER_NEXT_FIRE = 1;
-var REVOLVER_BULLET_SPEED = 700;
-var REVOLVER_FIRE_RATE = 0.1;
+var REVOLVER_NEXT_FIRE = 0;
+var REVOLVER_BULLET_SPEED = 400;
+var REVOLVER_FIRE_RATE = 250;
 var REVOLVER_BULLET_POWER = 1;
-var PRICE = 10;
+var PRICE = 20;
 
 var Revolver = function(level, x, y, inifinite) {
     Weapon.call(this,
@@ -936,7 +936,7 @@ Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
-    if (this.level.game.time.now > this.nextFire &&
+    if (this.level.game.time.time > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
         if (this.currentBullet) {
@@ -948,7 +948,7 @@ Weapon.prototype.fire = function(toX, toY) {
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =
                 Math.sin(this.currentBullet.rotation) * this.bulletSpeed;
-            this.nextFire = this.level.game.time.now + this.fireRate;
+            this.nextFire = this.level.game.time.time + this.fireRate;
             this.numberOfBullets--;
         }
     }
