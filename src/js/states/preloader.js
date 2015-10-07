@@ -65,6 +65,11 @@ Preloader.prototype = {
         this.game.load.spritesheet('strong_enemy',
             'assets/sprites/strong_enemy.png', 64, 64);
         this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 145, 99);
+        this.game.load.spritesheet('revolverSprite',
+            'assets/sprites/revolver.png', 30, 16);
+        this.game.load.spritesheet('machineGunSprite',
+            'assets/sprites/machineGun.png', 60, 42);
+
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');

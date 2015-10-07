@@ -26,6 +26,8 @@ var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
 var GRAVITY = 300;
+var RIGHT_DIRECTION = 1;
+var LEFT_DIRECTION = -1;
 
 /**
  * The Character class handles game characters general behaviour.
@@ -50,13 +52,14 @@ var Character = function(level, x, y, spriteKey, optionsArgs) {
     this.body.bounce.y = options.bounce || BOUNCE;
     this.body.gravity.y = options.gravity || GRAVITY;
     this.body.collideWorldBounds = true;
-    this.anchor.setTo(0.5, 1);
+    this.anchor.setTo(0.5, 0.5);
 
     this.currentWeaponIndex = 0;
 
     this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
+    this.direction = RIGHT_DIRECTION;
 };
 
 /**
@@ -71,32 +74,48 @@ Character.prototype.constructor = Character;
  * Moves the character in the left direction using normal speed.
  */
 Character.prototype.moveLeft = function() {
+    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.speed;
     this.animations.play('left');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToLeft();
+    }
 };
 
 /**
  * Moves the character in the right direction using normal speed.
  */
 Character.prototype.moveRight = function() {
+    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.speed;
     this.animations.play('right');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToRight();
+    }
 };
 
 /**
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
+    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.maxSpeed;
     this.animations.play('left');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToLeft();
+    }
 };
 
 /**
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
+    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.maxSpeed;
     this.animations.play('right');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToRight();
+    }
 };
 
 /**
@@ -183,7 +202,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 };
 
 /**
- * Changes player's current weapon, to the nest one in the weapons array.
+ * Changes player's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
  */
 Character.prototype.nextWeapon = function() {
@@ -200,8 +219,10 @@ Character.prototype.nextWeapon = function() {
  * @param {object} newWeapon - the weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
+    if (this.weapons[newWeapon.key] === undefined) {
+        this.weaponsKeys.push(newWeapon.key);
+    }
     this.weapons[newWeapon.key] = newWeapon;
-    this.weaponsKeys.push(newWeapon.key);
 };
 
 /**
@@ -221,6 +242,21 @@ Character.prototype.fireToXY = function(x, y) {
 Character.prototype.relocate = function(x, y) {
     this.x = x;
     this.y = y;
+};
+
+Character.prototype.useWeapon = function(weapon) {
+    if (this.weapons[weapon.key] === undefined) {
+        this.addWeapon(weapon);
+        this.updateCurrentWeapon(weapon.key);
+        if (this.direction === RIGHT_DIRECTION) {
+            this.currentWeapon.pointToRight();
+        }else {
+            this.currentWeapon.pointToLeft();
+        }
+    }else {
+        //weapon.kill();
+        this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
+    }
 };
 
 module.exports = Character;
@@ -267,7 +303,7 @@ Enemy.prototype.update = function() {
     }
     this.healthLevelText.x = this.body.x;
     this.healthLevelText.y = this.body.y - 20;
-    this.currentWeapon.updateCoordinates(this.x + 20, this.y - 20);
+    this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
 Enemy.prototype.updateHealhtLevelText = function() {
@@ -359,25 +395,13 @@ Player.prototype.updateHealhtLevelText = function() {
 
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
-        this.currentWeapon.rotation =
-            this.level.game.physics.arcade.angleToPointer(this);
-        this.currentWeapon.updateCoordinates(this.x, this.y - 10);
+        this.currentWeapon.updateCoordinates(this.x, this.y);
     }
 };
 
 Player.prototype.killCharacter = function() {
 
     Character.prototype.killCharacter.call(this);
-};
-
-Player.prototype.useWeapon = function(weapon) {
-    if (this.weapons[weapon.key] === undefined) {
-        this.addWeapon(weapon);
-        this.updateCurrentWeapon(weapon.key);
-    }else {
-        //weapon.kill();
-        this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
-    }
 };
 
 Player.prototype.changeSpeed = function(speed, maxSpeed) {
@@ -435,8 +459,7 @@ var SimpleEnemy = function(level, x, y) {
         MIN_RANGE_ATTACK,
         MAX_RANGE_ATTACK);
 
-    this.addWeapon(new Revolver(this, x, y, true));
-    this.updateCurrentWeapon('simpleWeapon');
+    this.useWeapon(new Revolver(this, x, y, true));
 };
 
 SimpleEnemy.prototype = Object.create(Enemy.prototype);
@@ -472,8 +495,7 @@ var StrongEnemy = function(level, x, y) {
         MAX_RANGE_ATTACK
     );
 
-    this.addWeapon(new MachineGun(this, x, y, true));
-    this.updateCurrentWeapon('strongWeapon');
+    this.useWeapon(new MachineGun(this, x, y, true));
 };
 
 StrongEnemy.prototype = Object.create(Enemy.prototype);
@@ -830,7 +852,7 @@ module.exports = Bullet;
 var Weapon = require('../weapons/Weapon');
 
 var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
-var MACHINE_GUN_KEY = 'strongWeapon';
+var MACHINE_GUN_KEY = 'machineGunSprite';
 var MACHINE_GUN_BULLET_KEY = 'bullet2';
 var MACHINE_GUN_NEXT_FIRE = 1;
 var MACHINE_GUN_BULLET_SPEED = 700;
@@ -867,7 +889,7 @@ module.exports = MachineGun;
 var Weapon = require('../weapons/Weapon');
 
 var REVOLVER_NUMBER_OF_BULLETS = 20;
-var REVOLVER_KEY = 'simpleWeapon';
+var REVOLVER_KEY = 'revolverSprite';
 var REVOLVER_BULLET_KEY = 'bullet1';
 var REVOLVER_NEXT_FIRE = 0;
 var REVOLVER_BULLET_SPEED = 400;
@@ -901,6 +923,9 @@ module.exports = Revolver;
 var Item = require('../Item');
 var Bullet = require('../weapons/Bullet');
 
+var RIGHT_KEY = 0;
+var LEFT_KEY = 1;
+
 var Weapon = function(level,
                       x,
                       y,
@@ -915,7 +940,7 @@ var Weapon = function(level,
                       price) {
     Item.call(this, level, x, y, weaponKey, price);
 
-    this.anchor.set(0.1, 0.5);
+    this.anchor.set(0.5, 0);
 
     this.numberOfBullets = numberOfBullets;
     this.power = power;
@@ -974,6 +999,14 @@ Weapon.prototype.addBullets = function(amount) {
 Weapon.prototype.killWeapon = function() {
     this.bullets.removeAll();
     this.kill();
+};
+
+Weapon.prototype.pointToRight = function() {
+    this.frame = RIGHT_KEY;
+};
+
+Weapon.prototype.pointToLeft = function() {
+    this.frame = LEFT_KEY;
 };
 
 module.exports = Weapon;
@@ -1100,7 +1133,7 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
 
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
-    this.anchor.set(0, 1);
+    this.anchor.set(0.5, 1);
     this.animations.add('left', [0], 10, true);
     this.animations.add('right', [1], 10, true);
 
@@ -1112,7 +1145,7 @@ InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 InteractiveCar.prototype.getOn = function() {
-    this.level.player.relocate(this.x, this.y - 10);
+    this.level.player.relocate(this.x, this.y - 100);
     this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
     this.level.player.changeGravity(CAR_GRAVITY);
     this.occupied = true;
@@ -1286,6 +1319,11 @@ Preloader.prototype = {
         this.game.load.spritesheet('strong_enemy',
             'assets/sprites/strong_enemy.png', 64, 64);
         this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 145, 99);
+        this.game.load.spritesheet('revolverSprite',
+            'assets/sprites/revolver.png', 30, 16);
+        this.game.load.spritesheet('machineGunSprite',
+            'assets/sprites/machineGun.png', 60, 42);
+
         for (var i = 1; i <= 2; i++) {
             this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
                 '.png');
@@ -1353,11 +1391,11 @@ Level.prototype.create = function() {
     this.gameObjects = [];
 
     this.createHealthPacksGroup();
-    this.createWeaponsGroup();
     this.createEnemiesGroup();
     this.createNpcsGroup();
     this.createCarsGroup();
     this.addPlayer();
+    this.createWeaponsGroup();
     this.addPlatforms();
     this.addTexts();
     this.addControls();
@@ -1465,9 +1503,8 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.fireToXY(
-            this.game.input.activePointer.worldX,
-            this.game.input.activePointer.worldY);
+        this.player.fireToXY(this.player.x + (100 * this.player.direction),
+            this.player.y);
         //  Add and update the score
         this.updateAmmoText();
     }
@@ -1529,8 +1566,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.addWeapon(new Revolver(this, 700, 100, false));
-    this.player.updateCurrentWeapon('simpleWeapon');
+    this.player.useWeapon(new Revolver(this, 700, 100, false));
 };
 
 Level.prototype.addTexts = function() {
@@ -1717,8 +1753,8 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.addObjects();
     this.addRevolver(2000, 400, false);
-    this.addMachineGun(2400, 400, false);
-    this.player.bringToTop();
+    this.addRevolver(2000, 400, false);
+    //this.player.bringToTop();
 };
 
 LevelOne.prototype.addObjects = function() {

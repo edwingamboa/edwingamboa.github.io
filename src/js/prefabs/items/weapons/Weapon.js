@@ -1,6 +1,9 @@
 var Item = require('../Item');
 var Bullet = require('../weapons/Bullet');
 
+var RIGHT_KEY = 0;
+var LEFT_KEY = 1;
+
 var Weapon = function(level,
                       x,
                       y,
@@ -15,7 +18,7 @@ var Weapon = function(level,
                       price) {
     Item.call(this, level, x, y, weaponKey, price);
 
-    this.anchor.set(0.1, 0.5);
+    this.anchor.set(0.5, 0);
 
     this.numberOfBullets = numberOfBullets;
     this.power = power;
@@ -74,6 +77,14 @@ Weapon.prototype.addBullets = function(amount) {
 Weapon.prototype.killWeapon = function() {
     this.bullets.removeAll();
     this.kill();
+};
+
+Weapon.prototype.pointToRight = function() {
+    this.frame = RIGHT_KEY;
+};
+
+Weapon.prototype.pointToLeft = function() {
+    this.frame = LEFT_KEY;
 };
 
 module.exports = Weapon;

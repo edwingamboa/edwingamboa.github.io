@@ -25,8 +25,7 @@ var StrongEnemy = function(level, x, y) {
         MAX_RANGE_ATTACK
     );
 
-    this.addWeapon(new MachineGun(this, x, y, true));
-    this.updateCurrentWeapon('strongWeapon');
+    this.useWeapon(new MachineGun(this, x, y, true));
 };
 
 StrongEnemy.prototype = Object.create(Enemy.prototype);

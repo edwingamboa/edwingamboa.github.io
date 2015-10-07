@@ -47,25 +47,13 @@ Player.prototype.updateHealhtLevelText = function() {
 
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
-        this.currentWeapon.rotation =
-            this.level.game.physics.arcade.angleToPointer(this);
-        this.currentWeapon.updateCoordinates(this.x, this.y - 10);
+        this.currentWeapon.updateCoordinates(this.x, this.y);
     }
 };
 
 Player.prototype.killCharacter = function() {
 
     Character.prototype.killCharacter.call(this);
-};
-
-Player.prototype.useWeapon = function(weapon) {
-    if (this.weapons[weapon.key] === undefined) {
-        this.addWeapon(weapon);
-        this.updateCurrentWeapon(weapon.key);
-    }else {
-        //weapon.kill();
-        this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
-    }
 };
 
 Player.prototype.changeSpeed = function(speed, maxSpeed) {

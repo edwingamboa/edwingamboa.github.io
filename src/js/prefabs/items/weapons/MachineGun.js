@@ -4,7 +4,7 @@
 var Weapon = require('../weapons/Weapon');
 
 var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
-var MACHINE_GUN_KEY = 'strongWeapon';
+var MACHINE_GUN_KEY = 'machineGunSprite';
 var MACHINE_GUN_BULLET_KEY = 'bullet2';
 var MACHINE_GUN_NEXT_FIRE = 1;
 var MACHINE_GUN_BULLET_SPEED = 700;

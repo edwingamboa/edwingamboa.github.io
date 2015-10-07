@@ -4,7 +4,7 @@
 var Weapon = require('../weapons/Weapon');
 
 var REVOLVER_NUMBER_OF_BULLETS = 20;
-var REVOLVER_KEY = 'simpleWeapon';
+var REVOLVER_KEY = 'revolverSprite';
 var REVOLVER_BULLET_KEY = 'bullet1';
 var REVOLVER_NEXT_FIRE = 0;
 var REVOLVER_BULLET_SPEED = 400;

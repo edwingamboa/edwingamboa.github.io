@@ -33,11 +33,11 @@ Level.prototype.create = function() {
     this.gameObjects = [];
 
     this.createHealthPacksGroup();
-    this.createWeaponsGroup();
     this.createEnemiesGroup();
     this.createNpcsGroup();
     this.createCarsGroup();
     this.addPlayer();
+    this.createWeaponsGroup();
     this.addPlatforms();
     this.addTexts();
     this.addControls();
@@ -145,9 +145,8 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.fireToXY(
-            this.game.input.activePointer.worldX,
-            this.game.input.activePointer.worldY);
+        this.player.fireToXY(this.player.x + (100 * this.player.direction),
+            this.player.y);
         //  Add and update the score
         this.updateAmmoText();
     }
@@ -209,8 +208,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.addWeapon(new Revolver(this, 700, 100, false));
-    this.player.updateCurrentWeapon('simpleWeapon');
+    this.player.useWeapon(new Revolver(this, 700, 100, false));
 };
 
 Level.prototype.addTexts = function() {

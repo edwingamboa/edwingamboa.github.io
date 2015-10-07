@@ -22,8 +22,8 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.addObjects();
     this.addRevolver(2000, 400, false);
-    this.addMachineGun(2400, 400, false);
-    this.player.bringToTop();
+    this.addRevolver(2000, 400, false);
+    //this.player.bringToTop();
 };
 
 LevelOne.prototype.addObjects = function() {

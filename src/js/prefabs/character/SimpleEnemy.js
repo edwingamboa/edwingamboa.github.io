@@ -23,8 +23,7 @@ var SimpleEnemy = function(level, x, y) {
         MIN_RANGE_ATTACK,
         MAX_RANGE_ATTACK);
 
-    this.addWeapon(new Revolver(this, x, y, true));
-    this.updateCurrentWeapon('simpleWeapon');
+    this.useWeapon(new Revolver(this, x, y, true));
 };
 
 SimpleEnemy.prototype = Object.create(Enemy.prototype);

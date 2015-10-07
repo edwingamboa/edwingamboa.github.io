@@ -39,7 +39,7 @@ Enemy.prototype.update = function() {
     }
     this.healthLevelText.x = this.body.x;
     this.healthLevelText.y = this.body.y - 20;
-    this.currentWeapon.updateCoordinates(this.x + 20, this.y - 20);
+    this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
 Enemy.prototype.updateHealhtLevelText = function() {

@@ -8,6 +8,8 @@ var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
 var GRAVITY = 300;
+var RIGHT_DIRECTION = 1;
+var LEFT_DIRECTION = -1;
 
 /**
  * The Character class handles game characters general behaviour.
@@ -32,13 +34,14 @@ var Character = function(level, x, y, spriteKey, optionsArgs) {
     this.body.bounce.y = options.bounce || BOUNCE;
     this.body.gravity.y = options.gravity || GRAVITY;
     this.body.collideWorldBounds = true;
-    this.anchor.setTo(0.5, 1);
+    this.anchor.setTo(0.5, 0.5);
 
     this.currentWeaponIndex = 0;
 
     this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
+    this.direction = RIGHT_DIRECTION;
 };
 
 /**
@@ -53,32 +56,48 @@ Character.prototype.constructor = Character;
  * Moves the character in the left direction using normal speed.
  */
 Character.prototype.moveLeft = function() {
+    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.speed;
     this.animations.play('left');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToLeft();
+    }
 };
 
 /**
  * Moves the character in the right direction using normal speed.
  */
 Character.prototype.moveRight = function() {
+    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.speed;
     this.animations.play('right');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToRight();
+    }
 };
 
 /**
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
+    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.maxSpeed;
     this.animations.play('left');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToLeft();
+    }
 };
 
 /**
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
+    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.maxSpeed;
     this.animations.play('right');
+    if (this.currentWeapon !== undefined) {
+        this.currentWeapon.pointToRight();
+    }
 };
 
 /**
@@ -165,7 +184,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 };
 
 /**
- * Changes player's current weapon, to the nest one in the weapons array.
+ * Changes player's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
  */
 Character.prototype.nextWeapon = function() {
@@ -182,8 +201,10 @@ Character.prototype.nextWeapon = function() {
  * @param {object} newWeapon - the weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
+    if (this.weapons[newWeapon.key] === undefined) {
+        this.weaponsKeys.push(newWeapon.key);
+    }
     this.weapons[newWeapon.key] = newWeapon;
-    this.weaponsKeys.push(newWeapon.key);
 };
 
 /**
@@ -203,6 +224,21 @@ Character.prototype.fireToXY = function(x, y) {
 Character.prototype.relocate = function(x, y) {
     this.x = x;
     this.y = y;
+};
+
+Character.prototype.useWeapon = function(weapon) {
+    if (this.weapons[weapon.key] === undefined) {
+        this.addWeapon(weapon);
+        this.updateCurrentWeapon(weapon.key);
+        if (this.direction === RIGHT_DIRECTION) {
+            this.currentWeapon.pointToRight();
+        }else {
+            this.currentWeapon.pointToLeft();
+        }
+    }else {
+        //weapon.kill();
+        this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
+    }
 };
 
 module.exports = Character;

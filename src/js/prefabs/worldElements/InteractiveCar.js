@@ -23,7 +23,7 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
 
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
-    this.anchor.set(0, 1);
+    this.anchor.set(0.5, 1);
     this.animations.add('left', [0], 10, true);
     this.animations.add('right', [1], 10, true);
 
@@ -35,7 +35,7 @@ InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 InteractiveCar.prototype.getOn = function() {
-    this.level.player.relocate(this.x, this.y - 10);
+    this.level.player.relocate(this.x, this.y - 100);
     this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
     this.level.player.changeGravity(CAR_GRAVITY);
     this.occupied = true;
