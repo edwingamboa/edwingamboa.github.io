@@ -1,13 +1,13 @@
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var ItemsGridView = require('../../items/ItemsGridView');
+var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
 var InventoryItem = require ('../inventory/InventoryItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
 var Inventory = function(level) {
-    ItemsGridView.call(this, level, 'inventory_background');
+    GridLayoutPopUp.call(this, level, 'inventory_background');
 
     this.level = level;
 
@@ -16,7 +16,7 @@ var Inventory = function(level) {
     this.createItemGroups();
 };
 
-Inventory.prototype = Object.create(ItemsGridView.prototype);
+Inventory.prototype = Object.create(GridLayoutPopUp.prototype);
 Inventory.prototype.constructor = Inventory;
 
 Inventory.prototype.addHealthPack = function(healthPack) {
@@ -42,12 +42,12 @@ Inventory.prototype.createItemGroups = function() {
     var healthPackItem = new HealthPack(this.level, 0, 0, 5);
     this.items.healthPack5 = new InventoryItem(this.level, healthPackItem,
         this);
-    this.addItemGroup(this.items.healthPack5);
+    this.addElement(this.items.healthPack5);
 
     var revolverItem = new Revolver(this.level, 0, 0, false);
     this.items.simpleWeapon = new InventoryItem(this.level, revolverItem,
         this);
-    this.addItemGroup(this.items.simpleWeapon);
+    this.addElement(this.items.simpleWeapon);
 };
 
 Inventory.prototype.showHealthPacks = function() {

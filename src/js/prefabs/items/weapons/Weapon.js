@@ -39,6 +39,7 @@ Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
+    var finalToY = toY || this.y;
     if (this.level.game.time.time > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
@@ -46,7 +47,7 @@ Weapon.prototype.fire = function(toX, toY) {
             this.currentBullet.reset(this.x, this.y);
             this.currentBullet.rotation =
                 this.level.game.physics.arcade.angleToXY(this.currentBullet,
-                toX, toY);
+                toX, finalToY);
             this.currentBullet.body.velocity.x =
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =

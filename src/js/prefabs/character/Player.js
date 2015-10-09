@@ -16,6 +16,8 @@ Player = function(level) {
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 5;
     this.score = MINIMUM_SCORE;
 };
 
@@ -47,7 +49,8 @@ Player.prototype.updateHealhtLevelText = function() {
 
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
-        this.currentWeapon.updateCoordinates(this.x, this.y);
+        this.currentWeapon.updateCoordinates(this.x + (this.direction * 25),
+            this.y + 20);
     }
 };
 

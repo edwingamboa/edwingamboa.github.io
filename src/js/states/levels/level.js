@@ -14,6 +14,8 @@ var PopUp = require('../../prefabs/util/PopUp');
 var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 var Dialog = require('../../prefabs/util/Dialog');
 
+var FamilyEC = require('../../prefabs/englishChallenges/levelOne/FamilyEC');
+
 var Level = function(game) {
     this.game = game;
 };
@@ -145,8 +147,7 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.fireToXY(this.player.x + (100 * this.player.direction),
-            this.player.y);
+        this.player.fireToXY(this.player.x + (100 * this.player.direction));
         //  Add and update the score
         this.updateAmmoText();
     }
@@ -277,6 +278,16 @@ Level.prototype.createStore = function() {
     this.storeButton.anchor.setTo(0.5, 0.5);
     this.storeButton.fixedToCamera = true;
     this.storeButton.input.priorityID = 1;
+
+    this.englishChallenge = new FamilyEC(this);
+    this.game.add.existing(this.englishChallenge);
+
+    this.addCashButton = this.game.add.button(170,
+        this.game.camera.height - 30, 'addCashButton',
+        this.englishChallenge.open, this.englishChallenge);
+    this.addCashButton.anchor.setTo(0.5, 0.5);
+    this.addCashButton.fixedToCamera = true;
+    this.addCashButton.input.priorityID = 1;
 };
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {

@@ -19,6 +19,8 @@ var Enemy = function(level,
     Character.call(this, level, x, y, spriteKey, options);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 2;
     this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
         '' + this.healthLevel, {fontSize: '12px', fill: '#000'});
     this.rangeDetection = level.game.rnd.integerInRange(minRangeDetection,

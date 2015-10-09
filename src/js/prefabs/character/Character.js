@@ -106,7 +106,11 @@ Character.prototype.runRight = function() {
 Character.prototype.stop = function() {
     this.body.velocity.x = 0;
     this.animations.stop();
-    this.frame = 4;
+    if (this.direction > 0) {
+        this.frame = this.stopRightFrameIndex;
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
 };
 
 /**

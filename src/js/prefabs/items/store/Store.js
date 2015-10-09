@@ -1,13 +1,13 @@
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var ItemsGridView = require('../../items/ItemsGridView');
+var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
 var StoreItem = require ('../store/StoreItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
 var Store = function(level) {
-    ItemsGridView.call(this, level, 'inventory_background');
+    GridLayoutPopUp.call(this, level, 'inventory_background');
 
     this.level = level;
 
@@ -16,7 +16,7 @@ var Store = function(level) {
     this.createItemGroups();
 };
 
-Store.prototype = Object.create(ItemsGridView.prototype);
+Store.prototype = Object.create(GridLayoutPopUp.prototype);
 Store.prototype.constructor = Store;
 
 Store.prototype.addHealthPack = function(healthPack) {
@@ -42,12 +42,12 @@ Store.prototype.createItemGroups = function() {
     var healthPackItem = new HealthPack(this.level, 0, 0, 5);
     this.items.healthPack5 = new StoreItem(this.level, healthPackItem,
         this);
-    this.addItemGroup(this.items.healthPack5);
+    this.addElement(this.items.healthPack5);
 
     var revolverItem = new Revolver(this.level, 0, 0, false);
     this.items.simpleWeapon = new StoreItem(this.level, revolverItem,
         this);
-    this.addItemGroup(this.items.simpleWeapon);
+    this.addElement(this.items.simpleWeapon);
 };
 
 Store.prototype.showHealthPacks = function() {

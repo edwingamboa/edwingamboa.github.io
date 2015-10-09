@@ -55,16 +55,17 @@ Preloader.prototype = {
         this.game.load.image('successIcon', 'assets/images/successIcon.png');
 
         this.game.load.spritesheet('character', 'assets/sprites/character.png',
-            32, 48);
+            64, 96);
         this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
-            32, 48);
+            64, 96);
         this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
-            32, 48);
+            64, 96);
         this.game.load.spritesheet('simple_enemy',
-            'assets/sprites/simple_enemy.png', 32, 32);
+            'assets/sprites/simple_enemy.png', 64, 64);
         this.game.load.spritesheet('strong_enemy',
             'assets/sprites/strong_enemy.png', 64, 64);
-        this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 145, 99);
+        this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
+            150);
         this.game.load.spritesheet('revolverSprite',
             'assets/sprites/revolver.png', 30, 16);
         this.game.load.spritesheet('machineGunSprite',
@@ -85,6 +86,13 @@ Preloader.prototype = {
         this.game.load.image('house', 'assets/images/house.png');
         this.game.load.image('openDoor', 'assets/images/openDoor.png');
         this.game.load.image('working', 'assets/images/working.png');
+        this.game.load.image('addCashButton', 'assets/images/addCash.png');
+        this.game.load.image('useButtonShade',
+            'assets/images/useButtonShade.png');
+        this.game.load.image('mother', 'assets/images/mother.png');
+        this.game.load.image('father', 'assets/images/father.png');
+        this.game.load.image('daughter', 'assets/images/daughter.png');
+        this.game.load.image('son', 'assets/images/son.png');
     },
 
     update: function() {
