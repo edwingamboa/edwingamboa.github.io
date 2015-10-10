@@ -89,10 +89,17 @@ Preloader.prototype = {
         this.game.load.image('addCashButton', 'assets/images/addCash.png');
         this.game.load.image('useButtonShade',
             'assets/images/useButtonShade.png');
+        this.game.load.image('button', 'assets/images/button.png');
         this.game.load.image('mother', 'assets/images/mother.png');
         this.game.load.image('father', 'assets/images/father.png');
         this.game.load.image('daughter', 'assets/images/daughter.png');
         this.game.load.image('son', 'assets/images/son.png');
+
+        this.game.load.image('wordField', 'assets/images/wordField.png');
+        this.game.load.image('letterShade', 'assets/images/letterShade.png');
+
+        this.game.load.script('webfont',
+            '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
     },
 
     update: function() {

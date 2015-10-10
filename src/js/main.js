@@ -1,5 +1,11 @@
 var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
 
+WebFontConfig = {
+    google: {
+        families: ['Shojumaru']
+    }
+};
+
 //Game States
 var Boot = require('./states/Boot');
 var Preloader = require('./states/Preloader');

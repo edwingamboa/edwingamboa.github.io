@@ -2,9 +2,10 @@
  * Created by Edwin Gamboa on 08/10/2015.
  */
 
-var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var GridLayoutPopUp = require('../util/GridLayoutPopUp');
+var Button = require('../util/Button');
 
-var FamilyEnglishChallenge = function(level) {
+var FamilyEC = function(level) {
     this.score = 30;
     var dimensions = {numberOfColumns: 3, numberOfRows: 3};
     GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
@@ -32,9 +33,8 @@ var FamilyEnglishChallenge = function(level) {
 
         var label = this.level.game.make.text(0, 0, familyKeys[key]);
         //Font style
-        label.font = 'Arial';
-        label.fontSize = 25;
-        label.fontWeight = 'bold';
+        label.font = 'Shojumaru';
+        label.fontSize = 20;
         label.fill = '#0040FF';
         label.inputEnabled = true;
         label.input.enableDrag(true, true);
@@ -44,12 +44,6 @@ var FamilyEnglishChallenge = function(level) {
         label.code = key;
         familyMembersCells.push(cell);
         familyMembersLabels.push(label);
-
-        this.confirmButton = level.game.make.sprite(0, 0, 'buyButton');
-        this.confirmButton.anchor.set(0, 1);
-        this.confirmButton.inputEnabled = true;
-        this.confirmButton.input.priorityID = 2;
-        this.confirmButton.events.onInputDown.add(this.confirm, this);
     }
 
     for (var familyMemberCell in familyMembersCells) {
@@ -74,13 +68,14 @@ var FamilyEnglishChallenge = function(level) {
         indexes.splice(randomIndex, 1);
     }
 
+    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
     this.addElement(this.confirmButton);
 };
 
-FamilyEnglishChallenge.prototype = Object.create(GridLayoutPopUp.prototype);
-FamilyEnglishChallenge.prototype.constructor = FamilyEnglishChallenge;
+FamilyEC.prototype = Object.create(GridLayoutPopUp.prototype);
+FamilyEC.prototype.constructor = FamilyEC;
 
-FamilyEnglishChallenge.prototype.fixLocation = function(item) {
+FamilyEC.prototype.fixLocation = function(item) {
     for (var shade in this.shades) {
         if (item.overlap(this.shades[shade]) &&
             this.shades[shade].children.length === 0) {
@@ -95,32 +90,30 @@ FamilyEnglishChallenge.prototype.fixLocation = function(item) {
     }
 };
 
-FamilyEnglishChallenge.prototype.bringItemToTop = function(item) {
-    if (FamilyEnglishChallenge.prototype.isPrototypeOf(item.parent)) {
+FamilyEC.prototype.bringItemToTop = function(item) {
+    if (FamilyEC.prototype.isPrototypeOf(item.parent)) {
         this.addChild(item);
     }else {
         this.addChild(item.parent.parent);
     }
 };
 
-FamilyEnglishChallenge.prototype.confirm = function() {
+FamilyEC.prototype.confirm = function() {
     var correct = true;
     for (var shade in this.shades) {
         if (this.shades[shade].children[0] === undefined) {
             this.level.showErrorMessage('The challenge is not complete.', this);
             return;
         }
+        var letter = this.shades[shade].children[0];
         if (this.shades[shade].children[0].code !== shade) {
-            correct = false;
+            this.level.showErrorMessage('Sorry! Try Again.', this);
+            return;
         }
     }
-    if (correct) {
-        this.level.increaseScore(this.score);
-        this.level.showSuccessMessage('Well done! You got ' + this.score +
-            ' points.', this);
-        this.close();
-    }else {
-        this.level.showErrorMessage('Sorry! Try Again.', this);
-    }
+    this.level.increaseScore(this.score);
+    this.level.showSuccessMessage('Well done! You got ' + this.score +
+        ' points.', this);
+    this.close();
 };
-module.exports = FamilyEnglishChallenge;
+module.exports = FamilyEC;

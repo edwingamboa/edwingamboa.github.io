@@ -14,7 +14,7 @@ var PopUp = require('../../prefabs/util/PopUp');
 var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 var Dialog = require('../../prefabs/util/Dialog');
 
-var FamilyEC = require('../../prefabs/englishChallenges/levelOne/FamilyEC');
+var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
 
 var Level = function(game) {
     this.game = game;
