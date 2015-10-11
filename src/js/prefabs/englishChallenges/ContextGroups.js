@@ -3,7 +3,7 @@
  */
 
 var GridLayoutPopUp = require('../util/GridLayoutPopUp');
-var GridPanel = require('../util/GridLayoutPanel');
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
 var NUMBER_OF_CONTEXTS = 2;
@@ -20,20 +20,22 @@ var ContextGroups = function(level) {
     this.contexts = [];
     var draggableWords = [];
     var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
-    this.wordsField = new GridPanel(this.level, 'wordField', optionals);
+    this.wordsField = new GridLayoutPanel(this.level, 'wordField', optionals);
 
     optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
-    var contextsPanels = new GridPanel(this.level, 'wordField', optionals);
+    var contextsPanels = new GridLayoutPanel(this.level, 'wordField',
+        optionals);
 
     var i;
     var j;
     var word;
+    var wordShade;
     var context;
     this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
     optionals = {numberOfRows: this.numberOfWords};
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
-        context = new GridPanel(this.level, 'itemGroupBackGround', optionals);
-        context.anchor.set(0.5, 0);
+        context = new GridLayoutPanel(this.level, 'itemGroupBackGround',
+            optionals);
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
@@ -47,9 +49,11 @@ var ContextGroups = function(level) {
             word.inputEnabled = true;
             word.input.enableDrag(true, true);
             word.events.onDragStop.add(this.fixLocation, this);
-            word.anchor.set(0.5, 0);
             word.code = '' + i;
             draggableWords.push(word);
+
+            wordShade = new GridLayoutPanel(this.level, 'useButtonShade');
+            context.addElement(wordShade);
         }
     }
 
@@ -81,17 +85,21 @@ ContextGroups.prototype = Object.create(GridLayoutPopUp.prototype);
 ContextGroups.prototype.constructor = ContextGroups;
 
 ContextGroups.prototype.fixLocation = function(item) {
-    for (var shade in this.contexts) {
-        if (item.overlap(this.contexts[shade]) &&
-            this.contexts[shade].children.length <= this.numberOfWords) {
-            item.x = 0;
-            item.y = 0;
-            this.contexts[shade].addElement(item);
-            return;
+    var context;
+    var shade;
+    for (context in this.contexts) {
+        for (shade in this.contexts[context].children) {
+            if (item.overlap(this.contexts[context].children[shade]) &&
+                this.contexts[context].children[shade].children.length === 0) {
+                item.x = 0;
+                item.y = 0;
+                this.contexts[context].children[shade].addChild (item);
+                return;
+            }
+            item.x = item.initialX;
+            item.y = item.initialY;
+            this.wordsField.addChild(item);
         }
-        item.x = item.initialX;
-        item.y = item.initialY;
-        this.wordsField.addChild(item);
     }
 };
 
@@ -111,7 +119,8 @@ ContextGroups.prototype.confirm = function() {
     }
     for (var shade in this.contexts) {
         for (var word in this.contexts[shade].children) {
-            if (this.contexts[shade].children[word].code !== shade) {
+            if (this.contexts[shade].children[word].children[0].code !==
+                shade) {
                 this.level.showErrorMessage('Sorry! Try Again.', this);
                 return;
             }
@@ -122,4 +131,5 @@ ContextGroups.prototype.confirm = function() {
         ' points.', this);
     this.close();
 };
+
 module.exports = ContextGroups;

@@ -524,7 +524,7 @@ module.exports = StrongEnemy;
  */
 
 var GridLayoutPopUp = require('../util/GridLayoutPopUp');
-var GridPanel = require('../util/GridLayoutPanel');
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
 var NUMBER_OF_CONTEXTS = 2;
@@ -541,20 +541,22 @@ var ContextGroups = function(level) {
     this.contexts = [];
     var draggableWords = [];
     var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
-    this.wordsField = new GridPanel(this.level, 'wordField', optionals);
+    this.wordsField = new GridLayoutPanel(this.level, 'wordField', optionals);
 
     optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
-    var contextsPanels = new GridPanel(this.level, 'wordField', optionals);
+    var contextsPanels = new GridLayoutPanel(this.level, 'wordField',
+        optionals);
 
     var i;
     var j;
     var word;
+    var wordShade;
     var context;
     this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
     optionals = {numberOfRows: this.numberOfWords};
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
-        context = new GridPanel(this.level, 'itemGroupBackGround', optionals);
-        context.anchor.set(0.5, 0);
+        context = new GridLayoutPanel(this.level, 'itemGroupBackGround',
+            optionals);
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
@@ -568,9 +570,11 @@ var ContextGroups = function(level) {
             word.inputEnabled = true;
             word.input.enableDrag(true, true);
             word.events.onDragStop.add(this.fixLocation, this);
-            word.anchor.set(0.5, 0);
             word.code = '' + i;
             draggableWords.push(word);
+
+            wordShade = new GridLayoutPanel(this.level, 'useButtonShade');
+            context.addElement(wordShade);
         }
     }
 
@@ -602,17 +606,21 @@ ContextGroups.prototype = Object.create(GridLayoutPopUp.prototype);
 ContextGroups.prototype.constructor = ContextGroups;
 
 ContextGroups.prototype.fixLocation = function(item) {
-    for (var shade in this.contexts) {
-        if (item.overlap(this.contexts[shade]) &&
-            this.contexts[shade].children.length <= this.numberOfWords) {
-            item.x = 0;
-            item.y = 0;
-            this.contexts[shade].addElement(item);
-            return;
+    var context;
+    var shade;
+    for (context in this.contexts) {
+        for (shade in this.contexts[context].children) {
+            if (item.overlap(this.contexts[context].children[shade]) &&
+                this.contexts[context].children[shade].children.length === 0) {
+                item.x = 0;
+                item.y = 0;
+                this.contexts[context].children[shade].addChild (item);
+                return;
+            }
+            item.x = item.initialX;
+            item.y = item.initialY;
+            this.wordsField.addChild(item);
         }
-        item.x = item.initialX;
-        item.y = item.initialY;
-        this.wordsField.addChild(item);
     }
 };
 
@@ -632,7 +640,8 @@ ContextGroups.prototype.confirm = function() {
     }
     for (var shade in this.contexts) {
         for (var word in this.contexts[shade].children) {
-            if (this.contexts[shade].children[word].code !== shade) {
+            if (this.contexts[shade].children[word].children[0].code !==
+                shade) {
                 this.level.showErrorMessage('Sorry! Try Again.', this);
                 return;
             }
@@ -643,6 +652,7 @@ ContextGroups.prototype.confirm = function() {
         ' points.', this);
     this.close();
 };
+
 module.exports = ContextGroups;
 
 },{"../util/Button":23,"../util/GridLayoutPanel":26,"../util/GridLayoutPopUp":27}],9:[function(require,module,exports){
@@ -704,12 +714,9 @@ var FamilyEC = function(level) {
 
     for (var key in familyKeys) {
         var cell = this.level.game.make.sprite(0, 0, 'itemGroupBackGround');
-        cell.anchor.set(0.5, 0);
         var familyMember = this.level.game.make.sprite(0, 0, familyKeys[key]);
-        familyMember.anchor.set(0.5, 0);
         var shade = this.level.game.make.sprite(0, familyMember.height + 10,
             'useButtonShade');
-        shade.anchor.set(0.5, 0);
         shade.code = key;
 
         this.shades.push(shade);
@@ -725,7 +732,6 @@ var FamilyEC = function(level) {
         label.input.enableDrag(true, true);
         label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.fixLocation, this);
-        label.anchor.set(0.5, 0);
         label.code = key;
         familyMembersCells.push(cell);
         familyMembersLabels.push(label);
@@ -1945,8 +1951,9 @@ var PopUp = require('../../prefabs/util/PopUp');
 var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 var Dialog = require('../../prefabs/util/Dialog');
 
-var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
+//var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
 //var FamilyEC = require('../../prefabs/englishChallenges/ContextGroups');
+var FamilyEC = require('../../prefabs/englishChallenges/FamilyEC');
 
 var Level = function(game) {
     this.game = game;
@@ -2314,7 +2321,7 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/englishChallenges/WordUnscramble":11,"../../prefabs/items/HealthPack":12,"../../prefabs/items/inventory/Inventory":15,"../../prefabs/items/store/Store":17,"../../prefabs/items/weapons/MachineGun":20,"../../prefabs/items/weapons/Revolver":21,"../../prefabs/util/Dialog":24,"../../prefabs/util/PopUp":30,"../../prefabs/worldElements/InteractiveCar":31}],37:[function(require,module,exports){
+},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/englishChallenges/FamilyEC":10,"../../prefabs/items/HealthPack":12,"../../prefabs/items/inventory/Inventory":15,"../../prefabs/items/store/Store":17,"../../prefabs/items/weapons/MachineGun":20,"../../prefabs/items/weapons/Revolver":21,"../../prefabs/util/Dialog":24,"../../prefabs/util/PopUp":30,"../../prefabs/worldElements/InteractiveCar":31}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */

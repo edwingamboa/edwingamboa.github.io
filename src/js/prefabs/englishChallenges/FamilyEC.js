@@ -19,12 +19,9 @@ var FamilyEC = function(level) {
 
     for (var key in familyKeys) {
         var cell = this.level.game.make.sprite(0, 0, 'itemGroupBackGround');
-        cell.anchor.set(0.5, 0);
         var familyMember = this.level.game.make.sprite(0, 0, familyKeys[key]);
-        familyMember.anchor.set(0.5, 0);
         var shade = this.level.game.make.sprite(0, familyMember.height + 10,
             'useButtonShade');
-        shade.anchor.set(0.5, 0);
         shade.code = key;
 
         this.shades.push(shade);
@@ -40,7 +37,6 @@ var FamilyEC = function(level) {
         label.input.enableDrag(true, true);
         label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.fixLocation, this);
-        label.anchor.set(0.5, 0);
         label.code = key;
         familyMembersCells.push(cell);
         familyMembersLabels.push(label);
