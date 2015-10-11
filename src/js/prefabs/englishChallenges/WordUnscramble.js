@@ -3,7 +3,7 @@
  */
 
 var GridLayoutPopUp = require('../util/GridLayoutPopUp');
-var GridPanel = require('../util/GridPanel');
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
 var FamilyEC = function(level) {
@@ -17,21 +17,19 @@ var FamilyEC = function(level) {
     this.shades = [];
     var letters = [];
     var wordImage = this.level.game.make.sprite(0, 0, 'mother');
-    wordImage.anchor.set(0.5, 0);
 
     var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridPanel(this.level, 'wordField', optionals);
+    var wordFieldAnswer = new GridLayoutPanel(this.level,
+        'wordField', optionals);
 
-    this.wordFieldLetters = new GridPanel(this.level, 'wordField', optionals);
+    this.wordFieldLetters = new GridLayoutPanel(this.level,
+        'wordField', optionals);
 
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = this.level.game.make.sprite(0, wordImage.height + 10,
-            'letterShade');
-        letterShade.anchor.set(0.5, 0);
-        letterShade.code = i;
+        letterShade = new GridLayoutPanel(this.level, 'letterShade');
         this.shades.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
@@ -44,7 +42,6 @@ var FamilyEC = function(level) {
         letter.inputEnabled = true;
         letter.input.enableDrag(true, true);
         letter.events.onDragStop.add(this.fixLocation, this);
-        letter.anchor.set(0.5, 0);
         letter.code = '' + i;
         letters.push(letter);
     }
@@ -84,7 +81,7 @@ FamilyEC.prototype.fixLocation = function(item) {
             this.shades[shade].children.length === 0) {
             item.x = 0;
             item.y = 0;
-            this.shades[shade].addChild(item);
+            this.shades[shade].addElement(item);
             return;
         }
         item.x = item.initialX;
@@ -103,12 +100,11 @@ FamilyEC.prototype.bringItemToTop = function(item) {
 
 FamilyEC.prototype.confirm = function() {
     var correct = true;
+    if (this.wordFieldLetters.children.length > 0) {
+        this.level.showErrorMessage('The challenge is not complete.', this);
+        return;
+    }
     for (var shade in this.shades) {
-        if (this.shades[shade].children[0] === undefined) {
-            this.level.showErrorMessage('The challenge is not complete.', this);
-            return;
-        }
-        var letter = this.shades[shade].children[0];
         if (this.shades[shade].children[0].code !== shade) {
             this.level.showErrorMessage('Sorry! Try Again.', this);
             return;

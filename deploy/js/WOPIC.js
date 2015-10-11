@@ -21,7 +21,7 @@ game.state.add('levelOne', LevelOne);
 game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":29,"./states/Menu":30,"./states/Preloader":31,"./states/levels/LevelOne":33,"./states/levels/LevelOneIntro":34}],2:[function(require,module,exports){
+},{"./states/Boot":33,"./states/Menu":34,"./states/Preloader":35,"./states/levels/LevelOne":37,"./states/levels/LevelOneIntro":38}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -482,7 +482,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../character/Enemy":3,"../items/weapons/Revolver":20}],7:[function(require,module,exports){
+},{"../character/Enemy":3,"../items/weapons/Revolver":21}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -518,7 +518,134 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../character/Enemy":3,"../items/weapons/MachineGun":19}],8:[function(require,module,exports){
+},{"../character/Enemy":3,"../items/weapons/MachineGun":20}],8:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/10/2015.
+ */
+
+var GridLayoutPopUp = require('../util/GridLayoutPopUp');
+var GridPanel = require('../util/GridLayoutPanel');
+var Button = require('../util/Button');
+
+var NUMBER_OF_CONTEXTS = 2;
+var ContextGroups = function(level) {
+    this.score = 30;
+    var dimensions = {numberOfColumns: 1, numberOfRows: 4};
+    GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
+
+    this.level = level;
+
+    var words = ['Mother', 'Son', 'Father', 'Living room', 'Dining room',
+        'Kitchen'];
+
+    this.contexts = [];
+    var draggableWords = [];
+    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
+    this.wordsField = new GridPanel(this.level, 'wordField', optionals);
+
+    optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
+    var contextsPanels = new GridPanel(this.level, 'wordField', optionals);
+
+    var i;
+    var j;
+    var word;
+    var context;
+    this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
+    optionals = {numberOfRows: this.numberOfWords};
+    for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
+        context = new GridPanel(this.level, 'itemGroupBackGround', optionals);
+        context.anchor.set(0.5, 0);
+        this.contexts.push(context);
+        contextsPanels.addElement(context);
+
+        for (j = i * (NUMBER_OF_CONTEXTS + 1);
+             j < (i + 1) * this.numberOfWords; j++) {
+            word = this.level.game.make.text(0, 0, words[j]);
+            //Font style
+            word.font = 'Shojumaru';
+            word.fontSize = 20;
+            word.fill = '#0040FF';
+            word.inputEnabled = true;
+            word.input.enableDrag(true, true);
+            word.events.onDragStop.add(this.fixLocation, this);
+            word.anchor.set(0.5, 0);
+            word.code = '' + i;
+            draggableWords.push(word);
+        }
+    }
+
+    var randomIndex;
+    var indexes = [];
+    for (i = 0; i < draggableWords.length; i++) {
+        indexes.push(i);
+    }
+
+    for (i = 0; i < draggableWords.length; i++) {
+        randomIndex = level.game.rnd.integerInRange(0,
+            indexes.length - 1);
+        this.wordsField.addElement(draggableWords[indexes[randomIndex]]);
+        draggableWords[indexes[randomIndex]].initialX =
+            draggableWords[indexes[randomIndex]].x;
+        draggableWords[indexes[randomIndex]].initialY =
+            draggableWords[indexes[randomIndex]].y;
+        indexes.splice(randomIndex, 1);
+    }
+
+    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
+    //this.addElement(Description);
+    this.addElement(contextsPanels);
+    this.addElement(this.wordsField);
+    this.addElement(this.confirmButton);
+};
+
+ContextGroups.prototype = Object.create(GridLayoutPopUp.prototype);
+ContextGroups.prototype.constructor = ContextGroups;
+
+ContextGroups.prototype.fixLocation = function(item) {
+    for (var shade in this.contexts) {
+        if (item.overlap(this.contexts[shade]) &&
+            this.contexts[shade].children.length <= this.numberOfWords) {
+            item.x = 0;
+            item.y = 0;
+            this.contexts[shade].addElement(item);
+            return;
+        }
+        item.x = item.initialX;
+        item.y = item.initialY;
+        this.wordsField.addChild(item);
+    }
+};
+
+ContextGroups.prototype.bringItemToTop = function(item) {
+    if (ContextGroups.prototype.isPrototypeOf(item.parent)) {
+        this.addChild(item);
+    }else {
+        this.addChild(item.parent.parent);
+    }
+};
+
+ContextGroups.prototype.confirm = function() {
+    var correct = true;
+    if (this.wordsField.children.length > 0) {
+        this.level.showErrorMessage('The challenge is not complete.', this);
+        return;
+    }
+    for (var shade in this.contexts) {
+        for (var word in this.contexts[shade].children) {
+            if (this.contexts[shade].children[word].code !== shade) {
+                this.level.showErrorMessage('Sorry! Try Again.', this);
+                return;
+            }
+        }
+    }
+    this.level.increaseScore(this.score);
+    this.level.showSuccessMessage('Well done! You got ' + this.score +
+        ' points.', this);
+    this.close();
+};
+module.exports = ContextGroups;
+
+},{"../util/Button":23,"../util/GridLayoutPanel":26,"../util/GridLayoutPopUp":27}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -555,7 +682,7 @@ EnglishChallenges.prototype.showHealthPacks = function() {
 
 module.exports = EnglishChallenges;
 
-},{"../util/GridLayoutPopUp":24}],9:[function(require,module,exports){
+},{"../util/GridLayoutPopUp":27}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -676,13 +803,13 @@ FamilyEC.prototype.confirm = function() {
 };
 module.exports = FamilyEC;
 
-},{"../util/Button":22,"../util/GridLayoutPopUp":24}],10:[function(require,module,exports){
+},{"../util/Button":23,"../util/GridLayoutPopUp":27}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
 
 var GridLayoutPopUp = require('../util/GridLayoutPopUp');
-var GridPanel = require('../util/GridPanel');
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
 var FamilyEC = function(level) {
@@ -696,21 +823,19 @@ var FamilyEC = function(level) {
     this.shades = [];
     var letters = [];
     var wordImage = this.level.game.make.sprite(0, 0, 'mother');
-    wordImage.anchor.set(0.5, 0);
 
     var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridPanel(this.level, 'wordField', optionals);
+    var wordFieldAnswer = new GridLayoutPanel(this.level,
+        'wordField', optionals);
 
-    this.wordFieldLetters = new GridPanel(this.level, 'wordField', optionals);
+    this.wordFieldLetters = new GridLayoutPanel(this.level,
+        'wordField', optionals);
 
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = this.level.game.make.sprite(0, wordImage.height + 10,
-            'letterShade');
-        letterShade.anchor.set(0.5, 0);
-        letterShade.code = i;
+        letterShade = new GridLayoutPanel(this.level, 'letterShade');
         this.shades.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
@@ -723,7 +848,6 @@ var FamilyEC = function(level) {
         letter.inputEnabled = true;
         letter.input.enableDrag(true, true);
         letter.events.onDragStop.add(this.fixLocation, this);
-        letter.anchor.set(0.5, 0);
         letter.code = '' + i;
         letters.push(letter);
     }
@@ -763,7 +887,7 @@ FamilyEC.prototype.fixLocation = function(item) {
             this.shades[shade].children.length === 0) {
             item.x = 0;
             item.y = 0;
-            this.shades[shade].addChild(item);
+            this.shades[shade].addElement(item);
             return;
         }
         item.x = item.initialX;
@@ -782,12 +906,11 @@ FamilyEC.prototype.bringItemToTop = function(item) {
 
 FamilyEC.prototype.confirm = function() {
     var correct = true;
+    if (this.wordFieldLetters.children.length > 0) {
+        this.level.showErrorMessage('The challenge is not complete.', this);
+        return;
+    }
     for (var shade in this.shades) {
-        if (this.shades[shade].children[0] === undefined) {
-            this.level.showErrorMessage('The challenge is not complete.', this);
-            return;
-        }
-        var letter = this.shades[shade].children[0];
         if (this.shades[shade].children[0].code !== shade) {
             this.level.showErrorMessage('Sorry! Try Again.', this);
             return;
@@ -800,7 +923,7 @@ FamilyEC.prototype.confirm = function() {
 };
 module.exports = FamilyEC;
 
-},{"../util/Button":22,"../util/GridLayoutPopUp":24,"../util/GridPanel":25}],11:[function(require,module,exports){
+},{"../util/Button":23,"../util/GridLayoutPanel":26,"../util/GridLayoutPopUp":27}],12:[function(require,module,exports){
 var Item = require('../items/Item');
 
 var PRCE_INCREASE_RATE = 10;
@@ -834,7 +957,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"../items/Item":12}],12:[function(require,module,exports){
+},{"../items/Item":13}],13:[function(require,module,exports){
 var BOUNCE = 0.7 + Math.random() * 0.2;
 
 var Item = function(level, x, y, key, price) {
@@ -852,35 +975,36 @@ Item.prototype.constructor = Item;
 
 module.exports = Item;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 var ItemGroupView = function(level,
                              item,
                              buttonKey,
                              parentView) {
     Phaser.Sprite.call(this, level.game, 0, 0, 'itemGroupBackGround');
-    this.anchor.set(0.5, 0);
-    this.icon = level.game.make.sprite(0, 10, item.key);
-    this.icon.anchor.set(0.5, 0);
-    this.button = level.game.make.sprite(-15, this.height - 5, buttonKey);
-    this.button.anchor.set(0, 1);
+    this.icon = level.game.make.sprite(10, 10, item.key);
+    this.message = level.game.make.text(0, 0, '');
+    this.message.font = 'Arial';
+    this.message.fontSize = 30;
+    this.message.fill = '#0040FF';
+    this.messageBackground = new GridLayoutPanel(level, 'letterShade');
+    this.messageBackground.addElement(this.message);
+
+    this.messageBackground.x = 10;
+    this.messageBackground.y = this.icon.y + this.icon.height + 10;
+
+    this.button = level.game.make.sprite(this.messageBackground.x +
+        this.messageBackground.width + 10,
+        this.icon.y + this.icon.height + 10, buttonKey);
     this.button.inputEnabled = true;
     this.button.input.priorityID = 2;
     this.button.events.onInputDown.add(this.buttonAction, this);
 
-    this.message = level.game.make.text(-20, this.height - 5,
-        '' + this.amountAvailable);
-    //Font style
-    this.message.font = 'Arial';
-    this.message.fontSize = 30;
-    this.message.fontWeight = 'bold';
-    this.message.fill = '#0040FF';
-    this.message.anchor.set(1, 1);
-
     this.addChild(this.icon);
-    this.addChild(this.message);
+    this.addChild(this.messageBackground);
     this.addChild(this.button);
     this.parent = parentView;
     this.item = item;
@@ -896,7 +1020,7 @@ ItemGroupView.prototype.buttonAction = function() {
 
 module.exports = ItemGroupView;
 
-},{}],14:[function(require,module,exports){
+},{"../util/GridLayoutPanel":26}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -955,7 +1079,7 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../../util/GridLayoutPopUp":24,"../HealthPack":11,"../inventory/InventoryItem":15,"../weapons/Revolver":20}],15:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":27,"../HealthPack":12,"../inventory/InventoryItem":16,"../weapons/Revolver":21}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -986,7 +1110,7 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../../items/ItemGroupView":13}],16:[function(require,module,exports){
+},{"../../items/ItemGroupView":14}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1045,7 +1169,7 @@ Store.prototype.showHealthPacks = function() {
 
 module.exports = Store;
 
-},{"../../util/GridLayoutPopUp":24,"../HealthPack":11,"../store/StoreItem":17,"../weapons/Revolver":20}],17:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":27,"../HealthPack":12,"../store/StoreItem":18,"../weapons/Revolver":21}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1076,7 +1200,7 @@ StoreItem.prototype.buttonAction = function() {
 
 module.exports = StoreItem;
 
-},{"../../items/ItemGroupView":13}],18:[function(require,module,exports){
+},{"../../items/ItemGroupView":14}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -1097,7 +1221,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1134,7 +1258,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"../weapons/Weapon":21}],20:[function(require,module,exports){
+},{"../weapons/Weapon":22}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1171,7 +1295,7 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"../weapons/Weapon":21}],21:[function(require,module,exports){
+},{"../weapons/Weapon":22}],22:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('../weapons/Bullet');
 
@@ -1264,7 +1388,7 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":12,"../weapons/Bullet":18}],22:[function(require,module,exports){
+},{"../Item":13,"../weapons/Bullet":19}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1276,7 +1400,7 @@ var Button = function(level, text, action, parent, optionals) {
 
     Phaser.Sprite.call(this, level.game, x, y, 'button');
 
-    this.text = level.game.make.text(0, 0, text);
+    this.text = level.game.make.text(this.width / 2, this.height / 2, text);
     this.text.anchor.set(0.5, 0.5);
     this.text.font = 'Shojumaru';
     this.text.fontSize = 20;
@@ -1285,7 +1409,6 @@ var Button = function(level, text, action, parent, optionals) {
     this.inputEnabled = true;
     this.events.onInputDown.add(action, parent);
 
-    this.anchor.set(0.5, 0.5);
     this.addChild(this.text);
 };
 
@@ -1294,33 +1417,27 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var PopUp = require('../util/PopUp');
+var HorizontalLayoutPopUp = require('../util/HorizontalLayoutPopUp');
 
 var Dialog = function(level, iconKey, text, parent) {
-    PopUp.call(this, level, 'dialog', parent);
+    HorizontalLayoutPopUp.call(this, level, 'dialog', parent);
 
-    this.icon = level.game.make.sprite(this.xOrigin, this.yCenter, iconKey);
-    this.icon.anchor.set(0, 0.5);
-
-    this.message = level.game.make.text(this.xOrigin + this.icon.width + 10,
-        this.yCenter, '');
-    //Font style
+    this.icon = level.game.make.sprite(0, 0, iconKey);
+    this.message = level.game.make.text(0, 0, '');
     this.message.font = 'Arial';
     this.message.fontSize = 20;
     this.message.fill = '#000000';
-    this.message.anchor.set(0, 0.5);
-
     this.message.text = text;
 
-    this.addChild(this.message);
-    this.addChild(this.icon);
+    this.addElement(this.icon);
+    this.addElement(this.message);
 };
 
-Dialog.prototype = Object.create(PopUp.prototype);
+Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
 Dialog.prototype.constructor = Dialog;
 
 Dialog.prototype.setText = function(text) {
@@ -1329,17 +1446,96 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"../util/PopUp":26}],24:[function(require,module,exports){
+},{"../util/HorizontalLayoutPopUp":29}],25:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var NUMBER_OF_COLUMNS = 5;
-var NUMBER_OF_ROWS = 3;
-var ITEMS_SPACE_LENGTH = 10;
-var PopUp = require('../util/PopUp');
+var MARGIN = 10;
 
-var GridLayoutPopUp = function(level, backgroundKey, dimensions) {
-    PopUp.call(this, level, backgroundKey);
+var GridLayout = function(numberOfColumns, numberOfRows, parent) {
+    this.currentRow = 0;
+    this.currentColumn = 0;
+    this.numberOfColumns = numberOfColumns;
+    this.numberOfRows = numberOfRows;
+    this.rowWidth = (parent.width - MARGIN * this.numberOfColumns) /
+        this.numberOfColumns;
+    this.rowHeight = (parent.height - MARGIN * this.numberOfRows) /
+        this.numberOfRows;
+    if (numberOfColumns === 1 && numberOfRows === 1) {
+        this.xOrigin = 0;
+        this.yOrigin = 0;
+    } else {
+        this.xOrigin = MARGIN;
+        this.yOrigin = MARGIN;
+    }
+    this.parent = parent;
+};
+
+GridLayout.prototype.constructor = GridLayout;
+
+GridLayout.prototype.addElement = function(element) {
+    if (this.currentColumn >= this.numberOfColumns) {
+        this.currentColumn = 0;
+        this.currentRow++;
+    }
+    var xCentered = (this.rowWidth / 2) - (element.width / 2);
+    element.x = this.xOrigin + (this.rowWidth + MARGIN) *
+        this.currentColumn + xCentered;
+    var yCentered = this.yOrigin + (this.rowHeight / 2) - (element.height / 2);
+    element.y = (this.rowHeight + MARGIN) *
+        this.currentRow + yCentered;
+
+    this.parent.addChild(element);
+    this.currentColumn ++;
+};
+
+module.exports = GridLayout;
+
+},{}],26:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 22/06/2015.
+ */
+var GridLayout = require('../util/GridLayout');
+
+var NUMBER_OF_COLUMNS = 1;
+var NUMBER_OF_ROWS = 1;
+
+var GridLayoutPanel = function(level, backgroundKey, optionals) {
+    var ops = optionals || [];
+    var x = ops.x || 0;
+    var y = ops.y || 0;
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.level = level;
+    this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
+    this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
+
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+};
+
+GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
+GridLayoutPanel.prototype.constructor = GridLayoutPanel;
+
+GridLayoutPanel.prototype.addElement = function(element) {
+    this.grid.addElement(element);
+};
+
+module.exports = GridLayoutPanel;
+
+},{"../util/GridLayout":25}],27:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 22/06/2015.
+ */
+var PopUp = require('../util/PopUp');
+var GridLayout = require('../util/GridLayout');
+
+var NUMBER_OF_COLUMNS = 5;
+var NUMBER_OF_ROWS = 1;
+
+var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {
+    PopUp.call(this, level, backgroundKey, parent);
     this.level = level;
     this.currentRow = 0;
     this.currentColumn = 0;
@@ -1348,10 +1544,7 @@ var GridLayoutPopUp = function(level, backgroundKey, dimensions) {
     this.numberOfColumns = dims.numberOfColumns || NUMBER_OF_COLUMNS;
     this.numberOfRows = dims.numberOfRows || NUMBER_OF_ROWS;
 
-    this.rowWidth = (this.width - ITEMS_SPACE_LENGTH * this.numberOfColumns) /
-        this.numberOfColumns;
-    this.rowHeight = (this.height - ITEMS_SPACE_LENGTH * this.numberOfRows) /
-        this.numberOfRows;
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
 
 };
 
@@ -1359,89 +1552,78 @@ GridLayoutPopUp.prototype = Object.create(PopUp.prototype);
 GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
 
 GridLayoutPopUp.prototype.addElement = function(element) {
-    if (this.currentColumn >= this.numberOfColumns) {
-        this.currentColumn = 0;
-        this.currentRow++;
-    }
-    element.x = this.xOrigin + this.rowWidth / 2 +
-        (this.rowWidth + ITEMS_SPACE_LENGTH) * this.currentColumn;
-    var yCentered = (this.rowHeight / 2) - (element.height / 2);
-    element.y = this.yOrigin + (this.rowHeight + ITEMS_SPACE_LENGTH) *
-        this.currentRow + yCentered;
-
-    this.addChild(element);
-    this.currentColumn ++;
+    this.grid.addElement(element);
 };
 
 module.exports = GridLayoutPopUp;
 
-},{"../util/PopUp":26}],25:[function(require,module,exports){
+},{"../util/GridLayout":25,"../util/PopUp":30}],28:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var NUMBER_OF_COLUMNS = 1;
-var NUMBER_OF_ROWS = 1;
 var MARGIN = 10;
 
-var GridPanel = function(level, backgroundKey, optionals) {
-    var ops = optionals || [];
-    var x = ops.x || 0;
-    var y = ops.y || 0;
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.anchor.set(0.5, 0.5);
-    this.level = level;
-    this.currentRow = 0;
-    this.currentColumn = 0;
-    this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
-    this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
-    this.rowWidth = (this.width - MARGIN * this.numberOfColumns) /
-        this.numberOfColumns;
-    this.rowHeight = (this.height - MARGIN * this.numberOfRows) /
-        this.numberOfRows;
-    this.xOrigin = -this.width / 2 + MARGIN;
-    this.yOrigin = -this.height / 2 + MARGIN;
+var HorizontalLayout = function(parent) {
+    this.currentX = MARGIN;
+    this.parent = parent;
 };
 
-GridPanel.prototype = Object.create(Phaser.Sprite.prototype);
-GridPanel.prototype.constructor = GridPanel;
+HorizontalLayout.prototype.constructor = HorizontalLayout;
 
-GridPanel.prototype.addElement = function(element) {
-    if (this.currentColumn >= this.numberOfColumns) {
-        this.currentColumn = 0;
-        this.currentRow++;
-    }
-    element.x = this.xOrigin + this.rowWidth / 2 +
-        (this.rowWidth + MARGIN) * this.currentColumn;
-    var yCentered = (this.rowHeight / 2) - (element.height / 2);
-    element.y = this.yOrigin + (this.rowHeight + MARGIN) *
-        this.currentRow + yCentered;
+HorizontalLayout.prototype.addElement = function(element) {
+    element.x = this.currentX;
+    this.currentX += element.width + MARGIN;
+    element.y = this.parent.height / 2 - element.height / 2;
 
-    this.addChild(element);
-    this.currentColumn ++;
+    this.parent.addChild(element);
 };
 
-module.exports = GridPanel;
+module.exports = HorizontalLayout;
 
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var PopUp = require('../util/PopUp');
+var Horizontalayout = require('../util/HorizontalLayout');
+
+var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
+    PopUp.call(this, level, backgroundKey, parent);
+    this.layout = new Horizontalayout(this);
+};
+
+HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);
+HorizontalLayoutPopUP.prototype.constructor = HorizontalLayoutPopUP;
+
+HorizontalLayoutPopUP.prototype.addElement = function(element) {
+    this.layout.addElement(element);
+};
+
+module.exports = HorizontalLayoutPopUP;
+
+
+},{"../util/HorizontalLayout":28,"../util/PopUp":30}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
 var PopUp = function(level, backgroundKey, parent) {
-    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
-        level.game.camera.height / 2, backgroundKey);
+    Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
-    this.anchor.set(0.5, 0.5);
+    this.xCenter = this.width / 2;
+    this.yCenter = this.height / 2;
 
-    this.xOrigin = -this.width / 2 + MARGIN;
-    this.yOrigin = -this.height / 2 + MARGIN;
+    this.x = level.game.camera.width / 2 - this.xCenter;
+    this.y = level.game.camera.height / 2 - this.yCenter;
 
-    this.xCenter = 0;
-    this.yCenter = 0;
-
-    this.closeButton = level.game.make.sprite(-this.xOrigin,
-        this.yOrigin, 'close');
-    this.closeButton.anchor.set(0.5);
+    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
+    this.closeButton.anchor.set(0.5, 0.5);
     this.closeButton.inputEnabled = true;
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);
@@ -1483,7 +1665,7 @@ PopUp.prototype.open = function() {
 
 module.exports = PopUp;
 
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -1544,7 +1726,7 @@ InteractiveCar.prototype.isStopped = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":26}],28:[function(require,module,exports){
+},{"../util/PopUp":30}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -1576,7 +1758,7 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":16}],29:[function(require,module,exports){
+},{"../items/store/Store":17}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -1599,7 +1781,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1627,7 +1809,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],31:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1746,7 +1928,7 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],32:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1764,6 +1946,7 @@ var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 var Dialog = require('../../prefabs/util/Dialog');
 
 var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
+//var FamilyEC = require('../../prefabs/englishChallenges/ContextGroups');
 
 var Level = function(game) {
     this.game = game;
@@ -1773,6 +1956,7 @@ Level.prototype.constructor = Level;
 
 Level.prototype.preload = function() {
     this.game.stage.backgroundColor = '#82CAFA';
+
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
@@ -2130,7 +2314,7 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/englishChallenges/WordUnscramble":10,"../../prefabs/items/HealthPack":11,"../../prefabs/items/inventory/Inventory":14,"../../prefabs/items/store/Store":16,"../../prefabs/items/weapons/MachineGun":19,"../../prefabs/items/weapons/Revolver":20,"../../prefabs/util/Dialog":23,"../../prefabs/util/PopUp":26,"../../prefabs/worldElements/InteractiveCar":27}],33:[function(require,module,exports){
+},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/englishChallenges/WordUnscramble":11,"../../prefabs/items/HealthPack":12,"../../prefabs/items/inventory/Inventory":15,"../../prefabs/items/store/Store":17,"../../prefabs/items/weapons/MachineGun":20,"../../prefabs/items/weapons/Revolver":21,"../../prefabs/util/Dialog":24,"../../prefabs/util/PopUp":30,"../../prefabs/worldElements/InteractiveCar":31}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -2200,7 +2384,7 @@ LevelOne.prototype.addEnemies = function() {
 
 module.exports = LevelOne;
 
-},{"../../prefabs/worldElements/InteractiveHouse":28,"../levels/Level":32}],34:[function(require,module,exports){
+},{"../../prefabs/worldElements/InteractiveHouse":32,"../levels/Level":36}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2239,4 +2423,4 @@ LevelOneIntro.prototype = {
 
 module.exports = LevelOneIntro;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38]);

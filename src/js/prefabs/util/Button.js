@@ -9,7 +9,7 @@ var Button = function(level, text, action, parent, optionals) {
 
     Phaser.Sprite.call(this, level.game, x, y, 'button');
 
-    this.text = level.game.make.text(0, 0, text);
+    this.text = level.game.make.text(this.width / 2, this.height / 2, text);
     this.text.anchor.set(0.5, 0.5);
     this.text.font = 'Shojumaru';
     this.text.fontSize = 20;
@@ -18,7 +18,6 @@ var Button = function(level, text, action, parent, optionals) {
     this.inputEnabled = true;
     this.events.onInputDown.add(action, parent);
 
-    this.anchor.set(0.5, 0.5);
     this.addChild(this.text);
 };
 

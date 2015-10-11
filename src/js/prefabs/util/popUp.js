@@ -3,20 +3,16 @@
  */
 var MARGIN = 10;
 var PopUp = function(level, backgroundKey, parent) {
-    Phaser.Sprite.call(this, level.game, level.game.camera.width / 2,
-        level.game.camera.height / 2, backgroundKey);
+    Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
-    this.anchor.set(0.5, 0.5);
+    this.xCenter = this.width / 2;
+    this.yCenter = this.height / 2;
 
-    this.xOrigin = -this.width / 2 + MARGIN;
-    this.yOrigin = -this.height / 2 + MARGIN;
+    this.x = level.game.camera.width / 2 - this.xCenter;
+    this.y = level.game.camera.height / 2 - this.yCenter;
 
-    this.xCenter = 0;
-    this.yCenter = 0;
-
-    this.closeButton = level.game.make.sprite(-this.xOrigin,
-        this.yOrigin, 'close');
-    this.closeButton.anchor.set(0.5);
+    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
+    this.closeButton.anchor.set(0.5, 0.5);
     this.closeButton.inputEnabled = true;
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);

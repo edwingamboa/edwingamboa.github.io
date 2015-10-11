@@ -1,29 +1,23 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var PopUp = require('../util/PopUp');
+var HorizontalLayoutPopUp = require('../util/HorizontalLayoutPopUp');
 
 var Dialog = function(level, iconKey, text, parent) {
-    PopUp.call(this, level, 'dialog', parent);
+    HorizontalLayoutPopUp.call(this, level, 'dialog', parent);
 
-    this.icon = level.game.make.sprite(this.xOrigin, this.yCenter, iconKey);
-    this.icon.anchor.set(0, 0.5);
-
-    this.message = level.game.make.text(this.xOrigin + this.icon.width + 10,
-        this.yCenter, '');
-    //Font style
+    this.icon = level.game.make.sprite(0, 0, iconKey);
+    this.message = level.game.make.text(0, 0, '');
     this.message.font = 'Arial';
     this.message.fontSize = 20;
     this.message.fill = '#000000';
-    this.message.anchor.set(0, 0.5);
-
     this.message.text = text;
 
-    this.addChild(this.message);
-    this.addChild(this.icon);
+    this.addElement(this.icon);
+    this.addElement(this.message);
 };
 
-Dialog.prototype = Object.create(PopUp.prototype);
+Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
 Dialog.prototype.constructor = Dialog;
 
 Dialog.prototype.setText = function(text) {

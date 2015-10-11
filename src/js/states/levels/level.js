@@ -15,6 +15,7 @@ var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
 var Dialog = require('../../prefabs/util/Dialog');
 
 var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
+//var FamilyEC = require('../../prefabs/englishChallenges/ContextGroups');
 
 var Level = function(game) {
     this.game = game;
@@ -24,6 +25,7 @@ Level.prototype.constructor = Level;
 
 Level.prototype.preload = function() {
     this.game.stage.backgroundColor = '#82CAFA';
+
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
