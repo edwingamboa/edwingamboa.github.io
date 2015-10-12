@@ -6,7 +6,7 @@
 var SPEED = 250;
 var MAX_SPEED = 300;
 var GRAVITY = 300;
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var MINIMUM_SCORE = 10;
 var Player;

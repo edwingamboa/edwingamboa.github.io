@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Enemy = require('../character/Enemy');
+var Enemy = require('./Enemy');
 var Revolver = require('../items/weapons/Revolver');
 
 var SPRITE_KEY = 'simple_enemy';

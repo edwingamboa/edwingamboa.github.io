@@ -1,10 +1,10 @@
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
-var ItemGroupView = require('../../items/ItemGroupView');
+var ItemGroupView = require('../ItemGroupView');
 
 var InventoryItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'useOneButton', parentView);
+    ItemGroupView.call(this, level, item, 'Use', parentView);
 
     this.amountAvailable = 0;
     this.updateAmountAvailableText();

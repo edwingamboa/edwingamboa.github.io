@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
-var InteractiveHouse = require ('../../prefabs/worldElements/InteractiveHouse');
+var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 
 var CHECK_POINT_X_ONE;
 var CHECK_POINTS_DISTANCE;

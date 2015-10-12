@@ -1,8 +1,7 @@
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
-var Boot;
-Boot = function(game) {};
+var Boot = function(game) {};
 
 Boot.prototype = {
     preload: function() {

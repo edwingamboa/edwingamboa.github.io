@@ -1,4 +1,4 @@
-var Item = require('../items/Item');
+var Item = require('./Item');
 
 var PRCE_INCREASE_RATE = 10;
 var GRAVITY = 300;

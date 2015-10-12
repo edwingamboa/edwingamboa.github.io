@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Enemy = require('../character/Enemy');
+var Enemy = require('./Enemy');
 var MachineGun = require('../items/weapons/MachineGun');
 
 var SPRITE_KEY = 'strong_enemy';

@@ -1,22 +1,22 @@
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var Inventory = require('../../prefabs/items/inventory/Inventory');
-var Store = require('../../prefabs/items/store/Store');
-var HealthPack = require('../../prefabs/items/HealthPack');
-var Player = require('../../prefabs/character/Player');
-var Revolver = require('../../prefabs/items/weapons/Revolver');
-var MachineGun = require('../../prefabs/items/weapons/MachineGun');
-var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
-var StrongEnemy = require('../../prefabs/character/StrongEnemy');
-var NPC = require('../../prefabs/character/NPC');
-var PopUp = require('../../prefabs/util/PopUp');
-var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
-var Dialog = require('../../prefabs/util/Dialog');
+var Inventory = require('../../items/inventory/Inventory');
+var Store = require('../../items/store/Store');
+var HealthPack = require('../../items/HealthPack');
+var Player = require('../../character/Player');
+var Revolver = require('../../items/weapons/Revolver');
+var MachineGun = require('../../items/weapons/MachineGun');
+var SimpleEnemy = require('../../character/SimpleEnemy');
+var StrongEnemy = require('../../character/StrongEnemy');
+var NPC = require('../../character/NPC');
+var PopUp = require('../../util/PopUp');
+var InteractiveCar = require ('../../worldElements/InteractiveCar');
+var Dialog = require('../../util/Dialog');
 
-//var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
-//var FamilyEC = require('../../prefabs/englishChallenges/ContextGroups');
-var FamilyEC = require('../../prefabs/englishChallenges/FamilyEC');
+//var FamilyEC = require('../../englishChallenges/WordUnscramble');
+//var FamilyEC = require('../../englishChallenges/ContextGroups');
+var FamilyEC = require('../../englishChallenges/FamilyEC');
 
 var Level = function(game) {
     this.game = game;

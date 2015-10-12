@@ -1,8 +1,7 @@
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Menu;
-Menu = function(game) {};
+var Menu = function(game) {};
 
 Menu.prototype = {
     create: function() {

@@ -2,9 +2,11 @@
  * Created by Edwin Gamboa on 17/07/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
+var Button = require('../util/Button');
+
 var ItemGroupView = function(level,
                              item,
-                             buttonKey,
+                             buttonText,
                              parentView) {
     Phaser.Sprite.call(this, level.game, 0, 0, 'itemGroupBackGround');
     this.icon = level.game.make.sprite(10, 10, item.key);
@@ -18,12 +20,10 @@ var ItemGroupView = function(level,
     this.messageBackground.x = 10;
     this.messageBackground.y = this.icon.y + this.icon.height + 10;
 
-    this.button = level.game.make.sprite(this.messageBackground.x +
-        this.messageBackground.width + 10,
-        this.icon.y + this.icon.height + 10, buttonKey);
-    this.button.inputEnabled = true;
-    this.button.input.priorityID = 2;
-    this.button.events.onInputDown.add(this.buttonAction, this);
+    this.button = new Button(level, buttonText, this.buttonAction, this);
+    this.button.x = this.messageBackground.x + this.messageBackground.width +
+        10;
+    this.button.y = this.icon.y + this.icon.height + 10;
 
     this.addChild(this.icon);
     this.addChild(this.messageBackground);

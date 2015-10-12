@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Weapon = require('../weapons/Weapon');
+var Weapon = require('./Weapon');
 
 var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'revolverSprite';

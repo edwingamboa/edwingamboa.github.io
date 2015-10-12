@@ -4,8 +4,8 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var PopUp = require('../util/PopUp');
-var Horizontalayout = require('../util/HorizontalLayout');
+var PopUp = require('./PopUp');
+var Horizontalayout = require('./HorizontalLayout');
 
 var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
     PopUp.call(this, level, backgroundKey, parent);

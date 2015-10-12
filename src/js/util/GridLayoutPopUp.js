@@ -1,8 +1,8 @@
 /**
- * Created by Edwin Gamboa on 22/06/2015.
+ * Created by Edwin Gamboa on 11/10/2015.
  */
-var PopUp = require('../util/PopUp');
-var GridLayout = require('../util/GridLayout');
+var PopUp = require('./PopUp');
+var GridLayout = require('./GridLayout');
 
 var NUMBER_OF_COLUMNS = 5;
 var NUMBER_OF_ROWS = 1;

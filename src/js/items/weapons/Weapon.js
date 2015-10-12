@@ -1,5 +1,5 @@
 var Item = require('../Item');
-var Bullet = require('../weapons/Bullet');
+var Bullet = require('./Bullet');
 
 var RIGHT_KEY = 0;
 var LEFT_KEY = 1;

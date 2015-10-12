@@ -1,8 +1,7 @@
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Preloader;
-Preloader = function(game) {
+var Preloader = function(game) {
     this.ready = false;
 };
 
@@ -97,6 +96,7 @@ Preloader.prototype = {
 
         this.game.load.image('wordField', 'assets/images/wordField.png');
         this.game.load.image('letterShade', 'assets/images/letterShade.png');
+        this.game.load.image('transparent', 'assets/images/transparent.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

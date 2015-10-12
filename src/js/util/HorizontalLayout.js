@@ -1,9 +1,6 @@
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
-/**
- * Created by Edwin Gamboa on 22/06/2015.
- */
 var MARGIN = 10;
 
 var HorizontalLayout = function(parent) {

@@ -21,7 +21,7 @@ game.state.add('levelOne', LevelOne);
 game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":33,"./states/Menu":34,"./states/Preloader":35,"./states/levels/LevelOne":37,"./states/levels/LevelOneIntro":38}],2:[function(require,module,exports){
+},{"./states/Boot":23,"./states/Menu":24,"./states/Preloader":25,"./states/levels/LevelOne":27,"./states/levels/LevelOneIntro":28}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -275,7 +275,7 @@ module.exports = Character;
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var Enemy = function(level,
                      spriteKey,
@@ -338,11 +338,11 @@ Enemy.prototype.rotateWeapon = function(x, y) {
 
 module.exports = Enemy;
 
-},{"../character/Character":2}],4:[function(require,module,exports){
+},{"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var NPC;
 NPC = function(level, x, y, key, comicKey) {
@@ -357,7 +357,7 @@ NPC.prototype.constructor = NPC;
 
 module.exports = NPC;
 
-},{"../character/Character":2}],5:[function(require,module,exports){
+},{"./Character":2}],5:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -366,7 +366,7 @@ module.exports = NPC;
 var SPEED = 250;
 var MAX_SPEED = 300;
 var GRAVITY = 300;
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var MINIMUM_SCORE = 10;
 var Player;
@@ -448,11 +448,11 @@ Player.prototype.buyItem = function(item) {
 
 module.exports = Player;
 
-},{"../character/Character":2}],6:[function(require,module,exports){
+},{"./Character":2}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Enemy = require('../character/Enemy');
+var Enemy = require('./Enemy');
 var Revolver = require('../items/weapons/Revolver');
 
 var SPRITE_KEY = 'simple_enemy';
@@ -482,11 +482,11 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../character/Enemy":3,"../items/weapons/Revolver":21}],7:[function(require,module,exports){
+},{"../items/weapons/Revolver":21,"./Enemy":3}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Enemy = require('../character/Enemy');
+var Enemy = require('./Enemy');
 var MachineGun = require('../items/weapons/MachineGun');
 
 var SPRITE_KEY = 'strong_enemy';
@@ -518,7 +518,7 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../character/Enemy":3,"../items/weapons/MachineGun":20}],8:[function(require,module,exports){
+},{"../items/weapons/MachineGun":20,"./Enemy":3}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -655,7 +655,7 @@ ContextGroups.prototype.confirm = function() {
 
 module.exports = ContextGroups;
 
-},{"../util/Button":23,"../util/GridLayoutPanel":26,"../util/GridLayoutPopUp":27}],9:[function(require,module,exports){
+},{"../util/Button":29,"../util/GridLayoutPanel":32,"../util/GridLayoutPopUp":33}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -692,7 +692,7 @@ EnglishChallenges.prototype.showHealthPacks = function() {
 
 module.exports = EnglishChallenges;
 
-},{"../util/GridLayoutPopUp":27}],10:[function(require,module,exports){
+},{"../util/GridLayoutPopUp":33}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -809,7 +809,7 @@ FamilyEC.prototype.confirm = function() {
 };
 module.exports = FamilyEC;
 
-},{"../util/Button":23,"../util/GridLayoutPopUp":27}],11:[function(require,module,exports){
+},{"../util/Button":29,"../util/GridLayoutPopUp":33}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -929,8 +929,8 @@ FamilyEC.prototype.confirm = function() {
 };
 module.exports = FamilyEC;
 
-},{"../util/Button":23,"../util/GridLayoutPanel":26,"../util/GridLayoutPopUp":27}],12:[function(require,module,exports){
-var Item = require('../items/Item');
+},{"../util/Button":29,"../util/GridLayoutPanel":32,"../util/GridLayoutPopUp":33}],12:[function(require,module,exports){
+var Item = require('./Item');
 
 var PRCE_INCREASE_RATE = 10;
 var GRAVITY = 300;
@@ -963,7 +963,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"../items/Item":13}],13:[function(require,module,exports){
+},{"./Item":13}],13:[function(require,module,exports){
 var BOUNCE = 0.7 + Math.random() * 0.2;
 
 var Item = function(level, x, y, key, price) {
@@ -986,9 +986,11 @@ module.exports = Item;
  * Created by Edwin Gamboa on 17/07/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
+var Button = require('../util/Button');
+
 var ItemGroupView = function(level,
                              item,
-                             buttonKey,
+                             buttonText,
                              parentView) {
     Phaser.Sprite.call(this, level.game, 0, 0, 'itemGroupBackGround');
     this.icon = level.game.make.sprite(10, 10, item.key);
@@ -1002,12 +1004,10 @@ var ItemGroupView = function(level,
     this.messageBackground.x = 10;
     this.messageBackground.y = this.icon.y + this.icon.height + 10;
 
-    this.button = level.game.make.sprite(this.messageBackground.x +
-        this.messageBackground.width + 10,
-        this.icon.y + this.icon.height + 10, buttonKey);
-    this.button.inputEnabled = true;
-    this.button.input.priorityID = 2;
-    this.button.events.onInputDown.add(this.buttonAction, this);
+    this.button = new Button(level, buttonText, this.buttonAction, this);
+    this.button.x = this.messageBackground.x + this.messageBackground.width +
+        10;
+    this.button.y = this.icon.y + this.icon.height + 10;
 
     this.addChild(this.icon);
     this.addChild(this.messageBackground);
@@ -1026,12 +1026,12 @@ ItemGroupView.prototype.buttonAction = function() {
 
 module.exports = ItemGroupView;
 
-},{"../util/GridLayoutPanel":26}],15:[function(require,module,exports){
+},{"../util/Button":29,"../util/GridLayoutPanel":32}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
 var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
-var InventoryItem = require ('../inventory/InventoryItem');
+var InventoryItem = require ('./InventoryItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
@@ -1085,14 +1085,14 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../../util/GridLayoutPopUp":27,"../HealthPack":12,"../inventory/InventoryItem":16,"../weapons/Revolver":21}],16:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":33,"../HealthPack":12,"../weapons/Revolver":21,"./InventoryItem":16}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
-var ItemGroupView = require('../../items/ItemGroupView');
+var ItemGroupView = require('../ItemGroupView');
 
 var InventoryItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'useOneButton', parentView);
+    ItemGroupView.call(this, level, item, 'Use', parentView);
 
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
@@ -1116,12 +1116,12 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../../items/ItemGroupView":14}],17:[function(require,module,exports){
+},{"../ItemGroupView":14}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
 var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
-var StoreItem = require ('../store/StoreItem');
+var StoreItem = require ('./StoreItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
@@ -1175,14 +1175,14 @@ Store.prototype.showHealthPacks = function() {
 
 module.exports = Store;
 
-},{"../../util/GridLayoutPopUp":27,"../HealthPack":12,"../store/StoreItem":18,"../weapons/Revolver":21}],18:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":33,"../HealthPack":12,"../weapons/Revolver":21,"./StoreItem":18}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
-var ItemGroupView = require('../../items/ItemGroupView');
+var ItemGroupView = require('../ItemGroupView');
 
 var StoreItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'buyButton', parentView);
+    ItemGroupView.call(this, level, item, 'Buy', parentView);
     this.updatePriceText();
 };
 
@@ -1206,7 +1206,7 @@ StoreItem.prototype.buttonAction = function() {
 
 module.exports = StoreItem;
 
-},{"../../items/ItemGroupView":14}],19:[function(require,module,exports){
+},{"../ItemGroupView":14}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -1231,7 +1231,7 @@ module.exports = Bullet;
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Weapon = require('../weapons/Weapon');
+var Weapon = require('./Weapon');
 
 var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
 var MACHINE_GUN_KEY = 'machineGunSprite';
@@ -1264,11 +1264,11 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"../weapons/Weapon":22}],21:[function(require,module,exports){
+},{"./Weapon":22}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
-var Weapon = require('../weapons/Weapon');
+var Weapon = require('./Weapon');
 
 var REVOLVER_NUMBER_OF_BULLETS = 20;
 var REVOLVER_KEY = 'revolverSprite';
@@ -1301,9 +1301,9 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"../weapons/Weapon":22}],22:[function(require,module,exports){
+},{"./Weapon":22}],22:[function(require,module,exports){
 var Item = require('../Item');
-var Bullet = require('../weapons/Bullet');
+var Bullet = require('./Bullet');
 
 var RIGHT_KEY = 0;
 var LEFT_KEY = 1;
@@ -1394,382 +1394,11 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":13,"../weapons/Bullet":19}],23:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 10/10/2015.
- */
-
-var Button = function(level, text, action, parent, optionals) {
-    var ops = optionals || [];
-    var x = ops.x || 0;
-    var y = ops.y || 0;
-
-    Phaser.Sprite.call(this, level.game, x, y, 'button');
-
-    this.text = level.game.make.text(this.width / 2, this.height / 2, text);
-    this.text.anchor.set(0.5, 0.5);
-    this.text.font = 'Shojumaru';
-    this.text.fontSize = 20;
-    this.text.fill = '#FFFFFF';
-
-    this.inputEnabled = true;
-    this.events.onInputDown.add(action, parent);
-
-    this.addChild(this.text);
-};
-
-Button.prototype = Object.create(Phaser.Sprite.prototype);
-Button.prototype.constructor = Button;
-
-module.exports = Button;
-
-},{}],24:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 16/07/2015.
- */
-var HorizontalLayoutPopUp = require('../util/HorizontalLayoutPopUp');
-
-var Dialog = function(level, iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, level, 'dialog', parent);
-
-    this.icon = level.game.make.sprite(0, 0, iconKey);
-    this.message = level.game.make.text(0, 0, '');
-    this.message.font = 'Arial';
-    this.message.fontSize = 20;
-    this.message.fill = '#000000';
-    this.message.text = text;
-
-    this.addElement(this.icon);
-    this.addElement(this.message);
-};
-
-Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
-Dialog.prototype.constructor = Dialog;
-
-Dialog.prototype.setText = function(text) {
-    this.message.text = text;
-};
-
-module.exports = Dialog;
-
-},{"../util/HorizontalLayoutPopUp":29}],25:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 11/10/2015.
- */
-/**
- * Created by Edwin Gamboa on 22/06/2015.
- */
-var MARGIN = 10;
-
-var GridLayout = function(numberOfColumns, numberOfRows, parent) {
-    this.currentRow = 0;
-    this.currentColumn = 0;
-    this.numberOfColumns = numberOfColumns;
-    this.numberOfRows = numberOfRows;
-    this.rowWidth = (parent.width - MARGIN * this.numberOfColumns) /
-        this.numberOfColumns;
-    this.rowHeight = (parent.height - MARGIN * this.numberOfRows) /
-        this.numberOfRows;
-    if (numberOfColumns === 1 && numberOfRows === 1) {
-        this.xOrigin = 0;
-        this.yOrigin = 0;
-    } else {
-        this.xOrigin = MARGIN;
-        this.yOrigin = MARGIN;
-    }
-    this.parent = parent;
-};
-
-GridLayout.prototype.constructor = GridLayout;
-
-GridLayout.prototype.addElement = function(element) {
-    if (this.currentColumn >= this.numberOfColumns) {
-        this.currentColumn = 0;
-        this.currentRow++;
-    }
-    var xCentered = (this.rowWidth / 2) - (element.width / 2);
-    element.x = this.xOrigin + (this.rowWidth + MARGIN) *
-        this.currentColumn + xCentered;
-    var yCentered = this.yOrigin + (this.rowHeight / 2) - (element.height / 2);
-    element.y = (this.rowHeight + MARGIN) *
-        this.currentRow + yCentered;
-
-    this.parent.addChild(element);
-    this.currentColumn ++;
-};
-
-module.exports = GridLayout;
-
-},{}],26:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 22/06/2015.
- */
-var GridLayout = require('../util/GridLayout');
-
-var NUMBER_OF_COLUMNS = 1;
-var NUMBER_OF_ROWS = 1;
-
-var GridLayoutPanel = function(level, backgroundKey, optionals) {
-    var ops = optionals || [];
-    var x = ops.x || 0;
-    var y = ops.y || 0;
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.level = level;
-    this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
-    this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
-
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
-};
-
-GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
-GridLayoutPanel.prototype.constructor = GridLayoutPanel;
-
-GridLayoutPanel.prototype.addElement = function(element) {
-    this.grid.addElement(element);
-};
-
-module.exports = GridLayoutPanel;
-
-},{"../util/GridLayout":25}],27:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 22/06/2015.
- */
-var PopUp = require('../util/PopUp');
-var GridLayout = require('../util/GridLayout');
-
-var NUMBER_OF_COLUMNS = 5;
-var NUMBER_OF_ROWS = 1;
-
-var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {
-    PopUp.call(this, level, backgroundKey, parent);
-    this.level = level;
-    this.currentRow = 0;
-    this.currentColumn = 0;
-
-    var dims = dimensions || {};
-    this.numberOfColumns = dims.numberOfColumns || NUMBER_OF_COLUMNS;
-    this.numberOfRows = dims.numberOfRows || NUMBER_OF_ROWS;
-
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
-
-};
-
-GridLayoutPopUp.prototype = Object.create(PopUp.prototype);
-GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
-
-GridLayoutPopUp.prototype.addElement = function(element) {
-    this.grid.addElement(element);
-};
-
-module.exports = GridLayoutPopUp;
-
-},{"../util/GridLayout":25,"../util/PopUp":30}],28:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 11/10/2015.
- */
-/**
- * Created by Edwin Gamboa on 22/06/2015.
- */
-var MARGIN = 10;
-
-var HorizontalLayout = function(parent) {
-    this.currentX = MARGIN;
-    this.parent = parent;
-};
-
-HorizontalLayout.prototype.constructor = HorizontalLayout;
-
-HorizontalLayout.prototype.addElement = function(element) {
-    element.x = this.currentX;
-    this.currentX += element.width + MARGIN;
-    element.y = this.parent.height / 2 - element.height / 2;
-
-    this.parent.addChild(element);
-};
-
-module.exports = HorizontalLayout;
-
-},{}],29:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 11/10/2015.
- */
-/**
- * Created by Edwin Gamboa on 16/07/2015.
- */
-var PopUp = require('../util/PopUp');
-var Horizontalayout = require('../util/HorizontalLayout');
-
-var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
-    PopUp.call(this, level, backgroundKey, parent);
-    this.layout = new Horizontalayout(this);
-};
-
-HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);
-HorizontalLayoutPopUP.prototype.constructor = HorizontalLayoutPopUP;
-
-HorizontalLayoutPopUP.prototype.addElement = function(element) {
-    this.layout.addElement(element);
-};
-
-module.exports = HorizontalLayoutPopUP;
-
-
-},{"../util/HorizontalLayout":28,"../util/PopUp":30}],30:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 16/07/2015.
- */
-var MARGIN = 10;
-var PopUp = function(level, backgroundKey, parent) {
-    Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
-
-    this.xCenter = this.width / 2;
-    this.yCenter = this.height / 2;
-
-    this.x = level.game.camera.width / 2 - this.xCenter;
-    this.y = level.game.camera.height / 2 - this.yCenter;
-
-    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
-    this.closeButton.anchor.set(0.5, 0.5);
-    this.closeButton.inputEnabled = true;
-    this.closeButton.input.priorityID = 2;
-    this.closeButton.events.onInputDown.add(this.close, this);
-
-    this.addChild(this.closeButton);
-
-    this.fixedToCamera = true;
-    this.visible = false;
-
-    if (parent === undefined) {
-        this.withoutParent = true;
-    }else {
-        this.withoutParent = false;
-        this.parent = parent;
-    }
-
-    this.level = level;
-};
-
-PopUp.prototype = Object.create(Phaser.Sprite.prototype);
-PopUp.prototype.constructor = PopUp;
-
-PopUp.prototype.close = function() {
-    this.visible = false;
-    if (this.withoutParent) {
-        this.level.resume();
-    }
-    this.kill();
-};
-
-PopUp.prototype.open = function() {
-    if (!this.alive) {
-        this.revive();
-    }
-    this.level.pause();
-    this.bringToTop();
-    this.visible = true;
-};
-
-module.exports = PopUp;
-
-},{}],31:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 29/08/2015.
- */
-var PopUp = require('../util/PopUp');
-
-var DEFAULT_CAR_SPEED = 400;
-var DEFAULT_CAR_MAX_SPEED = 500;
-var CAR_GRAVITY = 30000;
-
-var InteractiveCar = function(level, x, y, backgroundKey) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-
-    this.anchor.set(0, 0);
-
-    this.getOnButton = level.game.make.sprite(this.width / 2,
-        -this.height, 'openDoor');
-    this.getOnButton.anchor.set(0.5);
-    this.getOnButton.inputEnabled = true;
-    this.getOnButton.input.priorityID = 2;
-    this.getOnButton.events.onInputDown.add(this.getOn, this);
-
-    this.addChild(this.getOnButton);
-
-    level.game.physics.arcade.enable(this);
-    this.body.collideWorldBounds = true;
-    this.anchor.set(0.5, 1);
-    this.animations.add('left', [0], 10, true);
-    this.animations.add('right', [1], 10, true);
-
-    this.level = level;
-    this.occupied = false;
-};
-
-InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
-InteractiveCar.prototype.constructor = InteractiveCar;
-
-InteractiveCar.prototype.getOn = function() {
-    this.level.player.relocate(this.x, this.y - 100);
-    this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
-    this.level.player.changeGravity(CAR_GRAVITY);
-    this.occupied = true;
-};
-
-InteractiveCar.prototype.update = function() {
-    if (this.occupied) {
-        this.body.velocity.x = this.level.player.body.velocity.x;
-        if (this.body.velocity.x < 0) {
-            this.animations.play('left');
-        }else {
-            this.animations.play('right');
-        }
-    }
-};
-
-InteractiveCar.prototype.isStopped = function() {
-    return this.body.velocity.x === 0;
-};
-
-module.exports = InteractiveCar;
-
-},{"../util/PopUp":30}],32:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 29/08/2015.
- */
-var Store = require('../items/store/Store');
-var InteractiveHouse = function(level, x, y, backgroundKey) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-
-    this.anchor.set(0, 0);
-
-    this.openDoorButton = level.game.make.sprite(this.width / 2,
-        -this.height / 2, 'openDoor');
-    this.openDoorButton.anchor.set(0.5);
-    this.openDoorButton.inputEnabled = true;
-    this.openDoorButton.input.priorityID = 2;
-    this.openDoorButton.events.onInputDown.add(this.openActivity, this);
-
-    this.addChild(this.openDoorButton);
-    this.level = level;
-};
-
-InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
-InteractiveHouse.prototype.constructor = InteractiveHouse;
-
-InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new Store(this.level);
-    this.level.game.add.existing(popUp);
-    popUp.open();
-};
-
-module.exports = InteractiveHouse;
-
-},{"../items/store/Store":17}],33:[function(require,module,exports){
+},{"../Item":13,"./Bullet":19}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
-var Boot;
-Boot = function(game) {};
+var Boot = function(game) {};
 
 Boot.prototype = {
     preload: function() {
@@ -1787,12 +1416,11 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],34:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Menu;
-Menu = function(game) {};
+var Menu = function(game) {};
 
 Menu.prototype = {
     create: function() {
@@ -1815,12 +1443,11 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],35:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Preloader;
-Preloader = function(game) {
+var Preloader = function(game) {
     this.ready = false;
 };
 
@@ -1915,6 +1542,7 @@ Preloader.prototype = {
 
         this.game.load.image('wordField', 'assets/images/wordField.png');
         this.game.load.image('letterShade', 'assets/images/letterShade.png');
+        this.game.load.image('transparent', 'assets/images/transparent.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -1934,26 +1562,26 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],36:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
-var Inventory = require('../../prefabs/items/inventory/Inventory');
-var Store = require('../../prefabs/items/store/Store');
-var HealthPack = require('../../prefabs/items/HealthPack');
-var Player = require('../../prefabs/character/Player');
-var Revolver = require('../../prefabs/items/weapons/Revolver');
-var MachineGun = require('../../prefabs/items/weapons/MachineGun');
-var SimpleEnemy = require('../../prefabs/character/SimpleEnemy');
-var StrongEnemy = require('../../prefabs/character/StrongEnemy');
-var NPC = require('../../prefabs/character/NPC');
-var PopUp = require('../../prefabs/util/PopUp');
-var InteractiveCar = require ('../../prefabs/worldElements/InteractiveCar');
-var Dialog = require('../../prefabs/util/Dialog');
+var Inventory = require('../../items/inventory/Inventory');
+var Store = require('../../items/store/Store');
+var HealthPack = require('../../items/HealthPack');
+var Player = require('../../character/Player');
+var Revolver = require('../../items/weapons/Revolver');
+var MachineGun = require('../../items/weapons/MachineGun');
+var SimpleEnemy = require('../../character/SimpleEnemy');
+var StrongEnemy = require('../../character/StrongEnemy');
+var NPC = require('../../character/NPC');
+var PopUp = require('../../util/PopUp');
+var InteractiveCar = require ('../../worldElements/InteractiveCar');
+var Dialog = require('../../util/Dialog');
 
-//var FamilyEC = require('../../prefabs/englishChallenges/WordUnscramble');
-//var FamilyEC = require('../../prefabs/englishChallenges/ContextGroups');
-var FamilyEC = require('../../prefabs/englishChallenges/FamilyEC');
+//var FamilyEC = require('../../englishChallenges/WordUnscramble');
+//var FamilyEC = require('../../englishChallenges/ContextGroups');
+var FamilyEC = require('../../englishChallenges/FamilyEC');
 
 var Level = function(game) {
     this.game = game;
@@ -2321,12 +1949,12 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../prefabs/character/NPC":4,"../../prefabs/character/Player":5,"../../prefabs/character/SimpleEnemy":6,"../../prefabs/character/StrongEnemy":7,"../../prefabs/englishChallenges/FamilyEC":10,"../../prefabs/items/HealthPack":12,"../../prefabs/items/inventory/Inventory":15,"../../prefabs/items/store/Store":17,"../../prefabs/items/weapons/MachineGun":20,"../../prefabs/items/weapons/Revolver":21,"../../prefabs/util/Dialog":24,"../../prefabs/util/PopUp":30,"../../prefabs/worldElements/InteractiveCar":31}],37:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/FamilyEC":10,"../../items/HealthPack":12,"../../items/inventory/Inventory":15,"../../items/store/Store":17,"../../items/weapons/MachineGun":20,"../../items/weapons/Revolver":21,"../../util/Dialog":30,"../../util/PopUp":36,"../../worldElements/InteractiveCar":37}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
-var InteractiveHouse = require ('../../prefabs/worldElements/InteractiveHouse');
+var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 
 var CHECK_POINT_X_ONE;
 var CHECK_POINTS_DISTANCE;
@@ -2391,7 +2019,7 @@ LevelOne.prototype.addEnemies = function() {
 
 module.exports = LevelOne;
 
-},{"../../prefabs/worldElements/InteractiveHouse":32,"../levels/Level":36}],38:[function(require,module,exports){
+},{"../../worldElements/InteractiveHouse":38,"../levels/Level":26}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2400,34 +2028,403 @@ module.exports = LevelOne;
  */
 var LevelOneIntro = function(game) {};
 
-LevelOneIntro.prototype = {
-    create: function() {
-        var centerX = this.game.camera.width / 2;
-        var centerY = this.game.camera.height / 2;
+LevelOneIntro.prototype.create = function() {
+    var centerX = this.game.camera.width / 2;
+    var centerY = this.game.camera.height / 2;
 
-        this.background = this.game.add.sprite(centerX, centerY,
-            'introLevelOne');
-        this.background.anchor.setTo(0.5, 0.5);
+    this.background = this.game.add.sprite(centerX, centerY,
+        'introLevelOne');
+    this.background.anchor.setTo(0.5, 0.5);
 
-        var continueButton = this.game.add.text(
-            this.game.camera.width - 80,
-            this.game.camera.height - 30,
-            'Continue');
-        //Font style
-        continueButton.font = 'Arial';
-        continueButton.fontSize = 30;
-        continueButton.fontWeight = 'bold';
-        continueButton.fill = '#0040FF';
-        continueButton.anchor.set(0.5);
-        continueButton.inputEnabled = true;
-        continueButton.events.onInputDown.add(this.continue, this);
-    },
+    var continueButton = this.game.add.text(
+        this.game.camera.width - 80,
+        this.game.camera.height - 30,
+        'Continue');
+    //Font style
+    continueButton.font = 'Arial';
+    continueButton.fontSize = 30;
+    continueButton.fontWeight = 'bold';
+    continueButton.fill = '#0040FF';
+    continueButton.anchor.set(0.5);
+    continueButton.inputEnabled = true;
+    continueButton.events.onInputDown.add(this.continue, this);
+};
 
-    continue: function() {
-        this.game.state.start('levelOne');
-    }
+LevelOneIntro.prototype.continue = function() {
+    this.game.state.start('levelOne');
 };
 
 module.exports = LevelOneIntro;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38]);
+},{}],29:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 10/10/2015.
+ */
+
+var Button = function(level, text, action, parent, optionals) {
+    var ops = optionals || [];
+    var x = ops.x || 0;
+    var y = ops.y || 0;
+
+    Phaser.Sprite.call(this, level.game, x, y, 'transparent');
+
+    this.text = level.game.make.text(10, 10, text);
+    this.text.font = 'Shojumaru';
+    this.text.fontSize = 20;
+    this.text.fill = '#FFFFFF';
+
+    this.background = level.game.make.sprite(0, 0, 'button');
+
+    this.inputEnabled = true;
+    this.events.onInputDown.add(action, parent);
+
+    var scale = (this.text.width + 20) / this.background.width;
+    this.background.scale.x = scale;
+
+    //this.background.width = this.text.width + 20;
+
+    this.addChild(this.background);
+    this.addChild(this.text);
+};
+
+Button.prototype = Object.create(Phaser.Sprite.prototype);
+Button.prototype.constructor = Button;
+
+module.exports = Button;
+
+},{}],30:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
+
+var Dialog = function(level, iconKey, text, parent) {
+    HorizontalLayoutPopUp.call(this, level, 'dialog', parent);
+
+    this.icon = level.game.make.sprite(0, 0, iconKey);
+    this.message = level.game.make.text(0, 0, '');
+    this.message.font = 'Arial';
+    this.message.fontSize = 20;
+    this.message.fill = '#000000';
+    this.message.text = text;
+
+    this.addElement(this.icon);
+    this.addElement(this.message);
+};
+
+Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
+Dialog.prototype.constructor = Dialog;
+
+Dialog.prototype.setText = function(text) {
+    this.message.text = text;
+};
+
+module.exports = Dialog;
+
+},{"./HorizontalLayoutPopUp":35}],31:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+var MARGIN = 10;
+
+var GridLayout = function(numberOfColumns, numberOfRows, parent) {
+    this.currentRow = 0;
+    this.currentColumn = 0;
+    this.numberOfColumns = numberOfColumns;
+    this.numberOfRows = numberOfRows;
+    this.rowWidth = (parent.width - MARGIN * this.numberOfColumns) /
+        this.numberOfColumns;
+    this.rowHeight = (parent.height - MARGIN * this.numberOfRows) /
+        this.numberOfRows;
+    if (numberOfColumns === 1 && numberOfRows === 1) {
+        this.xOrigin = 0;
+        this.yOrigin = 0;
+    } else {
+        this.xOrigin = MARGIN;
+        this.yOrigin = MARGIN;
+    }
+    this.parent = parent;
+};
+
+GridLayout.prototype.constructor = GridLayout;
+
+GridLayout.prototype.addElement = function(element) {
+    if (this.currentColumn >= this.numberOfColumns) {
+        this.currentColumn = 0;
+        this.currentRow++;
+    }
+    var xCentered = (this.rowWidth / 2) - (element.width / 2);
+    element.x = this.xOrigin + (this.rowWidth + MARGIN) *
+        this.currentColumn + xCentered;
+    var yCentered = this.yOrigin + (this.rowHeight / 2) - (element.height / 2);
+    element.y = (this.rowHeight + MARGIN) *
+        this.currentRow + yCentered;
+
+    this.parent.addChild(element);
+    this.currentColumn ++;
+};
+
+module.exports = GridLayout;
+
+},{}],32:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+var GridLayout = require('./GridLayout');
+
+var NUMBER_OF_COLUMNS = 1;
+var NUMBER_OF_ROWS = 1;
+
+var GridLayoutPanel = function(level, backgroundKey, optionals) {
+    var ops = optionals || [];
+    var x = ops.x || 0;
+    var y = ops.y || 0;
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.level = level;
+    this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
+    this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
+
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+};
+
+GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
+GridLayoutPanel.prototype.constructor = GridLayoutPanel;
+
+GridLayoutPanel.prototype.addElement = function(element) {
+    this.grid.addElement(element);
+};
+
+module.exports = GridLayoutPanel;
+
+},{"./GridLayout":31}],33:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+var PopUp = require('./PopUp');
+var GridLayout = require('./GridLayout');
+
+var NUMBER_OF_COLUMNS = 5;
+var NUMBER_OF_ROWS = 1;
+
+var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {
+    PopUp.call(this, level, backgroundKey, parent);
+    this.level = level;
+    this.currentRow = 0;
+    this.currentColumn = 0;
+
+    var dims = dimensions || {};
+    this.numberOfColumns = dims.numberOfColumns || NUMBER_OF_COLUMNS;
+    this.numberOfRows = dims.numberOfRows || NUMBER_OF_ROWS;
+
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+
+};
+
+GridLayoutPopUp.prototype = Object.create(PopUp.prototype);
+GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
+
+GridLayoutPopUp.prototype.addElement = function(element) {
+    this.grid.addElement(element);
+};
+
+module.exports = GridLayoutPopUp;
+
+},{"./GridLayout":31,"./PopUp":36}],34:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+var MARGIN = 10;
+
+var HorizontalLayout = function(parent) {
+    this.currentX = MARGIN;
+    this.parent = parent;
+};
+
+HorizontalLayout.prototype.constructor = HorizontalLayout;
+
+HorizontalLayout.prototype.addElement = function(element) {
+    element.x = this.currentX;
+    this.currentX += element.width + MARGIN;
+    element.y = this.parent.height / 2 - element.height / 2;
+
+    this.parent.addChild(element);
+};
+
+module.exports = HorizontalLayout;
+
+},{}],35:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 11/10/2015.
+ */
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var PopUp = require('./PopUp');
+var Horizontalayout = require('./HorizontalLayout');
+
+var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
+    PopUp.call(this, level, backgroundKey, parent);
+    this.layout = new Horizontalayout(this);
+};
+
+HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);
+HorizontalLayoutPopUP.prototype.constructor = HorizontalLayoutPopUP;
+
+HorizontalLayoutPopUP.prototype.addElement = function(element) {
+    this.layout.addElement(element);
+};
+
+module.exports = HorizontalLayoutPopUP;
+
+
+},{"./HorizontalLayout":34,"./PopUp":36}],36:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 16/07/2015.
+ */
+var MARGIN = 10;
+var PopUp = function(level, backgroundKey, parent) {
+    Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
+
+    this.xCenter = this.width / 2;
+    this.yCenter = this.height / 2;
+
+    this.x = level.game.camera.width / 2 - this.xCenter;
+    this.y = level.game.camera.height / 2 - this.yCenter;
+
+    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
+    this.closeButton.anchor.set(0.5, 0.5);
+    this.closeButton.inputEnabled = true;
+    this.closeButton.input.priorityID = 2;
+    this.closeButton.events.onInputDown.add(this.close, this);
+
+    this.addChild(this.closeButton);
+
+    this.fixedToCamera = true;
+    this.visible = false;
+
+    if (parent === undefined) {
+        this.withoutParent = true;
+    }else {
+        this.withoutParent = false;
+        this.parent = parent;
+    }
+
+    this.level = level;
+};
+
+PopUp.prototype = Object.create(Phaser.Sprite.prototype);
+PopUp.prototype.constructor = PopUp;
+
+PopUp.prototype.close = function() {
+    this.visible = false;
+    if (this.withoutParent) {
+        this.level.resume();
+    }
+    this.kill();
+};
+
+PopUp.prototype.open = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.level.pause();
+    this.bringToTop();
+    this.visible = true;
+};
+
+module.exports = PopUp;
+
+},{}],37:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+var PopUp = require('../util/PopUp');
+
+var DEFAULT_CAR_SPEED = 400;
+var DEFAULT_CAR_MAX_SPEED = 500;
+var CAR_GRAVITY = 30000;
+
+var InteractiveCar = function(level, x, y, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+
+    this.anchor.set(0, 0);
+
+    this.getOnButton = level.game.make.sprite(this.width / 2,
+        -this.height, 'openDoor');
+    this.getOnButton.anchor.set(0.5);
+    this.getOnButton.inputEnabled = true;
+    this.getOnButton.input.priorityID = 2;
+    this.getOnButton.events.onInputDown.add(this.getOn, this);
+
+    this.addChild(this.getOnButton);
+
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    this.anchor.set(0.5, 1);
+    this.animations.add('left', [0], 10, true);
+    this.animations.add('right', [1], 10, true);
+
+    this.level = level;
+    this.occupied = false;
+};
+
+InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveCar.prototype.constructor = InteractiveCar;
+
+InteractiveCar.prototype.getOn = function() {
+    this.level.player.relocate(this.x, this.y - 100);
+    this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
+    this.level.player.changeGravity(CAR_GRAVITY);
+    this.occupied = true;
+};
+
+InteractiveCar.prototype.update = function() {
+    if (this.occupied) {
+        this.body.velocity.x = this.level.player.body.velocity.x;
+        if (this.body.velocity.x < 0) {
+            this.animations.play('left');
+        }else {
+            this.animations.play('right');
+        }
+    }
+};
+
+InteractiveCar.prototype.isStopped = function() {
+    return this.body.velocity.x === 0;
+};
+
+module.exports = InteractiveCar;
+
+},{"../util/PopUp":36}],38:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+var Store = require('../items/store/Store');
+var InteractiveHouse = function(level, x, y, backgroundKey) {
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+
+    this.anchor.set(0, 0);
+
+    this.openDoorButton = level.game.make.sprite(this.width / 2,
+        -this.height / 2, 'openDoor');
+    this.openDoorButton.anchor.set(0.5);
+    this.openDoorButton.inputEnabled = true;
+    this.openDoorButton.input.priorityID = 2;
+    this.openDoorButton.events.onInputDown.add(this.openActivity, this);
+
+    this.addChild(this.openDoorButton);
+    this.level = level;
+};
+
+InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveHouse.prototype.constructor = InteractiveHouse;
+
+InteractiveHouse.prototype.openActivity = function() {
+    var popUp = new Store(this.level);
+    this.level.game.add.existing(popUp);
+    popUp.open();
+};
+
+module.exports = InteractiveHouse;
+
+},{"../items/store/Store":17}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38]);

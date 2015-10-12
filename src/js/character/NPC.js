@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var NPC;
 NPC = function(level, x, y, key, comicKey) {

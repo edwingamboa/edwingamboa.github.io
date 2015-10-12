@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var HorizontalLayoutPopUp = require('../util/HorizontalLayoutPopUp');
+var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
 var Dialog = function(level, iconKey, text, parent) {
     HorizontalLayoutPopUp.call(this, level, 'dialog', parent);

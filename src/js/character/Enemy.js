@@ -1,7 +1,7 @@
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-var Character = require('../character/Character');
+var Character = require('./Character');
 
 var Enemy = function(level,
                      spriteKey,

@@ -1,10 +1,10 @@
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
-var ItemGroupView = require('../../items/ItemGroupView');
+var ItemGroupView = require('../ItemGroupView');
 
 var StoreItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'buyButton', parentView);
+    ItemGroupView.call(this, level, item, 'Buy', parentView);
     this.updatePriceText();
 };
 
