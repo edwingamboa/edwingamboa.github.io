@@ -14,7 +14,7 @@ var FamilyEC = function(level) {
     this.level = level;
 
     var word = 'mother';
-    this.shades = [];
+    this.destinations = [];
     var letters = [];
     var wordImage = this.level.game.make.sprite(0, 0, 'mother');
 
@@ -30,7 +30,7 @@ var FamilyEC = function(level) {
     var letterShade;
     for (i = 0; i < word.length; i++) {
         letterShade = new GridLayoutPanel(this.level, 'letterShade');
-        this.shades.push(letterShade);
+        this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
 
@@ -76,12 +76,12 @@ FamilyEC.prototype = Object.create(GridLayoutPopUp.prototype);
 FamilyEC.prototype.constructor = FamilyEC;
 
 FamilyEC.prototype.fixLocation = function(item) {
-    for (var shade in this.shades) {
-        if (item.overlap(this.shades[shade]) &&
-            this.shades[shade].children.length === 0) {
+    for (var shade in this.destinations) {
+        if (item.overlap(this.destinations[shade]) &&
+            this.destinations[shade].children.length === 0) {
             item.x = 0;
             item.y = 0;
-            this.shades[shade].addElement(item);
+            this.destinations[shade].addElement(item);
             return;
         }
         item.x = item.initialX;
@@ -104,8 +104,8 @@ FamilyEC.prototype.confirm = function() {
         this.level.showErrorMessage('The challenge is not complete.', this);
         return;
     }
-    for (var shade in this.shades) {
-        if (this.shades[shade].children[0].code !== shade) {
+    for (var shade in this.destinations) {
+        if (this.destinations[shade].children[0].code !== shade) {
             this.level.showErrorMessage('Sorry! Try Again.', this);
             return;
         }
