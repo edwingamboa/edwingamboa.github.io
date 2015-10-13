@@ -14,9 +14,9 @@ var PopUp = require('../../util/PopUp');
 var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 
-//var FamilyEC = require('../../englishChallenges/WordUnscramble');
-//var FamilyEC = require('../../englishChallenges/ContextGroups');
-var FamilyEC = require('../../englishChallenges/FamilyEC');
+//var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
+//var ImageWordMatch = require('../../englishChallenges/ContextGroups');
+var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
 
 var Level = function(game) {
     this.game = game;
@@ -282,7 +282,7 @@ Level.prototype.createStore = function() {
     this.storeButton.fixedToCamera = true;
     this.storeButton.input.priorityID = 1;
 
-    this.englishChallenge = new FamilyEC(this);
+    this.englishChallenge = new ImageWordMatch(this);
     this.game.add.existing(this.englishChallenge);
 
     this.addCashButton = this.game.add.button(170,

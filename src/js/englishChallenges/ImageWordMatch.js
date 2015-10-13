@@ -4,9 +4,18 @@
 
 var GridLayoutPopUp = require('../util/GridLayoutPopUp');
 var Button = require('../util/Button');
+var Utilities = require('../util/Utilities');
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
+var EnglishChallenge = require('../englishChallenges/EnglishChallenge');
 
-var FamilyEC = function(level) {
-    this.score = 30;
+var ImageWordMatch = function(level) {
+    this.englishChallenge = new EnglishChallenge(
+        level,
+        'mother',
+        'Word-Image Match',
+        10
+    );
+    var utils = new Utilities(level);
     var dimensions = {numberOfColumns: 3, numberOfRows: 3};
     GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
 
@@ -18,15 +27,14 @@ var FamilyEC = function(level) {
     this.shades = [];
 
     for (var key in familyKeys) {
-        var cell = this.level.game.make.sprite(0, 0, 'itemGroupBackGround');
+        var cell = new VerticalLayoutPanel(this.level, 'itemGroupBackGround');
         var familyMember = this.level.game.make.sprite(0, 0, familyKeys[key]);
-        var shade = this.level.game.make.sprite(0, familyMember.height + 10,
-            'useButtonShade');
+        var shade = this.level.game.make.sprite(0, 0, 'useButtonShade');
         shade.code = key;
 
         this.shades.push(shade);
-        cell.addChild(familyMember);
-        cell.addChild(shade);
+        cell.addElement(familyMember);
+        cell.addElement(shade);
 
         var label = this.level.game.make.text(0, 0, familyKeys[key]);
         //Font style
@@ -46,32 +54,24 @@ var FamilyEC = function(level) {
         this.addElement(familyMembersCells[familyMemberCell]);
     }
 
-    var randomIndex;
-    var indexes = [];
-    for (var familyMemberLabelIndex in familyMembersLabels) {
-        indexes.push(familyMemberLabelIndex);
-    }
-    for (var familyMemberLabel in familyMembersLabels) {
-        randomIndex = level.game.rnd.integerInRange(0,
-            indexes.length - 1);
-        this.addElement(familyMembersLabels[indexes[randomIndex]]);
-        //this.addElement(familyMembersLabels[familyMemberLabel]);
-        familyMembersLabels[indexes[randomIndex]].initialX =
-            familyMembersLabels[indexes[randomIndex]].x;
-        familyMembersLabels[indexes[randomIndex]].initialY =
-            familyMembersLabels[indexes[randomIndex]].y;
-
-        indexes.splice(randomIndex, 1);
+    var randomIndexes = utils.randomIndexesArray(familyMembersLabels.length);
+    var index;
+    for (index in randomIndexes) {
+        this.addElement(familyMembersLabels[randomIndexes[index]]);
+        familyMembersLabels[randomIndexes[index]].initialX =
+            familyMembersLabels[randomIndexes[index]].x;
+        familyMembersLabels[randomIndexes[index]].initialY =
+            familyMembersLabels[randomIndexes[index]].y;
     }
 
     this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
     this.addElement(this.confirmButton);
 };
 
-FamilyEC.prototype = Object.create(GridLayoutPopUp.prototype);
-FamilyEC.prototype.constructor = FamilyEC;
+ImageWordMatch.prototype = Object.create(GridLayoutPopUp.prototype);
+ImageWordMatch.prototype.constructor = ImageWordMatch;
 
-FamilyEC.prototype.fixLocation = function(item) {
+ImageWordMatch.prototype.fixLocation = function(item) {
     for (var shade in this.shades) {
         if (item.overlap(this.shades[shade]) &&
             this.shades[shade].children.length === 0) {
@@ -86,30 +86,28 @@ FamilyEC.prototype.fixLocation = function(item) {
     }
 };
 
-FamilyEC.prototype.bringItemToTop = function(item) {
-    if (FamilyEC.prototype.isPrototypeOf(item.parent)) {
+ImageWordMatch.prototype.bringItemToTop = function(item) {
+    if (ImageWordMatch.prototype.isPrototypeOf(item.parent)) {
         this.addChild(item);
     }else {
         this.addChild(item.parent.parent);
     }
 };
 
-FamilyEC.prototype.confirm = function() {
+ImageWordMatch.prototype.confirm = function() {
     var correct = true;
     for (var shade in this.shades) {
         if (this.shades[shade].children[0] === undefined) {
-            this.level.showErrorMessage('The challenge is not complete.', this);
+            this.englishChallenge.incomplete(this);
             return;
         }
         var letter = this.shades[shade].children[0];
         if (this.shades[shade].children[0].code !== shade) {
-            this.level.showErrorMessage('Sorry! Try Again.', this);
+            this.englishChallenge.failure(this);
             return;
         }
     }
-    this.level.increaseScore(this.score);
-    this.level.showSuccessMessage('Well done! You got ' + this.score +
-        ' points.', this);
-    this.close();
+    this.englishChallenge.success();
+    this.close(this);
 };
-module.exports = FamilyEC;
+module.exports = ImageWordMatch;
