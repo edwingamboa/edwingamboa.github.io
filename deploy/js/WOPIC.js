@@ -763,7 +763,7 @@ var ImageWordMatch = function(level) {
 
     var familyKeys = ['mother', 'son', 'daughter'];
     var familyMembersCells = [];
-    var familyMembersLabels = [];
+    this.elements = [];
 
     for (var key in familyKeys) {
         var cell = new VerticalLayoutPanel(this.level, 'itemGroupBackGround');
@@ -789,21 +789,22 @@ var ImageWordMatch = function(level) {
         label.source = this;
 
         familyMembersCells.push(cell);
-        familyMembersLabels.push(label);
+        this.elements.push(label);
     }
 
-    for (var familyMemberCell in familyMembersCells) {
+    var familyMemberCell;
+    for (familyMemberCell in familyMembersCells) {
         this.addElement(familyMembersCells[familyMemberCell]);
     }
 
-    var randomIndexes = utils.randomIndexesArray(familyMembersLabels.length);
+    var randomIndexes = utils.randomIndexesArray(this.elements.length);
     var index;
     for (index in randomIndexes) {
-        this.addElement(familyMembersLabels[randomIndexes[index]]);
-        familyMembersLabels[randomIndexes[index]].sourceX =
-            familyMembersLabels[randomIndexes[index]].x;
-        familyMembersLabels[randomIndexes[index]].sourceY =
-            familyMembersLabels[randomIndexes[index]].y;
+        this.addElement(this.elements[randomIndexes[index]]);
+        this.elements[randomIndexes[index]].sourceX =
+            this.elements[randomIndexes[index]].x;
+        this.elements[randomIndexes[index]].sourceY =
+            this.elements[randomIndexes[index]].y;
     }
 
     this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
@@ -827,21 +828,17 @@ module.exports = ImageWordMatch;
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
-
-var GridLayoutPopUp = require('../util/GridLayoutPopUp');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
+var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 
 var FamilyEC = function(level) {
-    this.score = 30;
-    var dimensions = {numberOfColumns: 1, numberOfRows: 4};
-    GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
-
+    var dimensions = {numberOfRows: 4};
+    DragAndDropChallenge.call(this, level, 'father', 'Word Unscramble', 10,
+        dimensions);
     this.level = level;
 
     var word = 'mother';
-    this.destinations = [];
-    var letters = [];
     var wordImage = this.level.game.make.sprite(0, 0, 'mother');
 
     var optionals = {numberOfColumns: word.length};
@@ -850,12 +847,13 @@ var FamilyEC = function(level) {
 
     this.wordFieldLetters = new GridLayoutPanel(this.level,
         'wordField', optionals);
-
+    this.source = this.wordFieldLetters;
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
         letterShade = new GridLayoutPanel(this.level, 'letterShade');
+        letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
@@ -867,29 +865,13 @@ var FamilyEC = function(level) {
         letter.fill = '#0040FF';
         letter.inputEnabled = true;
         letter.input.enableDrag(true, true);
-        letter.events.onDragStop.add(this.fixLocation, this);
+        letter.events.onDragStop.add(this.dragAndDropControl.fixLocation,
+            this.dragAndDropControl);
         letter.code = '' + i;
-        letters.push(letter);
+        this.elements.push(letter);
     }
 
-    var randomIndex;
-    var indexes = [];
-    for (i = 0; i < word.length; i++) {
-        indexes.push(i);
-    }
-
-    for (i = 0; i < word.length; i++) {
-        randomIndex = level.game.rnd.integerInRange(0,
-            indexes.length - 1);
-        this.wordFieldLetters.addElement(letters[indexes[randomIndex]]);
-        letters[indexes[randomIndex]].initialX =
-            letters[indexes[randomIndex]].x;
-        letters[indexes[randomIndex]].initialY =
-            letters[indexes[randomIndex]].y;
-
-        indexes.splice(randomIndex, 1);
-
-    }
+    this.dragAndDropControl.addElementsToSourceRandomly();
 
     this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
     this.addElement(wordImage);
@@ -898,23 +880,8 @@ var FamilyEC = function(level) {
     this.addElement(this.confirmButton);
 };
 
-FamilyEC.prototype = Object.create(GridLayoutPopUp.prototype);
+FamilyEC.prototype = Object.create(DragAndDropChallenge.prototype);
 FamilyEC.prototype.constructor = FamilyEC;
-
-FamilyEC.prototype.fixLocation = function(item) {
-    for (var shade in this.destinations) {
-        if (item.overlap(this.destinations[shade]) &&
-            this.destinations[shade].children.length === 0) {
-            item.x = 0;
-            item.y = 0;
-            this.destinations[shade].addElement(item);
-            return;
-        }
-        item.x = item.initialX;
-        item.y = item.initialY;
-        this.wordFieldLetters.addChild(item);
-    }
-};
 
 FamilyEC.prototype.bringItemToTop = function(item) {
     if (FamilyEC.prototype.isPrototypeOf(item.parent)) {
@@ -924,26 +891,9 @@ FamilyEC.prototype.bringItemToTop = function(item) {
     }
 };
 
-FamilyEC.prototype.confirm = function() {
-    var correct = true;
-    if (this.wordFieldLetters.children.length > 0) {
-        this.level.showErrorMessage('The challenge is not complete.', this);
-        return;
-    }
-    for (var shade in this.destinations) {
-        if (this.destinations[shade].children[0].code !== shade) {
-            this.level.showErrorMessage('Sorry! Try Again.', this);
-            return;
-        }
-    }
-    this.level.increaseScore(this.score);
-    this.level.showSuccessMessage('Well done! You got ' + this.score +
-        ' points.', this);
-    this.close();
-};
 module.exports = FamilyEC;
 
-},{"../util/Button":32,"../util/GridLayoutPanel":35,"../util/GridLayoutPopUp":36}],13:[function(require,module,exports){
+},{"../util/Button":32,"../util/GridLayoutPanel":35,"./dragAndDrop/DragAndDropChallenge":13}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -951,7 +901,19 @@ module.exports = FamilyEC;
 var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
 var EnglishChallenge = require('../../englishChallenges/EnglishChallenge');
 var DragAndDropController = require('./DragAndDropController');
+var Utilities = require('../../util/Utilities');
 
+/**
+ * Represents an EnglishChallenge that have draggable elements, which need to be
+ * arranged in a certain destinations.
+ * @param level {Level} level Object to access game level elements
+ * @param iconKey {string} Texture key of the Challenge icon
+ * @param challengeName {string} Challenge name to show in UI.
+ * @param score {number} Score to be increased in case of success.
+ * @param dimensions {Array} Array containing number of rows and columns needed
+ * for the challenge UI.
+ * @constructor
+ */
 var DragAndDropChallenge = function(level, iconKey, challengeName, score,
                                     dimensions) {
     GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
@@ -963,13 +925,17 @@ var DragAndDropChallenge = function(level, iconKey, challengeName, score,
     );
     this.level = level;
     this.destinations = [];
-    this.dragAndDropControl = new DragAndDropController(this.destinations);
+    this.elements = [];
+    this.dragAndDropControl = new DragAndDropController(this);
 };
 
 DragAndDropChallenge.prototype = Object.create(GridLayoutPopUp.prototype);
 DragAndDropChallenge.prototype.constructor = DragAndDropChallenge;
 
-
+/**
+ * Controls if the Challenge is complete and successfully overcome.
+ * messages
+ */
 DragAndDropChallenge.prototype.confirm = function() {
     if (this.dragAndDropControl.emptyDestinations()) {
         this.englishChallenge.incomplete(this);
@@ -982,30 +948,63 @@ DragAndDropChallenge.prototype.confirm = function() {
     this.englishChallenge.success();
     this.close(this);
 };
+
+/**
+ * Add every element to the source but in a random order.
+ */
+DragAndDropChallenge.prototype.addElementsToSourceRandomly = function() {
+    var utils = new Utilities(this.level);
+    var randomIndexes = utils.randomIndexesArray(this.elements.length);
+    var index;
+    for (index in randomIndexes) {
+        this.source.addElement(this.elements[randomIndexes[index]]);
+        this.elements[randomIndexes[index]].sourceX =
+            this.elements[randomIndexes[index]].x;
+        this.elements[randomIndexes[index]].sourceY =
+            this.elements[randomIndexes[index]].y;
+    }
+};
+
 module.exports = DragAndDropChallenge;
 
-
-},{"../../englishChallenges/EnglishChallenge":9,"../../util/GridLayoutPopUp":36,"./DragAndDropController":14}],14:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":9,"../../util/GridLayoutPopUp":36,"../../util/Utilities":40,"./DragAndDropController":14}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
+var Utilities = require('../../util/Utilities');
 
-var DragAndDropController = function(destinations) {
-    this.destinations = destinations;
+/**
+ * Controls draggable elements that are dropped in some destinations.
+ * @param destinations {Array} Destinations where the elements can be dropped.
+ * @param elements {Phaser.Sprite} elements to be arranged
+ * @constructor
+ */
+var DragAndDropController = function(container) {
+    this.container = container;
 };
 
+/**
+ * Adds a draggable element to a destination.
+ * @param element {Phaser.Sprite} element to be added.
+ * @param destinationIndex {string} index (key) to of the destination, where the
+ * element will be added.
+ */
 DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
     element.x = 0;
     element.y = 0;
-    this.destinations[destinationIndex].addChild(element);
+    this.container.destinations[destinationIndex].addChild(element);
 };
 
+/**
+ * Controls where to locate an element after it is dropped by the player.
+ * @param element {Phaser.Sprite} Dropped element to locate
+ */
 DragAndDropController.prototype.fixLocation = function(element) {
     var key;
-    for (key in this.destinations) {
-        if (element.overlap(this.destinations[key]) &&
-            this.destinations[key].children.length === 0) {
+    for (key in this.container.destinations) {
+        if (element.overlap(this.container.destinations[key]) &&
+            this.container.destinations[key].children.length === 0) {
             this.addToADestination(element, key);
             return;
         }
@@ -1013,40 +1012,64 @@ DragAndDropController.prototype.fixLocation = function(element) {
     this.returnElementToSource(element);
 };
 
+/**
+ * Determines whether all the destinations have the correct element as children.
+ * @returns {boolean}
+ */
 DragAndDropController.prototype.elementsInCorrectDestination = function() {
     var key;
-    for (key in this.destinations) {
-        if (this.destinations[key].children[0].code !==
-            this.destinations[key].code) {
+    for (key in this.container.destinations) {
+        if (this.container.destinations[key].children[0].code !==
+            this.container.destinations[key].code) {
             return false;
         }
     }
     return true;
 };
 
+/**
+ * Determines whether any destination is empty.
+ * @returns {boolean}
+ */
 DragAndDropController.prototype.emptyDestinations = function() {
     var key;
-    for (key in this.destinations) {
-        if (this.destinations[key].children[0] === undefined) {
+    for (key in this.container.destinations) {
+        if (this.container.destinations[key].children[0] === undefined) {
             return true;
         }
     }
     return false;
 };
 
+/**
+ * Locates an element within its source container.
+ * @param element {Phaser.Sprite} element to relocate.
+ */
 DragAndDropController.prototype.returnElementToSource = function(element) {
     element.x = element.sourceX;
     element.y = element.sourceY;
-    element.source.addChild(element);
+    this.container.source.addChild(element);
 };
 
+/**
+ * Add every element to the source but in a random order.
+ */
+DragAndDropController.prototype.addElementsToSourceRandomly = function() {
+    var utils = new Utilities(this.container.level);
+    var randomIndexes = utils.randomIndexesArray(this.container.elements.length);
+    var index;
+    for (index in randomIndexes) {
+        this.container.source.addElement(
+            this.container.elements[randomIndexes[index]]);
+        this.container.elements[randomIndexes[index]].sourceX =
+            this.container.elements[randomIndexes[index]].x;
+        this.container.elements[randomIndexes[index]].sourceY =
+            this.container.elements[randomIndexes[index]].y;
+    }
+};
 module.exports = DragAndDropController;
 
-/**
- * TODO: Comment code, control that elements are correctly located in destinations
- */
-
-},{}],15:[function(require,module,exports){
+},{"../../util/Utilities":40}],15:[function(require,module,exports){
 var Item = require('./Item');
 
 var PRCE_INCREASE_RATE = 10;
@@ -1696,9 +1719,9 @@ var PopUp = require('../../util/PopUp');
 var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 
-//var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
+var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
 //var ImageWordMatch = require('../../englishChallenges/ContextGroups');
-var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
+//var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
 
 var Level = function(game) {
     this.game = game;
@@ -2066,7 +2089,7 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/ImageWordMatch":11,"../../items/HealthPack":15,"../../items/inventory/Inventory":18,"../../items/store/Store":20,"../../items/weapons/MachineGun":23,"../../items/weapons/Revolver":24,"../../util/Dialog":33,"../../util/PopUp":39,"../../worldElements/InteractiveCar":43}],30:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/WordUnscramble":12,"../../items/HealthPack":15,"../../items/inventory/Inventory":18,"../../items/store/Store":20,"../../items/weapons/MachineGun":23,"../../items/weapons/Revolver":24,"../../util/Dialog":33,"../../util/PopUp":39,"../../worldElements/InteractiveCar":43}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -2320,7 +2343,7 @@ module.exports = GridLayoutPanel;
 var PopUp = require('./PopUp');
 var GridLayout = require('./GridLayout');
 
-var NUMBER_OF_COLUMNS = 5;
+var NUMBER_OF_COLUMNS = 1;
 var NUMBER_OF_ROWS = 1;
 
 var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {

@@ -10,7 +10,7 @@ var DragAndDropController = require('./DragAndDropController');
  * Represents an EnglishChallenge that have draggable elements, which need to be
  * arranged in a certain destinations.
  * @param level {Level} level Object to access game level elements
- * @param iconKey {string} Texture�s key of the Challenge icon
+ * @param iconKey {string} Texture key of the Challenge icon
  * @param challengeName {string} Challenge name to show in UI.
  * @param score {number} Score to be increased in case of success.
  * @param dimensions {Array} Array containing number of rows and columns needed
@@ -28,7 +28,8 @@ var DragAndDropChallenge = function(level, iconKey, challengeName, score,
     );
     this.level = level;
     this.destinations = [];
-    this.dragAndDropControl = new DragAndDropController(this.destinations);
+    this.elements = [];
+    this.dragAndDropControl = new DragAndDropController(this);
 };
 
 DragAndDropChallenge.prototype = Object.create(GridLayoutPopUp.prototype);

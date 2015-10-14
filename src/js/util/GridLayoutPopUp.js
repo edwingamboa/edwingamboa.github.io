@@ -4,7 +4,7 @@
 var PopUp = require('./PopUp');
 var GridLayout = require('./GridLayout');
 
-var NUMBER_OF_COLUMNS = 5;
+var NUMBER_OF_COLUMNS = 1;
 var NUMBER_OF_ROWS = 1;
 
 var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {

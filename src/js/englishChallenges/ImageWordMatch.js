@@ -16,7 +16,7 @@ var ImageWordMatch = function(level) {
 
     var familyKeys = ['mother', 'son', 'daughter'];
     var familyMembersCells = [];
-    var familyMembersLabels = [];
+    this.elements = [];
 
     for (var key in familyKeys) {
         var cell = new VerticalLayoutPanel(this.level, 'itemGroupBackGround');
@@ -42,21 +42,22 @@ var ImageWordMatch = function(level) {
         label.source = this;
 
         familyMembersCells.push(cell);
-        familyMembersLabels.push(label);
+        this.elements.push(label);
     }
 
-    for (var familyMemberCell in familyMembersCells) {
+    var familyMemberCell;
+    for (familyMemberCell in familyMembersCells) {
         this.addElement(familyMembersCells[familyMemberCell]);
     }
 
-    var randomIndexes = utils.randomIndexesArray(familyMembersLabels.length);
+    var randomIndexes = utils.randomIndexesArray(this.elements.length);
     var index;
     for (index in randomIndexes) {
-        this.addElement(familyMembersLabels[randomIndexes[index]]);
-        familyMembersLabels[randomIndexes[index]].sourceX =
-            familyMembersLabels[randomIndexes[index]].x;
-        familyMembersLabels[randomIndexes[index]].sourceY =
-            familyMembersLabels[randomIndexes[index]].y;
+        this.addElement(this.elements[randomIndexes[index]]);
+        this.elements[randomIndexes[index]].sourceX =
+            this.elements[randomIndexes[index]].x;
+        this.elements[randomIndexes[index]].sourceY =
+            this.elements[randomIndexes[index]].y;
     }
 
     this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);

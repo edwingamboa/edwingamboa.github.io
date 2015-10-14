@@ -1,14 +1,16 @@
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
+var Utilities = require('../../util/Utilities');
 
 /**
  * Controls draggable elements that are dropped in some destinations.
- * @param destinations {Array} Destinations where the elements can be dropped.
  * @constructor
+ * @param container {Phaser.Sprite} Sprite tha contains the draggable elements,
+ * their initial location (source) and their possible destinations.
  */
-var DragAndDropController = function(destinations) {
-    this.destinations = destinations;
+var DragAndDropController = function(container) {
+    this.container = container;
 };
 
 /**
@@ -21,7 +23,7 @@ DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
     element.x = 0;
     element.y = 0;
-    this.destinations[destinationIndex].addChild(element);
+    this.container.destinations[destinationIndex].addChild(element);
 };
 
 /**
@@ -30,9 +32,9 @@ DragAndDropController.prototype.addToADestination = function(element,
  */
 DragAndDropController.prototype.fixLocation = function(element) {
     var key;
-    for (key in this.destinations) {
-        if (element.overlap(this.destinations[key]) &&
-            this.destinations[key].children.length === 0) {
+    for (key in this.container.destinations) {
+        if (element.overlap(this.container.destinations[key]) &&
+            this.container.destinations[key].children.length === 0) {
             this.addToADestination(element, key);
             return;
         }
@@ -46,9 +48,9 @@ DragAndDropController.prototype.fixLocation = function(element) {
  */
 DragAndDropController.prototype.elementsInCorrectDestination = function() {
     var key;
-    for (key in this.destinations) {
-        if (this.destinations[key].children[0].code !==
-            this.destinations[key].code) {
+    for (key in this.container.destinations) {
+        if (this.container.destinations[key].children[0].code !==
+            this.container.destinations[key].code) {
             return false;
         }
     }
@@ -61,8 +63,8 @@ DragAndDropController.prototype.elementsInCorrectDestination = function() {
  */
 DragAndDropController.prototype.emptyDestinations = function() {
     var key;
-    for (key in this.destinations) {
-        if (this.destinations[key].children[0] === undefined) {
+    for (key in this.container.destinations) {
+        if (this.container.destinations[key].children[0] === undefined) {
             return true;
         }
     }
@@ -76,7 +78,23 @@ DragAndDropController.prototype.emptyDestinations = function() {
 DragAndDropController.prototype.returnElementToSource = function(element) {
     element.x = element.sourceX;
     element.y = element.sourceY;
-    element.source.addChild(element);
+    this.container.source.addChild(element);
 };
 
+/**
+ * Add every element to the source but in a random order.
+ */
+DragAndDropController.prototype.addElementsToSourceRandomly = function() {
+    var utils = new Utilities(this.container.level);
+    var rdmIndexes = utils.randomIndexesArray(this.container.elements.length);
+    var index;
+    for (index in rdmIndexes) {
+        this.container.source.addElement(
+            this.container.elements[rdmIndexes[index]]);
+        this.container.elements[rdmIndexes[index]].sourceX =
+            this.container.elements[rdmIndexes[index]].x;
+        this.container.elements[rdmIndexes[index]].sourceY =
+            this.container.elements[rdmIndexes[index]].y;
+    }
+};
 module.exports = DragAndDropController;

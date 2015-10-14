@@ -14,9 +14,9 @@ var PopUp = require('../../util/PopUp');
 var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 
-//var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
+var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
 //var ImageWordMatch = require('../../englishChallenges/ContextGroups');
-var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
+//var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
 
 var Level = function(game) {
     this.game = game;
