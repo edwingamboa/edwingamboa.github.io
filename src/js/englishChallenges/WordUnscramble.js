@@ -5,33 +5,43 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 
-var FamilyEC = function(level) {
+/**
+ * Represents the EnglishChallenge in which player is presented with a set of
+ * letters that should be correctly arranged in order to form a word.
+ * @constructor
+ */
+var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, level, 'father', 'Word Unscramble', 10,
+    DragAndDropChallenge.call(this, 'father', 'Word Unscramble', 10,
         dimensions);
-    this.level = level;
+};
 
+WordUnscramble.prototype = Object.create(DragAndDropChallenge.prototype);
+WordUnscramble.prototype.constructor = WordUnscramble;
+
+/**
+ * Create a new challenge to the player.
+ */
+WordUnscramble.prototype.newChallenge = function() {
+    this.clearChallenge();
     var word = 'mother';
-    var wordImage = this.level.game.make.sprite(0, 0, 'mother');
+    var wordImage = level.game.make.sprite(0, 0, 'mother');
 
     var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridLayoutPanel(this.level,
-        'wordField', optionals);
+    var wordFieldAnswer = new GridLayoutPanel('wordField', optionals);
 
-    this.wordFieldLetters = new GridLayoutPanel(this.level,
-        'wordField', optionals);
-    this.source = this.wordFieldLetters;
+    this.source = new GridLayoutPanel('wordField', optionals);
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = new GridLayoutPanel(this.level, 'letterShade');
+        letterShade = new GridLayoutPanel('letterShade');
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
 
-        letter = this.level.game.make.text(0, 0, word.charAt(i));
+        letter = level.game.make.text(0, 0, word.charAt(i));
         //Font style
         letter.font = 'Shojumaru';
         letter.fontSize = 20;
@@ -46,22 +56,24 @@ var FamilyEC = function(level) {
 
     this.dragAndDropControl.addElementsToSourceRandomly();
 
-    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
+    this.confirmButton = new Button('Confirm', this.confirm, this);
     this.addElement(wordImage);
     this.addElement(wordFieldAnswer);
-    this.addElement(this.wordFieldLetters);
+    this.addElement(this.source);
     this.addElement(this.confirmButton);
 };
 
-FamilyEC.prototype = Object.create(DragAndDropChallenge.prototype);
-FamilyEC.prototype.constructor = FamilyEC;
-
-FamilyEC.prototype.bringItemToTop = function(item) {
-    if (FamilyEC.prototype.isPrototypeOf(item.parent)) {
+/**
+ * Brings the element's container to the top. So that, when player drag the
+ * element over other containers it is not hidden by them.
+ * @param element {Sprite} element that is being dragged by the player
+ */
+WordUnscramble.prototype.bringItemToTop = function(item) {
+    if (WordUnscramble.prototype.isPrototypeOf(item.parent)) {
         this.addChild(item);
     }else {
         this.addChild(item.parent.parent);
     }
 };
 
-module.exports = FamilyEC;
+module.exports = WordUnscramble;

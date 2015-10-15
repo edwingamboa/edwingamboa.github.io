@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 10/10/2015.
  */
 
-var Button = function(level, text, action, parent, optionals) {
+var Button = function(text, action, parent, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;

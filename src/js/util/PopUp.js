@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
-var PopUp = function(level, backgroundKey, parent) {
+var PopUp = function(backgroundKey, parent) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
     this.xCenter = this.width / 2;
@@ -28,8 +28,6 @@ var PopUp = function(level, backgroundKey, parent) {
         this.withoutParent = false;
         this.parent = parent;
     }
-
-    this.level = level;
 };
 
 PopUp.prototype = Object.create(Phaser.Sprite.prototype);
@@ -38,7 +36,7 @@ PopUp.prototype.constructor = PopUp;
 PopUp.prototype.close = function() {
     this.visible = false;
     if (this.withoutParent) {
-        this.level.resume();
+        level.resume();
     }
     this.kill();
 };
@@ -47,7 +45,7 @@ PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
     }
-    this.level.pause();
+    level.pause();
     this.bringToTop();
     this.visible = true;
 };

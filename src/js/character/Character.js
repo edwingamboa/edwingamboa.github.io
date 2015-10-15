@@ -12,16 +12,14 @@ var RIGHT_DIRECTION = 1;
 var LEFT_DIRECTION = -1;
 
 /**
- * The Character class handles game characters general behaviour.
- *
- * @param {object} level - represents a game level
- * @param {number} x - character's x coordinate within the world
- * @param {number} y - character's y coordinate within the world
- * @param {string} spriteKey - key that represents the character sprite (preload)
- * @param {object} optionsArgs - character's physic properties
+ * Handles game characters general behaviour.
+ * @param x {number} - character's x coordinate within the world
+ * @param y {number} - character's y coordinate within the world
+ * @param spriteKey {string} - key that represents the character sprite (preload)
+ * @param  optionsArgs {object}  - character's physic properties
  * @constructor
  */
-var Character = function(level, x, y, spriteKey, optionsArgs) {
+var Character = function(x, y, spriteKey, optionsArgs) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
     var options = optionsArgs || {};
@@ -38,17 +36,11 @@ var Character = function(level, x, y, spriteKey, optionsArgs) {
 
     this.currentWeaponIndex = 0;
 
-    this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
     this.direction = RIGHT_DIRECTION;
 };
 
-/**
- * Character class constructor.
- *
- * @type {Phaser.Sprite}
- */
 Character.prototype = Object.create(Phaser.Sprite.prototype);
 Character.prototype.constructor = Character;
 
@@ -116,7 +108,6 @@ Character.prototype.stop = function() {
 /**
  * Determines whether the character's current health level is maxHelathLevel (is
  * full) or not.
- *
  * @returns {boolean}
  */
 Character.prototype.fullHealthLevel = function() {
@@ -127,7 +118,6 @@ Character.prototype.fullHealthLevel = function() {
  * Increase the character health level. If after the increasing, the healthLevel
  * is greater than or equal to the maxHealthLevel property, then healthLevel
  * will be maxHealthLevel.
- *
  * @param {number} increase - the amount to increase.
  */
 Character.prototype.increaseHealthLevel = function(increase) {
@@ -140,7 +130,6 @@ Character.prototype.increaseHealthLevel = function(increase) {
 /**
  * Decrease the character health level. If after the decreasing, the healthLevel
  * is lees than or equal to 0, then character and its elements will be killed.
- *
  * @param {number} decrease - the amount to decrease.
  */
 Character.prototype.decreaseHealthLevel = function(decrease) {
@@ -162,7 +151,6 @@ Character.prototype.killCharacter = function() {
 
 /**
  * Set the character health level.
- *
  * @param {number} healthLevel - the new caharacter's healthLevel.
  */
 Character.prototype.setHealthLevel = function(healthLevel) {
@@ -184,7 +172,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
     if (!this.currentWeapon.alive) {
         this.currentWeapon.revive();
     }
-    this.level.game.add.existing(this.currentWeapon);
+    level.game.add.existing(this.currentWeapon);
 };
 
 /**
@@ -201,8 +189,7 @@ Character.prototype.nextWeapon = function() {
 
 /**
  * Add a new weapon to character's weapons.
- *
- * @param {object} newWeapon - the weapon to be added.
+ * @param newWeapon {object} The weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
     if (this.weapons[newWeapon.key] === undefined) {
@@ -213,8 +200,8 @@ Character.prototype.addWeapon = function(newWeapon) {
 
 /**
  * Fires the current weapon if it is defined
- * @param {number} x - x coordinate on the point to fire
- * @param {number} y - y coordinate on the point to fire
+ * @param x {number} X coordinate on the point to fire
+ * @param y {number} Y coordinate on the point to fire
  */
 Character.prototype.fireToXY = function(x, y) {
     this.currentWeapon.fire(x, y);
@@ -222,8 +209,8 @@ Character.prototype.fireToXY = function(x, y) {
 
 /**
  * Lets to relocate the character on the given coordinates
- * @param {number} x - x coordinate to be relocated
- * @param {number} y - y coordinate to be relocated
+ * @param x {number} X coordinate to be relocated
+ * @param y {number} Y coordinate to be relocated
  */
 Character.prototype.relocate = function(x, y) {
     this.x = x;

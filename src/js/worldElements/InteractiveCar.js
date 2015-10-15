@@ -7,7 +7,7 @@ var DEFAULT_CAR_SPEED = 400;
 var DEFAULT_CAR_MAX_SPEED = 500;
 var CAR_GRAVITY = 30000;
 
-var InteractiveCar = function(level, x, y, backgroundKey) {
+var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
     this.anchor.set(0, 0);
@@ -26,8 +26,6 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
     this.anchor.set(0.5, 1);
     this.animations.add('left', [0], 10, true);
     this.animations.add('right', [1], 10, true);
-
-    this.level = level;
     this.occupied = false;
 };
 
@@ -35,15 +33,15 @@ InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 InteractiveCar.prototype.getOn = function() {
-    this.level.player.relocate(this.x, this.y - 100);
-    this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
-    this.level.player.changeGravity(CAR_GRAVITY);
+    level.player.relocate(this.x, this.y - 100);
+    level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
+    level.player.changeGravity(CAR_GRAVITY);
     this.occupied = true;
 };
 
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
-        this.body.velocity.x = this.level.player.body.velocity.x;
+        this.body.velocity.x = level.player.body.velocity.x;
         if (this.body.velocity.x < 0) {
             this.animations.play('left');
         }else {

@@ -6,10 +6,9 @@ var InventoryItem = require ('./InventoryItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
-var Inventory = function(level) {
-    GridLayoutPopUp.call(this, level, 'inventory_background');
-
-    this.level = level;
+var Inventory = function() {
+    var dimensions = {numberOfColumns: 5, numberOfRows: 2};
+    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
 
     this.healthPacks = [];
     this.items = [];
@@ -39,14 +38,12 @@ Inventory.prototype.addItem = function(item) {
 };
 
 Inventory.prototype.createItemGroups = function() {
-    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
-    this.items.healthPack5 = new InventoryItem(this.level, healthPackItem,
-        this);
+    var healthPackItem = new HealthPack(0, 0, 5);
+    this.items.healthPack5 = new InventoryItem(healthPackItem, this);
     this.addElement(this.items.healthPack5);
 
-    var revolverItem = new Revolver(this.level, 0, 0, false);
-    this.items.simpleWeapon = new InventoryItem(this.level, revolverItem,
-        this);
+    var revolverItem = new Revolver(0, 0, false);
+    this.items.simpleWeapon = new InventoryItem(revolverItem, this);
     this.addElement(this.items.simpleWeapon);
 };
 

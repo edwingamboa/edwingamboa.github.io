@@ -9,10 +9,10 @@ var GRAVITY = 300;
 var Character = require('./Character');
 
 var MINIMUM_SCORE = 10;
-var Player;
-Player = function(level) {
+
+var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, level, 32, level.game.world.height - 150,
+    Character.call(this, 32, level.game.world.height - 150,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -35,16 +35,16 @@ Player.prototype.crouch = function() {
 
 Player.prototype.increaseScore = function(increase) {
     this.score += increase;
-    this.level.updateScoreText();
+    level.updateScoreText();
 };
 
 Player.prototype.decreaseScore = function(decrease) {
     this.score += decrease;
-    this.level.updateScoreText();
+    level.updateScoreText();
 };
 
-Player.prototype.updateHealhtLevelText = function() {
-    this.level.updateHealthLevelText();
+Player.prototype.updateHealhtLevel = function() {
+    level.updateHealthLevel();
 };
 
 Player.prototype.update = function() {

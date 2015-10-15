@@ -21,7 +21,7 @@ game.state.add('levelOne', LevelOne);
 game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":26,"./states/Menu":27,"./states/Preloader":28,"./states/levels/LevelOne":30,"./states/levels/LevelOneIntro":31}],2:[function(require,module,exports){
+},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/LevelOne":32,"./states/levels/LevelOneIntro":33}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -36,16 +36,14 @@ var RIGHT_DIRECTION = 1;
 var LEFT_DIRECTION = -1;
 
 /**
- * The Character class handles game characters general behaviour.
- *
- * @param {object} level - represents a game level
- * @param {number} x - character's x coordinate within the world
- * @param {number} y - character's y coordinate within the world
- * @param {string} spriteKey - key that represents the character sprite (preload)
- * @param {object} optionsArgs - character's physic properties
+ * Handles game characters general behaviour.
+ * @param x {number} - character's x coordinate within the world
+ * @param y {number} - character's y coordinate within the world
+ * @param spriteKey {string} - key that represents the character sprite (preload)
+ * @param  optionsArgs {object}  - character's physic properties
  * @constructor
  */
-var Character = function(level, x, y, spriteKey, optionsArgs) {
+var Character = function(x, y, spriteKey, optionsArgs) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
     var options = optionsArgs || {};
@@ -62,17 +60,11 @@ var Character = function(level, x, y, spriteKey, optionsArgs) {
 
     this.currentWeaponIndex = 0;
 
-    this.level = level;
     this.weapons = [];
     this.weaponsKeys = [];
     this.direction = RIGHT_DIRECTION;
 };
 
-/**
- * Character class constructor.
- *
- * @type {Phaser.Sprite}
- */
 Character.prototype = Object.create(Phaser.Sprite.prototype);
 Character.prototype.constructor = Character;
 
@@ -140,7 +132,6 @@ Character.prototype.stop = function() {
 /**
  * Determines whether the character's current health level is maxHelathLevel (is
  * full) or not.
- *
  * @returns {boolean}
  */
 Character.prototype.fullHealthLevel = function() {
@@ -151,7 +142,6 @@ Character.prototype.fullHealthLevel = function() {
  * Increase the character health level. If after the increasing, the healthLevel
  * is greater than or equal to the maxHealthLevel property, then healthLevel
  * will be maxHealthLevel.
- *
  * @param {number} increase - the amount to increase.
  */
 Character.prototype.increaseHealthLevel = function(increase) {
@@ -164,7 +154,6 @@ Character.prototype.increaseHealthLevel = function(increase) {
 /**
  * Decrease the character health level. If after the decreasing, the healthLevel
  * is lees than or equal to 0, then character and its elements will be killed.
- *
  * @param {number} decrease - the amount to decrease.
  */
 Character.prototype.decreaseHealthLevel = function(decrease) {
@@ -186,7 +175,6 @@ Character.prototype.killCharacter = function() {
 
 /**
  * Set the character health level.
- *
  * @param {number} healthLevel - the new caharacter's healthLevel.
  */
 Character.prototype.setHealthLevel = function(healthLevel) {
@@ -208,7 +196,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
     if (!this.currentWeapon.alive) {
         this.currentWeapon.revive();
     }
-    this.level.game.add.existing(this.currentWeapon);
+    level.game.add.existing(this.currentWeapon);
 };
 
 /**
@@ -225,8 +213,7 @@ Character.prototype.nextWeapon = function() {
 
 /**
  * Add a new weapon to character's weapons.
- *
- * @param {object} newWeapon - the weapon to be added.
+ * @param newWeapon {object} The weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
     if (this.weapons[newWeapon.key] === undefined) {
@@ -237,8 +224,8 @@ Character.prototype.addWeapon = function(newWeapon) {
 
 /**
  * Fires the current weapon if it is defined
- * @param {number} x - x coordinate on the point to fire
- * @param {number} y - y coordinate on the point to fire
+ * @param x {number} X coordinate on the point to fire
+ * @param y {number} Y coordinate on the point to fire
  */
 Character.prototype.fireToXY = function(x, y) {
     this.currentWeapon.fire(x, y);
@@ -246,8 +233,8 @@ Character.prototype.fireToXY = function(x, y) {
 
 /**
  * Lets to relocate the character on the given coordinates
- * @param {number} x - x coordinate to be relocated
- * @param {number} y - y coordinate to be relocated
+ * @param x {number} X coordinate to be relocated
+ * @param y {number} Y coordinate to be relocated
  */
 Character.prototype.relocate = function(x, y) {
     this.x = x;
@@ -277,8 +264,7 @@ module.exports = Character;
  */
 var Character = require('./Character');
 
-var Enemy = function(level,
-                     spriteKey,
+var Enemy = function(spriteKey,
                      maxHealthLevel,
                      x,
                      y,
@@ -290,7 +276,7 @@ var Enemy = function(level,
         healthLevel : maxHealthLevel,
         maxHealthLevel : maxHealthLevel
     };
-    Character.call(this, level, x, y, spriteKey, options);
+    Character.call(this, x, y, spriteKey, options);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.stopLeftFrameIndex = 0;
@@ -318,7 +304,7 @@ Enemy.prototype.update = function() {
     this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
-Enemy.prototype.updateHealhtLevelText = function() {
+Enemy.prototype.updateHealhtLevel = function() {
     if (this.healthLevel > 0) {
         this.healthLevelText.text = '' + this.healthLevel;
     }
@@ -327,26 +313,49 @@ Enemy.prototype.updateHealhtLevelText = function() {
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
     this.healthLevelText.text = '';
-    this.level.player.increaseScore(this.maxHealthLevel * 0.1);
+    level.player.increaseScore(this.maxHealthLevel * 0.1);
     Character.prototype.killCharacter.call(this);
 };
 
 Enemy.prototype.rotateWeapon = function(x, y) {
     this.currentWeapon.rotation =
-        this.level.game.physics.arcade.angleToXY(this, x, y);
+        level.game.physics.arcade.angleToXY(this, x, y);
 };
 
 module.exports = Enemy;
 
 },{"./Character":2}],4:[function(require,module,exports){
 /**
+ * Created by Edwin Gamboa on 15/10/2015.
+ */
+
+var HealthBar = function(x, y, size) {
+    Phaser.Sprite.call(this, level.game, x, y, 'healthBarBackground');
+    this.bar = level.game.make.sprite(0, 0, 'healthBar');
+    var sizeOps = size || [];
+    var width = sizeOps.width || 1;
+    var height = sizeOps.height || 1;
+
+    this.addChild(this.bar);
+};
+
+HealthBar.prototype = Object.create(Phaser.Sprite.prototype);
+HealthBar.prototype.constructor = HealthBar;
+
+HealthBar.prototype.updateHealthBarLevel = function(barLevel) {
+    this.bar.scale.x = barLevel;
+};
+
+module.exports = HealthBar;
+
+},{}],5:[function(require,module,exports){
+/**
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var Character = require('./Character');
 
-var NPC;
-NPC = function(level, x, y, key, comicKey) {
-    Character.call(this, level, x, y, key);
+var NPC = function(x, y, key, comicKey) {
+    Character.call(this, x, y, key);
     this.comicKey = comicKey;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -357,7 +366,7 @@ NPC.prototype.constructor = NPC;
 
 module.exports = NPC;
 
-},{"./Character":2}],5:[function(require,module,exports){
+},{"./Character":2}],6:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -369,10 +378,10 @@ var GRAVITY = 300;
 var Character = require('./Character');
 
 var MINIMUM_SCORE = 10;
-var Player;
-Player = function(level) {
+
+var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, level, 32, level.game.world.height - 150,
+    Character.call(this, 32, level.game.world.height - 150,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -395,16 +404,16 @@ Player.prototype.crouch = function() {
 
 Player.prototype.increaseScore = function(increase) {
     this.score += increase;
-    this.level.updateScoreText();
+    level.updateScoreText();
 };
 
 Player.prototype.decreaseScore = function(decrease) {
     this.score += decrease;
-    this.level.updateScoreText();
+    level.updateScoreText();
 };
 
-Player.prototype.updateHealhtLevelText = function() {
-    this.level.updateHealthLevelText();
+Player.prototype.updateHealhtLevel = function() {
+    level.updateHealthLevel();
 };
 
 Player.prototype.update = function() {
@@ -448,7 +457,7 @@ Player.prototype.buyItem = function(item) {
 
 module.exports = Player;
 
-},{"./Character":2}],6:[function(require,module,exports){
+},{"./Character":2}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -462,9 +471,8 @@ var MAX_RANGE_DETECTION = 700;
 var MIN_RANGE_ATTACK = 50;
 var MAX_RANGE_ATTACK = 300;
 
-var SimpleEnemy = function(level, x, y) {
+var SimpleEnemy = function(x, y) {
     Enemy.call(this,
-        level,
         SPRITE_KEY,
         MAX_HEALTH_LEVEL,
         x,
@@ -482,7 +490,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":24,"./Enemy":3}],7:[function(require,module,exports){
+},{"../items/weapons/Revolver":26,"./Enemy":3}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -496,10 +504,9 @@ var MIN_RANGE_ATTACK = 600;
 var MAX_RANGE_DETECTION = 1000;
 var MAX_RANGE_ATTACK = 600;
 
-var StrongEnemy = function(level, x, y) {
+var StrongEnemy = function(x, y) {
     Enemy.call(
         this,
-        level,
         SPRITE_KEY,
         MAX_HEALTH_LEVEL,
         x,
@@ -518,33 +525,51 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":23,"./Enemy":3}],8:[function(require,module,exports){
+},{"../items/weapons/MachineGun":25,"./Enemy":3}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
 
-var GridLayoutPopUp = require('../util/GridLayoutPopUp');
+var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
+/**
+ * The number of contexts allowed for this challenge
+ * @constant
+ * @type {number}
+ */
 var NUMBER_OF_CONTEXTS = 2;
-var ContextGroups = function(level) {
-    this.score = 30;
-    var dimensions = {numberOfColumns: 1, numberOfRows: 4};
-    GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
 
-    this.level = level;
+/**
+ * Represents the EnglishChallenge in which the player should associate each
+ * word to one context. This is a drag and drop kind of challenge.
+ * @constructor
+ */
+var ContextGroups = function() {
+    var dimensions = {numberOfRows: 4};
+    DragAndDropChallenge.call(this, 'son', 'Context Groups', 10,
+        dimensions);
+};
+
+ContextGroups.prototype = Object.create(DragAndDropChallenge.prototype);
+ContextGroups.prototype.constructor = ContextGroups;
+
+/**
+ * Create a new challenge to the player.
+ */
+ContextGroups.prototype.newChallenge = function() {
+    this.clearChallenge();
 
     var words = ['Mother', 'Son', 'Father', 'Living room', 'Dining room',
         'Kitchen'];
 
     this.contexts = [];
-    var draggableWords = [];
     var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
-    this.wordsField = new GridLayoutPanel(this.level, 'wordField', optionals);
+    this.source = new GridLayoutPanel('wordField', optionals);
 
     optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
-    var contextsPanels = new GridLayoutPanel(this.level, 'wordField',
+    var contextsPanels = new GridLayoutPanel('wordField',
         optionals);
 
     var i;
@@ -555,75 +580,46 @@ var ContextGroups = function(level) {
     this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
     optionals = {numberOfRows: this.numberOfWords};
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
-        context = new GridLayoutPanel(this.level, 'itemGroupBackGround',
+        context = new GridLayoutPanel('itemGroupBackGround',
             optionals);
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
         for (j = i * (NUMBER_OF_CONTEXTS + 1);
              j < (i + 1) * this.numberOfWords; j++) {
-            word = this.level.game.make.text(0, 0, words[j]);
+            word = level.game.make.text(0, 0, words[j]);
             //Font style
             word.font = 'Shojumaru';
             word.fontSize = 20;
             word.fill = '#0040FF';
             word.inputEnabled = true;
             word.input.enableDrag(true, true);
-            word.events.onDragStop.add(this.fixLocation, this);
+            word.events.onDragStop.add(this.dragAndDropControl.fixLocation,
+                this.dragAndDropControl);
             word.code = '' + i;
-            draggableWords.push(word);
+            this.elements.push(word);
 
-            wordShade = new GridLayoutPanel(this.level, 'useButtonShade');
+            wordShade = new GridLayoutPanel('useButtonShade');
+            wordShade.code = '' + i;
+            this.destinations.push(wordShade);
             context.addElement(wordShade);
         }
     }
 
-    var randomIndex;
-    var indexes = [];
-    for (i = 0; i < draggableWords.length; i++) {
-        indexes.push(i);
-    }
+    this.dragAndDropControl.addElementsToSourceRandomly();
 
-    for (i = 0; i < draggableWords.length; i++) {
-        randomIndex = level.game.rnd.integerInRange(0,
-            indexes.length - 1);
-        this.wordsField.addElement(draggableWords[indexes[randomIndex]]);
-        draggableWords[indexes[randomIndex]].initialX =
-            draggableWords[indexes[randomIndex]].x;
-        draggableWords[indexes[randomIndex]].initialY =
-            draggableWords[indexes[randomIndex]].y;
-        indexes.splice(randomIndex, 1);
-    }
-
-    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
+    this.confirmButton = new Button('Confirm', this.confirm, this);
     //this.addElement(Description);
     this.addElement(contextsPanels);
-    this.addElement(this.wordsField);
+    this.addElement(this.source);
     this.addElement(this.confirmButton);
 };
 
-ContextGroups.prototype = Object.create(GridLayoutPopUp.prototype);
-ContextGroups.prototype.constructor = ContextGroups;
-
-ContextGroups.prototype.fixLocation = function(item) {
-    var context;
-    var shade;
-    for (context in this.contexts) {
-        for (shade in this.contexts[context].children) {
-            if (item.overlap(this.contexts[context].children[shade]) &&
-                this.contexts[context].children[shade].children.length === 0) {
-                item.x = 0;
-                item.y = 0;
-                this.contexts[context].children[shade].addChild (item);
-                return;
-            }
-            item.x = item.initialX;
-            item.y = item.initialY;
-            this.wordsField.addChild(item);
-        }
-    }
-};
-
+/**
+ * Brings the element's container to the top. So that, when player drag the
+ * element over other containers it is not hidden by them.
+ * @param element {Sprite} element that is being dragged by the player
+ */
 ContextGroups.prototype.bringItemToTop = function(item) {
     if (ContextGroups.prototype.isPrototypeOf(item.parent)) {
         this.addChild(item);
@@ -632,30 +628,9 @@ ContextGroups.prototype.bringItemToTop = function(item) {
     }
 };
 
-ContextGroups.prototype.confirm = function() {
-    var correct = true;
-    if (this.wordsField.children.length > 0) {
-        this.level.showErrorMessage('The challenge is not complete.', this);
-        return;
-    }
-    for (var shade in this.contexts) {
-        for (var word in this.contexts[shade].children) {
-            if (this.contexts[shade].children[word].children[0].code !==
-                shade) {
-                this.level.showErrorMessage('Sorry! Try Again.', this);
-                return;
-            }
-        }
-    }
-    this.level.increaseScore(this.score);
-    this.level.showSuccessMessage('Well done! You got ' + this.score +
-        ' points.', this);
-    this.close();
-};
-
 module.exports = ContextGroups;
 
-},{"../util/Button":32,"../util/GridLayoutPanel":35,"../util/GridLayoutPopUp":36}],9:[function(require,module,exports){
+},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":13}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -663,15 +638,13 @@ module.exports = ContextGroups;
 /**
  * Represents an EnglishChallenge within the game. An EnglishChallenge is used,
  * by the player to increase his/her score in a faster way.
- * @param level {Level} level Object to access game level elements
  * @param iconKey {string} Texture's key for the icon of the challenge
  * @param name {string} Name of the challenge
  * @param score {number} Score to be increased in case of success.
  * @constructor
  */
-var EnglishChallenge = function(level, iconKey, name, score) {
-    this.level = level;
-    this.icon = this.level.game.make.sprite(10, 10, iconKey);
+var EnglishChallenge = function(iconKey, name, score) {
+    this.iconKey = iconKey;
     this.name = name;
     this.score = score;
 };
@@ -682,8 +655,8 @@ var EnglishChallenge = function(level, iconKey, name, score) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.success = function(parent) {
-    this.level.increaseScore(this.score);
-    this.level.showSuccessMessage('Well done! You got ' + this.score +
+    level.increaseScore(this.score);
+    level.showSuccessMessage('Well done! You got ' + this.score +
         ' points.', parent);
 };
 
@@ -693,7 +666,7 @@ EnglishChallenge.prototype.success = function(parent) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.failure = function(parent) {
-    this.level.showErrorMessage('Sorry! Try Again.', parent);
+    level.showErrorMessage('Sorry! Try Again.', parent);
 };
 
 /**
@@ -702,118 +675,92 @@ EnglishChallenge.prototype.failure = function(parent) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.incomplete = function(parent) {
-    this.level.showErrorMessage('The challenge is not complete.', parent);
+    level.showErrorMessage('The challenge is not complete.', parent);
 };
 
 module.exports = EnglishChallenge;
 
-},{}],10:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 10/10/2015.
- */
-var GridLayoutPopUp = require('../util/GridLayoutPopUp');
-
-var EnglishChallenges = function(level) {
-    GridLayoutPopUp.call(this, level, 'inventory_background');
-
-    this.level = level;
-    this.createGames();
-};
-
-EnglishChallenges.prototype = Object.create(GridLayoutPopUp.prototype);
-EnglishChallenges.prototype.constructor = EnglishChallenges;
-
-EnglishChallenges.prototype.createGames = function() {
-
-    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
-    this.items.healthPack5 = new EnglishChallengesItem(this.level,
-        healthPackItem,
-        this);
-    this.addElement(this.items.healthPack5);
-
-    var revolverItem = new Revolver(this.level, 0, 0, false);
-    this.items.simpleWeapon = new EnglishChallengesItem(this.level,
-        revolverItem,
-        this);
-    this.addElement(this.items.simpleWeapon);
-};
-
-EnglishChallenges.prototype.showHealthPacks = function() {
-    //TODO
-};
-
-module.exports = EnglishChallenges;
-
-},{"../util/GridLayoutPopUp":36}],11:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 var Button = require('../util/Button');
-var Utilities = require('../util/Utilities');
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
+var GridLayoutPanel = require('../util/GridLayoutPanel');
 
-var ImageWordMatch = function(level) {
-    var dimensions = {numberOfColumns: 3, numberOfRows: 3};
-    DragAndDropChallenge.call(this, level, 'mother', 'Word-Image Match', 10,
+/**
+ * Represents the EnglishChallenge in which player should match a word with its
+ * corresponding image representation. This is a drag and drop challenge.
+ * @constructor
+ */
+var ImageWordMatch = function() {
+    var dimensions = {numberOfRows: 3};
+    DragAndDropChallenge.call(this, 'mother', 'Word-Image Match', 10,
         dimensions);
+};
 
-    var utils = new Utilities(level);
+ImageWordMatch.prototype = Object.create(DragAndDropChallenge.prototype);
+ImageWordMatch.prototype.constructor = ImageWordMatch;
 
+/**
+ * Create a new challenge to the player.
+ */
+ImageWordMatch.prototype.newChallenge = function() {
+    this.clearChallenge();
     var familyKeys = ['mother', 'son', 'daughter'];
     var familyMembersCells = [];
-    this.elements = [];
 
     for (var key in familyKeys) {
-        var cell = new VerticalLayoutPanel(this.level, 'itemGroupBackGround');
-        var familyMember = this.level.game.make.sprite(0, 0, familyKeys[key]);
-        var shade = this.level.game.make.sprite(0, 0, 'useButtonShade');
+        var cell = new VerticalLayoutPanel('itemGroupBackGround');
+        var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
+        var shade = level.game.make.sprite(0, 0, 'useButtonShade');
         shade.code = key;
 
         this.destinations.push(shade);
         cell.addElement(familyMember);
         cell.addElement(shade);
 
-        var label = this.level.game.make.text(0, 0, familyKeys[key]);
+        var label = level.game.make.text(0, 0, familyKeys[key]);
         //Font style
         label.font = 'Shojumaru';
         label.fontSize = 20;
         label.fill = '#0040FF';
         label.inputEnabled = true;
         label.input.enableDrag(true, true);
-        label.events.onDragStart.add(this.bringItemToTop, this);
+        //label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.dragAndDropControl.fixLocation,
             this.dragAndDropControl);
         label.code = key;
-        label.source = this;
 
         familyMembersCells.push(cell);
         this.elements.push(label);
     }
 
+    var optionals = {numberOfColumns: this.elements.length};
+    this.source = new GridLayoutPanel('wordField', optionals);
+
+    var images = new GridLayoutPanel('wordField', optionals);
+
     var familyMemberCell;
     for (familyMemberCell in familyMembersCells) {
-        this.addElement(familyMembersCells[familyMemberCell]);
+        images.addElement(familyMembersCells[familyMemberCell]);
     }
 
-    var randomIndexes = utils.randomIndexesArray(this.elements.length);
-    var index;
-    for (index in randomIndexes) {
-        this.addElement(this.elements[randomIndexes[index]]);
-        this.elements[randomIndexes[index]].sourceX =
-            this.elements[randomIndexes[index]].x;
-        this.elements[randomIndexes[index]].sourceY =
-            this.elements[randomIndexes[index]].y;
-    }
+    this.dragAndDropControl.addElementsToSourceRandomly();
+    this.confirmButton = new Button('Confirm', this.confirm, this);
 
-    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
+    this.addElement(images);
+    this.addElement(this.source);
     this.addElement(this.confirmButton);
 };
 
-ImageWordMatch.prototype = Object.create(DragAndDropChallenge.prototype);
-ImageWordMatch.prototype.constructor = ImageWordMatch;
-
+/**
+ * Brings the element's container to the top. So that, when player drag the
+ * element over other containers it is not hidden by them.
+ * @param element {Sprite} element that is being dragged by the player
+ */
 ImageWordMatch.prototype.bringItemToTop = function(element) {
     if (ImageWordMatch.prototype.isPrototypeOf(element.parent)) {
         this.addChild(element);
@@ -824,7 +771,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/Button":32,"../util/Utilities":40,"../util/VerticalLayoutPanel":42,"./dragAndDrop/DragAndDropChallenge":13}],12:[function(require,module,exports){
+},{"../util/Button":34,"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":45,"./dragAndDrop/DragAndDropChallenge":13}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -832,33 +779,43 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 
-var FamilyEC = function(level) {
+/**
+ * Represents the EnglishChallenge in which player is presented with a set of
+ * letters that should be correctly arranged in order to form a word.
+ * @constructor
+ */
+var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, level, 'father', 'Word Unscramble', 10,
+    DragAndDropChallenge.call(this, 'father', 'Word Unscramble', 10,
         dimensions);
-    this.level = level;
+};
 
+WordUnscramble.prototype = Object.create(DragAndDropChallenge.prototype);
+WordUnscramble.prototype.constructor = WordUnscramble;
+
+/**
+ * Create a new challenge to the player.
+ */
+WordUnscramble.prototype.newChallenge = function() {
+    this.clearChallenge();
     var word = 'mother';
-    var wordImage = this.level.game.make.sprite(0, 0, 'mother');
+    var wordImage = level.game.make.sprite(0, 0, 'mother');
 
     var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridLayoutPanel(this.level,
-        'wordField', optionals);
+    var wordFieldAnswer = new GridLayoutPanel('wordField', optionals);
 
-    this.wordFieldLetters = new GridLayoutPanel(this.level,
-        'wordField', optionals);
-    this.source = this.wordFieldLetters;
+    this.source = new GridLayoutPanel('wordField', optionals);
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = new GridLayoutPanel(this.level, 'letterShade');
+        letterShade = new GridLayoutPanel('letterShade');
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
 
-        letter = this.level.game.make.text(0, 0, word.charAt(i));
+        letter = level.game.make.text(0, 0, word.charAt(i));
         //Font style
         letter.font = 'Shojumaru';
         letter.fontSize = 20;
@@ -873,27 +830,29 @@ var FamilyEC = function(level) {
 
     this.dragAndDropControl.addElementsToSourceRandomly();
 
-    this.confirmButton = new Button(this.level, 'Confirm', this.confirm, this);
+    this.confirmButton = new Button('Confirm', this.confirm, this);
     this.addElement(wordImage);
     this.addElement(wordFieldAnswer);
-    this.addElement(this.wordFieldLetters);
+    this.addElement(this.source);
     this.addElement(this.confirmButton);
 };
 
-FamilyEC.prototype = Object.create(DragAndDropChallenge.prototype);
-FamilyEC.prototype.constructor = FamilyEC;
-
-FamilyEC.prototype.bringItemToTop = function(item) {
-    if (FamilyEC.prototype.isPrototypeOf(item.parent)) {
+/**
+ * Brings the element's container to the top. So that, when player drag the
+ * element over other containers it is not hidden by them.
+ * @param element {Sprite} element that is being dragged by the player
+ */
+WordUnscramble.prototype.bringItemToTop = function(item) {
+    if (WordUnscramble.prototype.isPrototypeOf(item.parent)) {
         this.addChild(item);
     }else {
         this.addChild(item.parent.parent);
     }
 };
 
-module.exports = FamilyEC;
+module.exports = WordUnscramble;
 
-},{"../util/Button":32,"../util/GridLayoutPanel":35,"./dragAndDrop/DragAndDropChallenge":13}],13:[function(require,module,exports){
+},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":13}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -901,12 +860,10 @@ module.exports = FamilyEC;
 var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
 var EnglishChallenge = require('../../englishChallenges/EnglishChallenge');
 var DragAndDropController = require('./DragAndDropController');
-var Utilities = require('../../util/Utilities');
 
 /**
  * Represents an EnglishChallenge that have draggable elements, which need to be
  * arranged in a certain destinations.
- * @param level {Level} level Object to access game level elements
  * @param iconKey {string} Texture key of the Challenge icon
  * @param challengeName {string} Challenge name to show in UI.
  * @param score {number} Score to be increased in case of success.
@@ -914,16 +871,14 @@ var Utilities = require('../../util/Utilities');
  * for the challenge UI.
  * @constructor
  */
-var DragAndDropChallenge = function(level, iconKey, challengeName, score,
+var DragAndDropChallenge = function(iconKey, challengeName, score,
                                     dimensions) {
-    GridLayoutPopUp.call(this, level, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
     this.englishChallenge = new EnglishChallenge(
-        level,
         iconKey,
         challengeName,
         score
     );
-    this.level = level;
     this.destinations = [];
     this.elements = [];
     this.dragAndDropControl = new DragAndDropController(this);
@@ -950,24 +905,24 @@ DragAndDropChallenge.prototype.confirm = function() {
 };
 
 /**
- * Add every element to the source but in a random order.
+ * Clear all the containers and elements of the challenge, so that a new
+ * challenge can be created.
  */
-DragAndDropChallenge.prototype.addElementsToSourceRandomly = function() {
-    var utils = new Utilities(this.level);
-    var randomIndexes = utils.randomIndexesArray(this.elements.length);
-    var index;
-    for (index in randomIndexes) {
-        this.source.addElement(this.elements[randomIndexes[index]]);
-        this.elements[randomIndexes[index]].sourceX =
-            this.elements[randomIndexes[index]].x;
-        this.elements[randomIndexes[index]].sourceY =
-            this.elements[randomIndexes[index]].y;
+DragAndDropChallenge.prototype.clearChallenge = function() {
+    if (this.children.length > 1) {
+        this.removeAllElements();
+    }
+    if (this.elements.length > 0) {
+        this.elements.splice(0, this.elements.length);
+    }
+    if (this.destinations.length > 0) {
+        this.destinations.splice(0, this.destinations.length);
     }
 };
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":9,"../../util/GridLayoutPopUp":36,"../../util/Utilities":40,"./DragAndDropController":14}],14:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":10,"../../util/GridLayoutPopUp":38,"./DragAndDropController":14}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -975,9 +930,9 @@ var Utilities = require('../../util/Utilities');
 
 /**
  * Controls draggable elements that are dropped in some destinations.
- * @param destinations {Array} Destinations where the elements can be dropped.
- * @param elements {Phaser.Sprite} elements to be arranged
  * @constructor
+ * @param container {Phaser.Sprite} Sprite tha contains the draggable elements,
+ * their initial location (source) and their possible destinations.
  */
 var DragAndDropController = function(container) {
     this.container = container;
@@ -1055,31 +1010,114 @@ DragAndDropController.prototype.returnElementToSource = function(element) {
  * Add every element to the source but in a random order.
  */
 DragAndDropController.prototype.addElementsToSourceRandomly = function() {
-    var utils = new Utilities(this.container.level);
-    var randomIndexes = utils.randomIndexesArray(this.container.elements.length);
+    var utils = new Utilities();
+    var rdmIndexes = utils.randomIndexesArray(this.container.elements.length);
     var index;
-    for (index in randomIndexes) {
+    for (index in rdmIndexes) {
         this.container.source.addElement(
-            this.container.elements[randomIndexes[index]]);
-        this.container.elements[randomIndexes[index]].sourceX =
-            this.container.elements[randomIndexes[index]].x;
-        this.container.elements[randomIndexes[index]].sourceY =
-            this.container.elements[randomIndexes[index]].y;
+            this.container.elements[rdmIndexes[index]]);
+        this.container.elements[rdmIndexes[index]].sourceX =
+            this.container.elements[rdmIndexes[index]].x;
+        this.container.elements[rdmIndexes[index]].sourceY =
+            this.container.elements[rdmIndexes[index]].y;
     }
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":40}],15:[function(require,module,exports){
+},{"../../util/Utilities":43}],15:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 10/10/2015.
+ */
+var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var MenuItem = require('./MenuItem');
+var WordUnscramble = require('../WordUnscramble');
+var ContextGroups = require('../ContextGroups');
+var ImageWordMatch = require('../ImageWordMatch');
+
+/**
+ * Menu that allows accessing to all the EnglishChallenges.
+ * @constructor
+ */
+var EnglishChallengesMenu = function() {
+    var dimensions = {numberOfRows: 2, numberOfColumns: 2};
+    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    this.createGames();
+};
+
+EnglishChallengesMenu.prototype = Object.create(GridLayoutPopUp.prototype);
+EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
+
+/**
+ * Creates the menu, it adds an icon for every EnglishChallenge, so the player
+ * can access them.
+ */
+EnglishChallengesMenu.prototype.createGames = function() {
+    var challenges = [];
+    challenges.push(new WordUnscramble());
+    challenges.push(new ContextGroups());
+    challenges.push(new ImageWordMatch());
+    var i;
+    for (i in challenges) {
+        this.addElement(new MenuItem(challenges[i], this));
+        level.game.add.existing(challenges[i]);
+    }
+};
+
+module.exports = EnglishChallengesMenu;
+
+},{"../../util/GridLayoutPopUp":38,"../ContextGroups":9,"../ImageWordMatch":11,"../WordUnscramble":12,"./MenuItem":16}],16:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 15/10/2015.
+ */
+
+var ItemGroupView = require('../../items/ItemGroupView');
+
+/**
+ * Represents a challenge within the EnglishChallengesMenu.
+ * @param challenge {EnglishChallenge} Challenge that can be accessed through
+ * this item.
+ * @param parentView {PopUp} PopUp that contatins this item.
+ * @constructor
+ */
+var MenuItem = function(challenge, parentView) {
+    ItemGroupView.call(this, challenge.englishChallenge.iconKey,
+        challenge.englishChallenge.name, parentView);
+    this.challenge = challenge;
+    this.updateScoreText();
+};
+
+MenuItem.prototype = Object.create(ItemGroupView.prototype);
+MenuItem.prototype.constructor = MenuItem;
+
+/**
+ * Called when the play button is clicked. It close the menu (PopUp), creates
+ * a new challenge and displays it to the player.
+ */
+MenuItem.prototype.buttonAction = function() {
+    this.parent.close();
+    this.challenge.newChallenge();
+    this.challenge.open();
+};
+
+/**
+ * Updates the text that shows the number of points that player can get, after
+ * completing the challenge.
+ */
+MenuItem.prototype.updateScoreText = function() {
+    this.message.text = '' + this.challenge.englishChallenge.score;
+};
+
+module.exports = MenuItem;
+
+
+},{"../../items/ItemGroupView":19}],17:[function(require,module,exports){
 var Item = require('./Item');
 
 var PRCE_INCREASE_RATE = 10;
 var GRAVITY = 300;
 
-var HealthPack = function(level,
-                          x,
-                          y,
-                          maxIncreasing) {
-    Item.call(this, level, x, y, 'healthPack' + maxIncreasing,
+var HealthPack = function(x, y, maxIncreasing) {
+    Item.call(this, x, y, 'healthPack' + maxIncreasing,
         maxIncreasing * PRCE_INCREASE_RATE);
     this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
@@ -1096,17 +1134,17 @@ HealthPack.prototype.use = function() {
     if (!this.alive) {
         this.revive();
     }
-    this.x = this.level.player.x;
+    this.x = level.player.x;
     this.y = 50;
-    this.level.addHealthPack(this);
+    level.addHealthPack(this);
 };
 
 module.exports = HealthPack;
 
-},{"./Item":16}],16:[function(require,module,exports){
+},{"./Item":18}],18:[function(require,module,exports){
 var BOUNCE = 0.7 + Math.random() * 0.2;
 
-var Item = function(level, x, y, key, price) {
+var Item = function(x, y, key, price) {
     Phaser.Sprite.call(this, level.game, x, y, key);
     this.anchor.set(0.5, 0.5);
     level.game.physics.arcade.enable(this);
@@ -1121,30 +1159,27 @@ Item.prototype.constructor = Item;
 
 module.exports = Item;
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 
-var ItemGroupView = function(level,
-                             item,
-                             buttonText,
-                             parentView) {
+var ItemGroupView = function(iconKey, buttonText, parentView) {
     Phaser.Sprite.call(this, level.game, 0, 0, 'itemGroupBackGround');
-    this.icon = level.game.make.sprite(10, 10, item.key);
+    this.icon = level.game.make.sprite(10, 10, iconKey);
     this.message = level.game.make.text(0, 0, '');
     this.message.font = 'Arial';
     this.message.fontSize = 30;
     this.message.fill = '#0040FF';
-    this.messageBackground = new GridLayoutPanel(level, 'letterShade');
+    this.messageBackground = new GridLayoutPanel('letterShade');
     this.messageBackground.addElement(this.message);
 
     this.messageBackground.x = 10;
     this.messageBackground.y = this.icon.y + this.icon.height + 10;
 
-    this.button = new Button(level, buttonText, this.buttonAction, this);
+    this.button = new Button(buttonText, this.buttonAction, this);
     this.button.x = this.messageBackground.x + this.messageBackground.width +
         10;
     this.button.y = this.icon.y + this.icon.height + 10;
@@ -1153,8 +1188,6 @@ var ItemGroupView = function(level,
     this.addChild(this.messageBackground);
     this.addChild(this.button);
     this.parent = parentView;
-    this.item = item;
-    this.level = level;
 };
 
 ItemGroupView.prototype = Object.create(Phaser.Sprite.prototype);
@@ -1166,7 +1199,7 @@ ItemGroupView.prototype.buttonAction = function() {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":32,"../util/GridLayoutPanel":35}],18:[function(require,module,exports){
+},{"../util/Button":34,"../util/GridLayoutPanel":37}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1175,10 +1208,9 @@ var InventoryItem = require ('./InventoryItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
-var Inventory = function(level) {
-    GridLayoutPopUp.call(this, level, 'inventory_background');
-
-    this.level = level;
+var Inventory = function() {
+    var dimensions = {numberOfColumns: 5, numberOfRows: 2};
+    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
 
     this.healthPacks = [];
     this.items = [];
@@ -1208,14 +1240,12 @@ Inventory.prototype.addItem = function(item) {
 };
 
 Inventory.prototype.createItemGroups = function() {
-    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
-    this.items.healthPack5 = new InventoryItem(this.level, healthPackItem,
-        this);
+    var healthPackItem = new HealthPack(0, 0, 5);
+    this.items.healthPack5 = new InventoryItem(healthPackItem, this);
     this.addElement(this.items.healthPack5);
 
-    var revolverItem = new Revolver(this.level, 0, 0, false);
-    this.items.simpleWeapon = new InventoryItem(this.level, revolverItem,
-        this);
+    var revolverItem = new Revolver(0, 0, false);
+    this.items.simpleWeapon = new InventoryItem(revolverItem, this);
     this.addElement(this.items.simpleWeapon);
 };
 
@@ -1225,15 +1255,16 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../../util/GridLayoutPopUp":36,"../HealthPack":15,"../weapons/Revolver":24,"./InventoryItem":19}],19:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":38,"../HealthPack":17,"../weapons/Revolver":26,"./InventoryItem":21}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
 var ItemGroupView = require('../ItemGroupView');
 
-var InventoryItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'Use', parentView);
+var InventoryItem = function(item, parentView) {
+    ItemGroupView.call(this, item.key, 'Use', parentView);
 
+    this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
 };
@@ -1256,7 +1287,7 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../ItemGroupView":17}],20:[function(require,module,exports){
+},{"../ItemGroupView":19}],22:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1265,10 +1296,9 @@ var StoreItem = require ('./StoreItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 
-var Store = function(level) {
-    GridLayoutPopUp.call(this, level, 'inventory_background');
-
-    this.level = level;
+var Store = function() {
+    var dimensions = {numberOfColumns: 5, numberOfRows: 2};
+    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
 
     this.healthPacks = [];
     this.items = [];
@@ -1298,14 +1328,12 @@ Store.prototype.addItem = function(item) {
 };
 
 Store.prototype.createItemGroups = function() {
-    var healthPackItem = new HealthPack(this.level, 0, 0, 5);
-    this.items.healthPack5 = new StoreItem(this.level, healthPackItem,
-        this);
+    var healthPackItem = new HealthPack(0, 0, 5);
+    this.items.healthPack5 = new StoreItem(healthPackItem, this);
     this.addElement(this.items.healthPack5);
 
-    var revolverItem = new Revolver(this.level, 0, 0, false);
-    this.items.simpleWeapon = new StoreItem(this.level, revolverItem,
-        this);
+    var revolverItem = new Revolver(0, 0, false);
+    this.items.simpleWeapon = new StoreItem(revolverItem, this);
     this.addElement(this.items.simpleWeapon);
 };
 
@@ -1315,14 +1343,15 @@ Store.prototype.showHealthPacks = function() {
 
 module.exports = Store;
 
-},{"../../util/GridLayoutPopUp":36,"../HealthPack":15,"../weapons/Revolver":24,"./StoreItem":21}],21:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":38,"../HealthPack":17,"../weapons/Revolver":26,"./StoreItem":23}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
 var ItemGroupView = require('../ItemGroupView');
 
-var StoreItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'Buy', parentView);
+var StoreItem = function(item, parentView) {
+    ItemGroupView.call(this, item.key, 'Buy', parentView);
+    this.item = item;
     this.updatePriceText();
 };
 
@@ -1334,24 +1363,24 @@ StoreItem.prototype.updatePriceText = function() {
 };
 
 StoreItem.prototype.buttonAction = function() {
-    var succesfulPurchase = this.level.player.buyItem(this.item);
-    if (succesfulPurchase) {
+    var successfulPurchase = level.player.buyItem(this.item);
+    if (successfulPurchase) {
         this.item.use();
-        this.level.updateScoreText();
-        this.level.showSuccessMessage('Successful Purchase!', this.parent);
+        level.updateScoreText();
+        level.showSuccessMessage('Successful Purchase!', this.parent);
     }else {
-        this.level.showErrorMessage('Not enough money.', this.parent);
+        level.showErrorMessage('Not enough money.', this.parent);
     }
 };
 
 module.exports = StoreItem;
 
-},{"../ItemGroupView":17}],22:[function(require,module,exports){
+},{"../ItemGroupView":19}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
 var Bullet;
-Bullet = function(level, power, imageKey) {
+Bullet = function(power, imageKey) {
     Phaser.Sprite.call(this, level.game, 0, 0, imageKey);
     this.power = power;
 
@@ -1367,7 +1396,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1382,9 +1411,9 @@ var MACHINE_GUN_FIRE_RATE = 100;
 var MACHINE_GUN_BULLET_POWER = 10;
 var PRICE = 100;
 
-var MachineGun = function(level, x, y, inifinite) {
-    Weapon.call(this,
-        level,
+var MachineGun = function(x, y, inifinite) {
+    Weapon.call(
+        this,
         x,
         y,
         MACHINE_GUN_NUMBER_OF_BULLETS,
@@ -1404,7 +1433,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":25}],24:[function(require,module,exports){
+},{"./Weapon":27}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1419,9 +1448,9 @@ var REVOLVER_FIRE_RATE = 250;
 var REVOLVER_BULLET_POWER = 1;
 var PRICE = 20;
 
-var Revolver = function(level, x, y, inifinite) {
-    Weapon.call(this,
-        level,
+var Revolver = function(x, y, inifinite) {
+    Weapon.call(
+        this,
         x,
         y,
         REVOLVER_NUMBER_OF_BULLETS,
@@ -1441,15 +1470,14 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":25}],25:[function(require,module,exports){
+},{"./Weapon":27}],27:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
 var RIGHT_KEY = 0;
 var LEFT_KEY = 1;
 
-var Weapon = function(level,
-                      x,
+var Weapon = function(x,
                       y,
                       numberOfBullets,
                       weaponKey,
@@ -1460,7 +1488,7 @@ var Weapon = function(level,
                       power,
                       infinite,
                       price) {
-    Item.call(this, level, x, y, weaponKey, price);
+    Item.call(this, x, y, weaponKey, price);
 
     this.anchor.set(0.5, 0);
 
@@ -1469,13 +1497,12 @@ var Weapon = function(level,
     this.bullets = level.game.add.group();
 
     for (var i = 0; i < this.numberOfBullets; i++) {
-        this.bullets.add(new Bullet(level, power, bulletKey));
+        this.bullets.add(new Bullet(power, bulletKey));
     }
 
     this.nextFire = nextFire;
     this.bulletSpeed = bulletSpeed;
     this.fireRate = fireRate;
-    this.level = level;
     this.infinite = infinite;
 };
 
@@ -1484,19 +1511,19 @@ Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
     var finalToY = toY || this.y;
-    if (this.level.game.time.time > this.nextFire &&
+    if (level.game.time.time > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
         if (this.currentBullet) {
             this.currentBullet.reset(this.x, this.y);
             this.currentBullet.rotation =
-                this.level.game.physics.arcade.angleToXY(this.currentBullet,
+                level.game.physics.arcade.angleToXY(this.currentBullet,
                 toX, finalToY);
             this.currentBullet.body.velocity.x =
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =
                 Math.sin(this.currentBullet.rotation) * this.bulletSpeed;
-            this.nextFire = this.level.game.time.time + this.fireRate;
+            this.nextFire = level.game.time.time + this.fireRate;
             this.numberOfBullets--;
         }
     }
@@ -1511,8 +1538,8 @@ Weapon.prototype.use = function() {
     if (!this.alive) {
         this.revive();
     }
-    this.level.player.useWeapon(this);
-    this.level.updateAmmoText();
+    level.player.useWeapon(this);
+    level.updateAmmoText();
 };
 
 Weapon.prototype.addBullets = function(amount) {
@@ -1534,7 +1561,7 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":16,"./Bullet":22}],26:[function(require,module,exports){
+},{"../Item":18,"./Bullet":24}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -1556,7 +1583,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1583,7 +1610,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1683,6 +1710,9 @@ Preloader.prototype = {
         this.game.load.image('wordField', 'assets/images/wordField.png');
         this.game.load.image('letterShade', 'assets/images/letterShade.png');
         this.game.load.image('transparent', 'assets/images/transparent.png');
+        this.game.load.image('healthBarBackground',
+            'assets/images/healthBarBackground.png');
+        this.game.load.image('healthBar', 'assets/images/healthBar.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -1692,6 +1722,7 @@ Preloader.prototype = {
         if (!!this.ready) {
             //this.game.state.start('menu');
             this.game.state.start('levelOne');
+            level = this.game.state.states.levelOne;
         }
     },
 
@@ -1702,7 +1733,7 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1718,10 +1749,9 @@ var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
 var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
-
-var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
-//var ImageWordMatch = require('../../englishChallenges/ContextGroups');
-//var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
+var EnglishChallengesMenu =
+    require('../../englishChallenges/menu/EnglishChallengesMenu');
+var HealthBar = require('../../character/HealthBar');
 
 var Level = function(game) {
     this.game = game;
@@ -1750,9 +1780,11 @@ Level.prototype.create = function() {
     this.createWeaponsGroup();
     this.addPlatforms();
     this.addTexts();
+    this.addHealthBar();
     this.addControls();
     this.addCamera();
     this.createInventory();
+    this.createEnglishChallengesMenu();
     this.createStore();
 };
 
@@ -1791,7 +1823,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            var comic = new PopUp(this, npc.comicKey);
+            var comic = new PopUp(npc.comicKey);
             this.game.add.existing(comic);
             comic.open();
             if (this.player.x < npc.x) {
@@ -1861,6 +1893,14 @@ Level.prototype.update = function() {
     }
 };
 
+Level.prototype.addHealthBar = function() {
+    var x = this.healthLevelText.x + this.healthLevelText.width;
+    var y = this.healthLevelText.y;
+    this.healthBar = new HealthBar(x, y);
+    this.addObject(this.healthBar);
+    this.healthBar.fixedToCamera = true;
+};
+
 Level.prototype.createEnemiesGroup = function() {
     this.enemies = this.game.add.group();
     this.gameObjects.push(this.enemies);
@@ -1877,19 +1917,19 @@ Level.prototype.createCarsGroup = function() {
 };
 
 Level.prototype.addSimpleEnemy = function(x) {
-    this.enemies.add(new SimpleEnemy(this, x, this.GROUND_HEIGHT - 100));
+    this.enemies.add(new SimpleEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addStrongEnemy = function(x) {
-    this.enemies.add(new StrongEnemy(this, x, this.GROUND_HEIGHT - 100));
+    this.enemies.add(new StrongEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addNPC = function(x, key, comicKey) {
-    this.npcs.add(new NPC(this, x, this.GROUND_HEIGHT - 100, key, comicKey));
+    this.npcs.add(new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey));
 };
 
 Level.prototype.addCar = function(x, key) {
-    this.cars.add(new InteractiveCar(this, x, this.GROUND_HEIGHT, key));
+    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, key));
 };
 
 Level.prototype.addPlatforms = function() {
@@ -1917,7 +1957,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.useWeapon(new Revolver(this, 700, 100, false));
+    this.player.useWeapon(new Revolver(700, 100, false));
 };
 
 Level.prototype.addTexts = function() {
@@ -1937,8 +1977,8 @@ Level.prototype.addTexts = function() {
     this.ammoText.fixedToCamera = true;
 
     //The health level
-    this.healthLevelText = this.game.add.text(16, 16, 'Health: ' +
-        this.player.healthLevel, {fontSize: '32px', fill: '#000'});
+    this.healthLevelText = this.game.add.text(16, 16, 'Health: ',
+        {fontSize: '32px', fill: '#000'});
     this.healthLevelText.fixedToCamera = true;
 };
 
@@ -1956,7 +1996,7 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack(this, 500, 10, 5, this));
+    this.addHealthPack(new HealthPack(500, 10, 5, this));
 };
 
 Level.prototype.createWeaponsGroup = function() {
@@ -1976,6 +2016,18 @@ Level.prototype.createInventory = function() {
     this.inventoryButton.input.priorityID = 1;
 };
 
+Level.prototype.createEnglishChallengesMenu = function() {
+    this.englishChallengeMenu = new EnglishChallengesMenu();
+    this.game.add.existing(this.englishChallengeMenu);
+
+    this.addCashButton = this.game.add.button(170,
+        this.game.camera.height - 30, 'addCashButton',
+        this.englishChallengeMenu.open, this.englishChallengeMenu);
+    this.addCashButton.anchor.setTo(0.5, 0.5);
+    this.addCashButton.fixedToCamera = true;
+    this.addCashButton.input.priorityID = 1;
+};
+
 Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
@@ -1986,21 +2038,11 @@ Level.prototype.createStore = function() {
     this.storeButton.anchor.setTo(0.5, 0.5);
     this.storeButton.fixedToCamera = true;
     this.storeButton.input.priorityID = 1;
-
-    this.englishChallenge = new ImageWordMatch(this);
-    this.game.add.existing(this.englishChallenge);
-
-    this.addCashButton = this.game.add.button(170,
-        this.game.camera.height - 30, 'addCashButton',
-        this.englishChallenge.open, this.englishChallenge);
-    this.addCashButton.anchor.setTo(0.5, 0.5);
-    this.addCashButton.fixedToCamera = true;
-    this.addCashButton.input.priorityID = 1;
 };
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevelText();
+    character.updateHealhtLevel();
     bullet.kill();
 };
 
@@ -2034,16 +2076,18 @@ Level.prototype.updateScoreText = function() {
     this.scoreText.text = 'Score: ' + this.player.score;
 };
 
-Level.prototype.updateHealthLevelText = function() {
+Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
         this.game.state.start('menu');
     }
     this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
+    this.healthBar.updateHealthBarLevel(this.player.healthLevel /
+        this.player.maxHealthLevel);
 };
 
 Level.prototype.increaseHealthLevel = function(increase) {
     this.player.increaseHealthLevel(increase);
-    this.updateHealthLevelText();
+    this.updateHealthLevel();
 };
 
 Level.prototype.increaseScore = function(increase) {
@@ -2051,20 +2095,16 @@ Level.prototype.increaseScore = function(increase) {
     this.updateScoreText();
 };
 
-Level.prototype.render = function() {
-    this.game.debug.cameraInfo(this.game.camera, 32, 32);
-};
-
 Level.prototype.addHealthPack = function(healthPack) {
     this.healthPacks.add(healthPack);
 };
 
 Level.prototype.addRevolver = function(x, y, infiniteAmmo) {
-    this.weapons.add(new Revolver(this, x, y, infiniteAmmo));
+    this.weapons.add(new Revolver(x, y, infiniteAmmo));
 };
 
 Level.prototype.addMachineGun = function(x, y, infiniteAmmo) {
-    this.weapons.add(new MachineGun(this, x, y, infiniteAmmo));
+    this.weapons.add(new MachineGun(x, y, infiniteAmmo));
 };
 
 Level.prototype.pause = function() {
@@ -2076,20 +2116,20 @@ Level.prototype.resume = function() {
 };
 
 Level.prototype.showErrorMessage = function(errorMessage, parent) {
-    var errorDialog = new Dialog(this, 'errorIcon', errorMessage, parent);
+    var errorDialog = new Dialog('errorIcon', errorMessage, parent);
     this.game.add.existing(errorDialog);
     errorDialog.open();
 };
 
 Level.prototype.showSuccessMessage = function(successMessage, parent) {
-    var successDialog = new Dialog(this, 'successIcon', successMessage, parent);
+    var successDialog = new Dialog('successIcon', successMessage, parent);
     this.game.add.existing(successDialog);
     successDialog.open();
 };
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/WordUnscramble":12,"../../items/HealthPack":15,"../../items/inventory/Inventory":18,"../../items/store/Store":20,"../../items/weapons/MachineGun":23,"../../items/weapons/Revolver":24,"../../util/Dialog":33,"../../util/PopUp":39,"../../worldElements/InteractiveCar":43}],30:[function(require,module,exports){
+},{"../../character/HealthBar":4,"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../englishChallenges/menu/EnglishChallengesMenu":15,"../../items/HealthPack":17,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../worldElements/InteractiveCar":46}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -2120,7 +2160,6 @@ LevelOne.prototype.create = function() {
 
 LevelOne.prototype.addObjects = function() {
     var gunsStore = new InteractiveHouse(
-        this,
         CHECK_POINT_X_ONE + 1.5 * CHECK_POINTS_DISTANCE,
         this.GROUND_HEIGHT,
         'house'
@@ -2129,7 +2168,6 @@ LevelOne.prototype.addObjects = function() {
     this.addObject(gunsStore);
 
     var friendsHouse = new InteractiveHouse(
-        this,
         CHECK_POINT_X_ONE + 5 * CHECK_POINTS_DISTANCE,
         this.GROUND_HEIGHT,
         'house'
@@ -2159,7 +2197,7 @@ LevelOne.prototype.addEnemies = function() {
 
 module.exports = LevelOne;
 
-},{"../../worldElements/InteractiveHouse":44,"../levels/Level":29}],31:[function(require,module,exports){
+},{"../../worldElements/InteractiveHouse":47,"../levels/Level":31}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2196,12 +2234,12 @@ LevelOneIntro.prototype.continue = function() {
 
 module.exports = LevelOneIntro;
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
 
-var Button = function(level, text, action, parent, optionals) {
+var Button = function(text, action, parent, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;
@@ -2232,14 +2270,14 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
-var Dialog = function(level, iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, level, 'dialog', parent);
+var Dialog = function(iconKey, text, parent) {
+    HorizontalLayoutPopUp.call(this, 'dialog', parent);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
     this.message = level.game.make.text(0, 0, '');
@@ -2261,20 +2299,34 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":38}],34:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":41}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
+
+/**
+ * The margin between the cells if the grid.
+ * @constant
+ * @type {number}
+ */
 var MARGIN = 10;
 
-var GridLayout = function(numberOfColumns, numberOfRows, parent) {
+/**
+ * Represents a grid with a fixed number of rows and columns. All the cells have
+ * the same height and width.
+ * @param numberOfColumns {number} Number of columns for the grid.
+ * @param numberOfRows {number} Number of rows for the grid.
+ * @param container {Sprite} Container in which elements are added
+ * @constructor
+ */
+var GridLayout = function(numberOfColumns, numberOfRows, container) {
     this.currentRow = 0;
     this.currentColumn = 0;
     this.numberOfColumns = numberOfColumns;
     this.numberOfRows = numberOfRows;
-    this.rowWidth = (parent.width - MARGIN * this.numberOfColumns) /
+    this.rowWidth = (container.width - MARGIN * this.numberOfColumns) /
         this.numberOfColumns;
-    this.rowHeight = (parent.height - MARGIN * this.numberOfRows) /
+    this.rowHeight = (container.height - MARGIN * this.numberOfRows) /
         this.numberOfRows;
     if (numberOfColumns === 1 && numberOfRows === 1) {
         this.xOrigin = 0;
@@ -2283,15 +2335,22 @@ var GridLayout = function(numberOfColumns, numberOfRows, parent) {
         this.xOrigin = MARGIN;
         this.yOrigin = MARGIN;
     }
-    this.parent = parent;
+    this.container = container;
 };
 
 GridLayout.prototype.constructor = GridLayout;
 
+/**
+ * Adds an element to the container on the next possible cell of the grid.
+ * @param element {Sprite} Element to be added to the container
+ */
 GridLayout.prototype.addElement = function(element) {
     if (this.currentColumn >= this.numberOfColumns) {
         this.currentColumn = 0;
         this.currentRow++;
+        if (this.currentRow === this.numberOfRows) {
+            return;
+        }
     }
     var xCentered = (this.rowWidth / 2) - (element.width / 2);
     element.x = this.xOrigin + (this.rowWidth + MARGIN) *
@@ -2300,13 +2359,21 @@ GridLayout.prototype.addElement = function(element) {
     element.y = (this.rowHeight + MARGIN) *
         this.currentRow + yCentered;
 
-    this.parent.addChild(element);
+    this.container.addChild(element);
     this.currentColumn ++;
+};
+
+/**
+ * Restarts the indexes, currentRow and currentColumn
+ */
+GridLayout.prototype.restartsIndexes = function() {
+    this.currentColumn = 0;
+    this.currentRow = 0;
 };
 
 module.exports = GridLayout;
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2315,12 +2382,11 @@ var GridLayout = require('./GridLayout');
 var NUMBER_OF_COLUMNS = 1;
 var NUMBER_OF_ROWS = 1;
 
-var GridLayoutPanel = function(level, backgroundKey, optionals) {
+var GridLayoutPanel = function(backgroundKey, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.level = level;
     this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
     this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
 
@@ -2334,27 +2400,52 @@ GridLayoutPanel.prototype.addElement = function(element) {
     this.grid.addElement(element);
 };
 
+/**
+ * Remove all the elements that contains the panel
+ */
+GridLayoutPanel.prototype.removeAllElements = function() {
+    this.removeChildren();
+    this.grid.restartsIndexes();
+};
+
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":34}],36:[function(require,module,exports){
+},{"./GridLayout":36}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
 var PopUp = require('./PopUp');
 var GridLayout = require('./GridLayout');
 
-var NUMBER_OF_COLUMNS = 1;
-var NUMBER_OF_ROWS = 1;
+/**
+ * Minimum number of columns for this container
+ * @constant
+ * @type {number}
+ */
+var MIN_NUMBER_OF_COLUMNS = 1;
+/**
+ * Minimum number of rows for this container
+ * @constant
+ * @type {number}
+ */
+var MIN_NUMBER_OF_ROWS = 1;
 
-var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {
-    PopUp.call(this, level, backgroundKey, parent);
-    this.level = level;
+/**
+ * Represents a PopUpLayout that contains a grid layout to arrange its elements.
+ * @param level
+ * @param backgroundKey {string} Texture's key of the background
+ * @param dimensions {Array} Array containing the number of rows and columns
+ * @param parent {Sprite} View or Sprite that opened this PopUp
+ * @constructor
+ */
+var GridLayoutPopUp = function(backgroundKey, dimensions, parent) {
+    PopUp.call(this, backgroundKey, parent);
     this.currentRow = 0;
     this.currentColumn = 0;
 
     var dims = dimensions || {};
-    this.numberOfColumns = dims.numberOfColumns || NUMBER_OF_COLUMNS;
-    this.numberOfRows = dims.numberOfRows || NUMBER_OF_ROWS;
+    this.numberOfColumns = dims.numberOfColumns || MIN_NUMBER_OF_COLUMNS;
+    this.numberOfRows = dims.numberOfRows || MIN_NUMBER_OF_ROWS;
 
     this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
 
@@ -2363,13 +2454,25 @@ var GridLayoutPopUp = function(level, backgroundKey, dimensions, parent) {
 GridLayoutPopUp.prototype = Object.create(PopUp.prototype);
 GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
 
+/**
+ * Add an element to the container in the next possible cell of the grid.
+ * @param element
+ */
 GridLayoutPopUp.prototype.addElement = function(element) {
     this.grid.addElement(element);
 };
 
+/**
+ * Remove all the elements that contains the PopUp
+ */
+GridLayoutPopUp.prototype.removeAllElements = function() {
+    this.removeChildren(1);
+    this.grid.restartsIndexes();
+};
+
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":34,"./PopUp":39}],37:[function(require,module,exports){
+},{"./GridLayout":36,"./PopUp":42}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2392,7 +2495,41 @@ HorizontalLayout.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayout;
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 15/10/2015.
+ */
+
+var HorizontalLayout = require('./HorizontalLayout');
+/**
+ * Represents a panel that has a HorizontalLayout to arrange its elements.
+ * @param backgroundKey {string} Texture's key for panel's background
+ * @param optionals {Array} array containing optional parameters x and/or y
+ * coordinates for the panel, it can be undefined (optional)
+ * @constructor
+ */
+var HorizontalLayoutPanel = function(backgroundKey, optionals) {
+    var ops = optionals || [];
+    var x = ops.x || 0;
+    var y = ops.y || 0;
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.layout = new HorizontalLayout(this);
+};
+
+HorizontalLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
+HorizontalLayoutPanel.prototype.constructor = HorizontalLayoutPanel;
+
+/**
+ * Adds an element to the Panel horizontally.
+ * @param element
+ */
+HorizontalLayoutPanel.prototype.addElement = function(element) {
+    this.layout.addElement(element);
+};
+
+module.exports = HorizontalLayoutPanel;
+
+},{"./HorizontalLayout":39}],41:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2402,8 +2539,8 @@ module.exports = HorizontalLayout;
 var PopUp = require('./PopUp');
 var Horizontalayout = require('./HorizontalLayout');
 
-var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
-    PopUp.call(this, level, backgroundKey, parent);
+var HorizontalLayoutPopUP = function(backgroundKey, parent) {
+    PopUp.call(this, backgroundKey, parent);
     this.layout = new Horizontalayout(this);
 };
 
@@ -2417,12 +2554,12 @@ HorizontalLayoutPopUP.prototype.addElement = function(element) {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":37,"./PopUp":39}],39:[function(require,module,exports){
+},{"./HorizontalLayout":39,"./PopUp":42}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
-var PopUp = function(level, backgroundKey, parent) {
+var PopUp = function(backgroundKey, parent) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
     this.xCenter = this.width / 2;
@@ -2448,8 +2585,6 @@ var PopUp = function(level, backgroundKey, parent) {
         this.withoutParent = false;
         this.parent = parent;
     }
-
-    this.level = level;
 };
 
 PopUp.prototype = Object.create(Phaser.Sprite.prototype);
@@ -2458,7 +2593,7 @@ PopUp.prototype.constructor = PopUp;
 PopUp.prototype.close = function() {
     this.visible = false;
     if (this.withoutParent) {
-        this.level.resume();
+        level.resume();
     }
     this.kill();
 };
@@ -2467,14 +2602,14 @@ PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
     }
-    this.level.pause();
+    level.pause();
     this.bringToTop();
     this.visible = true;
 };
 
 module.exports = PopUp;
 
-},{}],40:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -2482,12 +2617,9 @@ module.exports = PopUp;
 /**
  * Tha class Utilities contains different functions or utilities that are useful
  * within other classes.
- * @param {Level} level object to acces game level elements.
  * @constructor
  */
-var Utilities = function(level) {
-    this.level = level;
-};
+var Utilities = function() {};
 
 /**
  * Returns a list with random indexes for an array of length = size
@@ -2503,7 +2635,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
         indexes.push(i);
     }
     for (i = 0; i < size; i++) {
-        randomIndex = this.level.game.rnd.integerInRange(0, indexes.length - 1);
+        randomIndex = level.game.rnd.integerInRange(0, indexes.length - 1);
         randomIndexes.push(indexes[randomIndex]);
         indexes.splice(randomIndex, 1);
     }
@@ -2512,7 +2644,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],41:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -2550,7 +2682,7 @@ VerticalLayout.prototype.addElement = function(element) {
 
 module.exports = VerticalLayout;
 
-},{}],42:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -2559,18 +2691,16 @@ var VerticalLayout = require('./VerticalLayout');
 
 /**
  * Represents a panel that has a VerticalLayout to arrange its elements.
- * @param {Level} level Object to access game level elements
  * @param {string} backgroundKey Texture's key for panel's background
  * @param {Array} optionals array containing optional parameters x and/or y
  * coordinates for the panel, it can be undefined (optional)
  * @constructor
  */
-var VerticalLayoutPanel = function(level, backgroundKey, optionals) {
+var VerticalLayoutPanel = function(backgroundKey, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.level = level;
     this.layout = new VerticalLayout(this);
 };
 
@@ -2588,7 +2718,7 @@ VerticalLayoutPanel.prototype.addElement = function(element) {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":41}],43:[function(require,module,exports){
+},{"./VerticalLayout":44}],46:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2598,7 +2728,7 @@ var DEFAULT_CAR_SPEED = 400;
 var DEFAULT_CAR_MAX_SPEED = 500;
 var CAR_GRAVITY = 30000;
 
-var InteractiveCar = function(level, x, y, backgroundKey) {
+var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
     this.anchor.set(0, 0);
@@ -2617,8 +2747,6 @@ var InteractiveCar = function(level, x, y, backgroundKey) {
     this.anchor.set(0.5, 1);
     this.animations.add('left', [0], 10, true);
     this.animations.add('right', [1], 10, true);
-
-    this.level = level;
     this.occupied = false;
 };
 
@@ -2626,15 +2754,15 @@ InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 InteractiveCar.prototype.getOn = function() {
-    this.level.player.relocate(this.x, this.y - 100);
-    this.level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
-    this.level.player.changeGravity(CAR_GRAVITY);
+    level.player.relocate(this.x, this.y - 100);
+    level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
+    level.player.changeGravity(CAR_GRAVITY);
     this.occupied = true;
 };
 
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
-        this.body.velocity.x = this.level.player.body.velocity.x;
+        this.body.velocity.x = level.player.body.velocity.x;
         if (this.body.velocity.x < 0) {
             this.animations.play('left');
         }else {
@@ -2649,12 +2777,13 @@ InteractiveCar.prototype.isStopped = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":39}],44:[function(require,module,exports){
+},{"../util/PopUp":42}],47:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
 var Store = require('../items/store/Store');
-var InteractiveHouse = function(level, x, y, backgroundKey) {
+
+var InteractiveHouse = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
     this.anchor.set(0, 0);
@@ -2667,18 +2796,17 @@ var InteractiveHouse = function(level, x, y, backgroundKey) {
     this.openDoorButton.events.onInputDown.add(this.openActivity, this);
 
     this.addChild(this.openDoorButton);
-    this.level = level;
 };
 
 InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new Store(this.level);
-    this.level.game.add.existing(popUp);
+    var popUp = new Store(level);
+    level.game.add.existing(popUp);
     popUp.open();
 };
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":20}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]);
+},{"../items/store/Store":22}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]);

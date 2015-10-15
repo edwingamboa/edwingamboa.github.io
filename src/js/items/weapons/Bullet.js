@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 10/07/2015.
  */
 var Bullet;
-Bullet = function(level, power, imageKey) {
+Bullet = function(power, imageKey) {
     Phaser.Sprite.call(this, level.game, 0, 0, imageKey);
     this.power = power;
 

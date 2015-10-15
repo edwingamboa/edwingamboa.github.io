@@ -5,12 +5,9 @@
 /**
  * Tha class Utilities contains different functions or utilities that are useful
  * within other classes.
- * @param {Level} level object to acces game level elements.
  * @constructor
  */
-var Utilities = function(level) {
-    this.level = level;
-};
+var Utilities = function() {};
 
 /**
  * Returns a list with random indexes for an array of length = size
@@ -26,7 +23,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
         indexes.push(i);
     }
     for (i = 0; i < size; i++) {
-        randomIndex = this.level.game.rnd.integerInRange(0, indexes.length - 1);
+        randomIndex = level.game.rnd.integerInRange(0, indexes.length - 1);
         randomIndexes.push(indexes[randomIndex]);
         indexes.splice(randomIndex, 1);
     }

@@ -7,8 +7,8 @@
 var PopUp = require('./PopUp');
 var Horizontalayout = require('./HorizontalLayout');
 
-var HorizontalLayoutPopUP = function(level, backgroundKey, parent) {
-    PopUp.call(this, level, backgroundKey, parent);
+var HorizontalLayoutPopUP = function(backgroundKey, parent) {
+    PopUp.call(this, backgroundKey, parent);
     this.layout = new Horizontalayout(this);
 };
 

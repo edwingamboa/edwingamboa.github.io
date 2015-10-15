@@ -3,8 +3,7 @@
  */
 var Character = require('./Character');
 
-var Enemy = function(level,
-                     spriteKey,
+var Enemy = function(spriteKey,
                      maxHealthLevel,
                      x,
                      y,
@@ -16,7 +15,7 @@ var Enemy = function(level,
         healthLevel : maxHealthLevel,
         maxHealthLevel : maxHealthLevel
     };
-    Character.call(this, level, x, y, spriteKey, options);
+    Character.call(this, x, y, spriteKey, options);
     this.animations.add('left', [0, 1], 10, true);
     this.animations.add('right', [2, 3], 10, true);
     this.stopLeftFrameIndex = 0;
@@ -44,7 +43,7 @@ Enemy.prototype.update = function() {
     this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
-Enemy.prototype.updateHealhtLevelText = function() {
+Enemy.prototype.updateHealhtLevel = function() {
     if (this.healthLevel > 0) {
         this.healthLevelText.text = '' + this.healthLevel;
     }
@@ -53,13 +52,13 @@ Enemy.prototype.updateHealhtLevelText = function() {
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
     this.healthLevelText.text = '';
-    this.level.player.increaseScore(this.maxHealthLevel * 0.1);
+    level.player.increaseScore(this.maxHealthLevel * 0.1);
     Character.prototype.killCharacter.call(this);
 };
 
 Enemy.prototype.rotateWeapon = function(x, y) {
     this.currentWeapon.rotation =
-        this.level.game.physics.arcade.angleToXY(this, x, y);
+        level.game.physics.arcade.angleToXY(this, x, y);
 };
 
 module.exports = Enemy;

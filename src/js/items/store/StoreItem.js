@@ -3,8 +3,9 @@
  */
 var ItemGroupView = require('../ItemGroupView');
 
-var StoreItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'Buy', parentView);
+var StoreItem = function(item, parentView) {
+    ItemGroupView.call(this, item.key, 'Buy', parentView);
+    this.item = item;
     this.updatePriceText();
 };
 
@@ -16,13 +17,13 @@ StoreItem.prototype.updatePriceText = function() {
 };
 
 StoreItem.prototype.buttonAction = function() {
-    var succesfulPurchase = this.level.player.buyItem(this.item);
-    if (succesfulPurchase) {
+    var successfulPurchase = level.player.buyItem(this.item);
+    if (successfulPurchase) {
         this.item.use();
-        this.level.updateScoreText();
-        this.level.showSuccessMessage('Successful Purchase!', this.parent);
+        level.updateScoreText();
+        level.showSuccessMessage('Successful Purchase!', this.parent);
     }else {
-        this.level.showErrorMessage('Not enough money.', this.parent);
+        level.showErrorMessage('Not enough money.', this.parent);
     }
 };
 

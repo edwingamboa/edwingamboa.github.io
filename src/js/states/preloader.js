@@ -97,6 +97,9 @@ Preloader.prototype = {
         this.game.load.image('wordField', 'assets/images/wordField.png');
         this.game.load.image('letterShade', 'assets/images/letterShade.png');
         this.game.load.image('transparent', 'assets/images/transparent.png');
+        this.game.load.image('healthBarBackground',
+            'assets/images/healthBarBackground.png');
+        this.game.load.image('healthBar', 'assets/images/healthBar.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -106,6 +109,7 @@ Preloader.prototype = {
         if (!!this.ready) {
             //this.game.state.start('menu');
             this.game.state.start('levelOne');
+            level = this.game.state.states.levelOne;
         }
     },
 

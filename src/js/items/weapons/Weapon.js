@@ -4,8 +4,7 @@ var Bullet = require('./Bullet');
 var RIGHT_KEY = 0;
 var LEFT_KEY = 1;
 
-var Weapon = function(level,
-                      x,
+var Weapon = function(x,
                       y,
                       numberOfBullets,
                       weaponKey,
@@ -16,7 +15,7 @@ var Weapon = function(level,
                       power,
                       infinite,
                       price) {
-    Item.call(this, level, x, y, weaponKey, price);
+    Item.call(this, x, y, weaponKey, price);
 
     this.anchor.set(0.5, 0);
 
@@ -25,13 +24,12 @@ var Weapon = function(level,
     this.bullets = level.game.add.group();
 
     for (var i = 0; i < this.numberOfBullets; i++) {
-        this.bullets.add(new Bullet(level, power, bulletKey));
+        this.bullets.add(new Bullet(power, bulletKey));
     }
 
     this.nextFire = nextFire;
     this.bulletSpeed = bulletSpeed;
     this.fireRate = fireRate;
-    this.level = level;
     this.infinite = infinite;
 };
 
@@ -40,19 +38,19 @@ Weapon.prototype.constructor = Weapon;
 
 Weapon.prototype.fire = function(toX, toY) {
     var finalToY = toY || this.y;
-    if (this.level.game.time.time > this.nextFire &&
+    if (level.game.time.time > this.nextFire &&
         (this.infinite || this.numberOfBullets > 0)) {
         this.currentBullet = this.bullets.getFirstExists(false);
         if (this.currentBullet) {
             this.currentBullet.reset(this.x, this.y);
             this.currentBullet.rotation =
-                this.level.game.physics.arcade.angleToXY(this.currentBullet,
+                level.game.physics.arcade.angleToXY(this.currentBullet,
                 toX, finalToY);
             this.currentBullet.body.velocity.x =
                 Math.cos(this.currentBullet.rotation) * this.bulletSpeed;
             this.currentBullet.body.velocity.y =
                 Math.sin(this.currentBullet.rotation) * this.bulletSpeed;
-            this.nextFire = this.level.game.time.time + this.fireRate;
+            this.nextFire = level.game.time.time + this.fireRate;
             this.numberOfBullets--;
         }
     }
@@ -67,8 +65,8 @@ Weapon.prototype.use = function() {
     if (!this.alive) {
         this.revive();
     }
-    this.level.player.useWeapon(this);
-    this.level.updateAmmoText();
+    level.player.useWeapon(this);
+    level.updateAmmoText();
 };
 
 Weapon.prototype.addBullets = function(amount) {

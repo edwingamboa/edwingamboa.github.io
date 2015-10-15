@@ -85,7 +85,7 @@ DragAndDropController.prototype.returnElementToSource = function(element) {
  * Add every element to the source but in a random order.
  */
 DragAndDropController.prototype.addElementsToSourceRandomly = function() {
-    var utils = new Utilities(this.container.level);
+    var utils = new Utilities();
     var rdmIndexes = utils.randomIndexesArray(this.container.elements.length);
     var index;
     for (index in rdmIndexes) {

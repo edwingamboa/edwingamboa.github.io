@@ -13,10 +13,9 @@ var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
 var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
-
-var ImageWordMatch = require('../../englishChallenges/WordUnscramble');
-//var ImageWordMatch = require('../../englishChallenges/ContextGroups');
-//var ImageWordMatch = require('../../englishChallenges/ImageWordMatch');
+var EnglishChallengesMenu =
+    require('../../englishChallenges/menu/EnglishChallengesMenu');
+var HealthBar = require('../../character/HealthBar');
 
 var Level = function(game) {
     this.game = game;
@@ -45,9 +44,11 @@ Level.prototype.create = function() {
     this.createWeaponsGroup();
     this.addPlatforms();
     this.addTexts();
+    this.addHealthBar();
     this.addControls();
     this.addCamera();
     this.createInventory();
+    this.createEnglishChallengesMenu();
     this.createStore();
 };
 
@@ -86,7 +87,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            var comic = new PopUp(this, npc.comicKey);
+            var comic = new PopUp(npc.comicKey);
             this.game.add.existing(comic);
             comic.open();
             if (this.player.x < npc.x) {
@@ -156,6 +157,14 @@ Level.prototype.update = function() {
     }
 };
 
+Level.prototype.addHealthBar = function() {
+    var x = this.healthLevelText.x + this.healthLevelText.width;
+    var y = this.healthLevelText.y;
+    this.healthBar = new HealthBar(x, y);
+    this.addObject(this.healthBar);
+    this.healthBar.fixedToCamera = true;
+};
+
 Level.prototype.createEnemiesGroup = function() {
     this.enemies = this.game.add.group();
     this.gameObjects.push(this.enemies);
@@ -172,19 +181,19 @@ Level.prototype.createCarsGroup = function() {
 };
 
 Level.prototype.addSimpleEnemy = function(x) {
-    this.enemies.add(new SimpleEnemy(this, x, this.GROUND_HEIGHT - 100));
+    this.enemies.add(new SimpleEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addStrongEnemy = function(x) {
-    this.enemies.add(new StrongEnemy(this, x, this.GROUND_HEIGHT - 100));
+    this.enemies.add(new StrongEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
 Level.prototype.addNPC = function(x, key, comicKey) {
-    this.npcs.add(new NPC(this, x, this.GROUND_HEIGHT - 100, key, comicKey));
+    this.npcs.add(new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey));
 };
 
 Level.prototype.addCar = function(x, key) {
-    this.cars.add(new InteractiveCar(this, x, this.GROUND_HEIGHT, key));
+    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, key));
 };
 
 Level.prototype.addPlatforms = function() {
@@ -212,7 +221,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.game.add.existing(this.player);
     this.gameObjects.push(this.player);
-    this.player.useWeapon(new Revolver(this, 700, 100, false));
+    this.player.useWeapon(new Revolver(700, 100, false));
 };
 
 Level.prototype.addTexts = function() {
@@ -232,8 +241,8 @@ Level.prototype.addTexts = function() {
     this.ammoText.fixedToCamera = true;
 
     //The health level
-    this.healthLevelText = this.game.add.text(16, 16, 'Health: ' +
-        this.player.healthLevel, {fontSize: '32px', fill: '#000'});
+    this.healthLevelText = this.game.add.text(16, 16, 'Health: ',
+        {fontSize: '32px', fill: '#000'});
     this.healthLevelText.fixedToCamera = true;
 };
 
@@ -251,7 +260,7 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack(this, 500, 10, 5, this));
+    this.addHealthPack(new HealthPack(500, 10, 5, this));
 };
 
 Level.prototype.createWeaponsGroup = function() {
@@ -271,6 +280,18 @@ Level.prototype.createInventory = function() {
     this.inventoryButton.input.priorityID = 1;
 };
 
+Level.prototype.createEnglishChallengesMenu = function() {
+    this.englishChallengeMenu = new EnglishChallengesMenu();
+    this.game.add.existing(this.englishChallengeMenu);
+
+    this.addCashButton = this.game.add.button(170,
+        this.game.camera.height - 30, 'addCashButton',
+        this.englishChallengeMenu.open, this.englishChallengeMenu);
+    this.addCashButton.anchor.setTo(0.5, 0.5);
+    this.addCashButton.fixedToCamera = true;
+    this.addCashButton.input.priorityID = 1;
+};
+
 Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
@@ -281,21 +302,11 @@ Level.prototype.createStore = function() {
     this.storeButton.anchor.setTo(0.5, 0.5);
     this.storeButton.fixedToCamera = true;
     this.storeButton.input.priorityID = 1;
-
-    this.englishChallenge = new ImageWordMatch(this);
-    this.game.add.existing(this.englishChallenge);
-
-    this.addCashButton = this.game.add.button(170,
-        this.game.camera.height - 30, 'addCashButton',
-        this.englishChallenge.open, this.englishChallenge);
-    this.addCashButton.anchor.setTo(0.5, 0.5);
-    this.addCashButton.fixedToCamera = true;
-    this.addCashButton.input.priorityID = 1;
 };
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevelText();
+    character.updateHealhtLevel();
     bullet.kill();
 };
 
@@ -329,16 +340,18 @@ Level.prototype.updateScoreText = function() {
     this.scoreText.text = 'Score: ' + this.player.score;
 };
 
-Level.prototype.updateHealthLevelText = function() {
+Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
         this.game.state.start('menu');
     }
     this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
+    this.healthBar.updateHealthBarLevel(this.player.healthLevel /
+        this.player.maxHealthLevel);
 };
 
 Level.prototype.increaseHealthLevel = function(increase) {
     this.player.increaseHealthLevel(increase);
-    this.updateHealthLevelText();
+    this.updateHealthLevel();
 };
 
 Level.prototype.increaseScore = function(increase) {
@@ -346,20 +359,16 @@ Level.prototype.increaseScore = function(increase) {
     this.updateScoreText();
 };
 
-Level.prototype.render = function() {
-    this.game.debug.cameraInfo(this.game.camera, 32, 32);
-};
-
 Level.prototype.addHealthPack = function(healthPack) {
     this.healthPacks.add(healthPack);
 };
 
 Level.prototype.addRevolver = function(x, y, infiniteAmmo) {
-    this.weapons.add(new Revolver(this, x, y, infiniteAmmo));
+    this.weapons.add(new Revolver(x, y, infiniteAmmo));
 };
 
 Level.prototype.addMachineGun = function(x, y, infiniteAmmo) {
-    this.weapons.add(new MachineGun(this, x, y, infiniteAmmo));
+    this.weapons.add(new MachineGun(x, y, infiniteAmmo));
 };
 
 Level.prototype.pause = function() {
@@ -371,13 +380,13 @@ Level.prototype.resume = function() {
 };
 
 Level.prototype.showErrorMessage = function(errorMessage, parent) {
-    var errorDialog = new Dialog(this, 'errorIcon', errorMessage, parent);
+    var errorDialog = new Dialog('errorIcon', errorMessage, parent);
     this.game.add.existing(errorDialog);
     errorDialog.open();
 };
 
 Level.prototype.showSuccessMessage = function(successMessage, parent) {
-    var successDialog = new Dialog(this, 'successIcon', successMessage, parent);
+    var successDialog = new Dialog('successIcon', successMessage, parent);
     this.game.add.existing(successDialog);
     successDialog.open();
 };

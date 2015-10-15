@@ -12,9 +12,9 @@ var REVOLVER_FIRE_RATE = 250;
 var REVOLVER_BULLET_POWER = 1;
 var PRICE = 20;
 
-var Revolver = function(level, x, y, inifinite) {
-    Weapon.call(this,
-        level,
+var Revolver = function(x, y, inifinite) {
+    Weapon.call(
+        this,
         x,
         y,
         REVOLVER_NUMBER_OF_BULLETS,

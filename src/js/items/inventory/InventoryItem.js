@@ -3,9 +3,10 @@
  */
 var ItemGroupView = require('../ItemGroupView');
 
-var InventoryItem = function(level, item, parentView) {
-    ItemGroupView.call(this, level, item, 'Use', parentView);
+var InventoryItem = function(item, parentView) {
+    ItemGroupView.call(this, item.key, 'Use', parentView);
 
+    this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
 };

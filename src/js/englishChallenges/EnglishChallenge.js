@@ -5,15 +5,13 @@
 /**
  * Represents an EnglishChallenge within the game. An EnglishChallenge is used,
  * by the player to increase his/her score in a faster way.
- * @param level {Level} level Object to access game level elements
  * @param iconKey {string} Texture's key for the icon of the challenge
  * @param name {string} Name of the challenge
  * @param score {number} Score to be increased in case of success.
  * @constructor
  */
-var EnglishChallenge = function(level, iconKey, name, score) {
-    this.level = level;
-    this.icon = this.level.game.make.sprite(10, 10, iconKey);
+var EnglishChallenge = function(iconKey, name, score) {
+    this.iconKey = iconKey;
     this.name = name;
     this.score = score;
 };
@@ -24,8 +22,8 @@ var EnglishChallenge = function(level, iconKey, name, score) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.success = function(parent) {
-    this.level.increaseScore(this.score);
-    this.level.showSuccessMessage('Well done! You got ' + this.score +
+    level.increaseScore(this.score);
+    level.showSuccessMessage('Well done! You got ' + this.score +
         ' points.', parent);
 };
 
@@ -35,7 +33,7 @@ EnglishChallenge.prototype.success = function(parent) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.failure = function(parent) {
-    this.level.showErrorMessage('Sorry! Try Again.', parent);
+    level.showErrorMessage('Sorry! Try Again.', parent);
 };
 
 /**
@@ -44,7 +42,7 @@ EnglishChallenge.prototype.failure = function(parent) {
  * @param parent Parent Ui to show dalog
  */
 EnglishChallenge.prototype.incomplete = function(parent) {
-    this.level.showErrorMessage('The challenge is not complete.', parent);
+    level.showErrorMessage('The challenge is not complete.', parent);
 };
 
 module.exports = EnglishChallenge;

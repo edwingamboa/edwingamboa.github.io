@@ -28,7 +28,6 @@ LevelOne.prototype.create = function() {
 
 LevelOne.prototype.addObjects = function() {
     var gunsStore = new InteractiveHouse(
-        this,
         CHECK_POINT_X_ONE + 1.5 * CHECK_POINTS_DISTANCE,
         this.GROUND_HEIGHT,
         'house'
@@ -37,7 +36,6 @@ LevelOne.prototype.addObjects = function() {
     this.addObject(gunsStore);
 
     var friendsHouse = new InteractiveHouse(
-        this,
         CHECK_POINT_X_ONE + 5 * CHECK_POINTS_DISTANCE,
         this.GROUND_HEIGHT,
         'house'

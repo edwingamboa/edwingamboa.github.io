@@ -11,10 +11,9 @@ var MIN_RANGE_ATTACK = 600;
 var MAX_RANGE_DETECTION = 1000;
 var MAX_RANGE_ATTACK = 600;
 
-var StrongEnemy = function(level, x, y) {
+var StrongEnemy = function(x, y) {
     Enemy.call(
         this,
-        level,
         SPRITE_KEY,
         MAX_HEALTH_LEVEL,
         x,
