@@ -8,8 +8,6 @@ var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
 var GRAVITY = 300;
-var RIGHT_DIRECTION = 1;
-var LEFT_DIRECTION = -1;
 
 /**
  * Handles game characters general behaviour.
@@ -38,7 +36,7 @@ var Character = function(x, y, spriteKey, optionsArgs) {
 
     this.weapons = [];
     this.weaponsKeys = [];
-    this.direction = RIGHT_DIRECTION;
+    this.onVehicle = false;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -48,9 +46,12 @@ Character.prototype.constructor = Character;
  * Moves the character in the left direction using normal speed.
  */
 Character.prototype.moveLeft = function() {
-    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.speed;
-    this.animations.play('left');
+    if (!this.onVehicle) {
+        this.animations.play('left');
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToLeft();
     }
@@ -60,9 +61,12 @@ Character.prototype.moveLeft = function() {
  * Moves the character in the right direction using normal speed.
  */
 Character.prototype.moveRight = function() {
-    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.speed;
-    this.animations.play('right');
+    if (!this.onVehicle) {
+        this.animations.play('right');
+    }else {
+        this.frame = this.stopRightFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToRight();
     }
@@ -72,9 +76,12 @@ Character.prototype.moveRight = function() {
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
-    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.maxSpeed;
-    this.animations.play('left');
+    if (!this.onVehicle) {
+        this.animations.play('left');
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToLeft();
     }
@@ -84,9 +91,12 @@ Character.prototype.runLeft = function() {
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
-    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.maxSpeed;
-    this.animations.play('right');
+    if (!this.onVehicle) {
+        this.animations.play('right');
+    }else {
+        this.frame = this.stopRightFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToRight();
     }
@@ -98,7 +108,7 @@ Character.prototype.runRight = function() {
 Character.prototype.stop = function() {
     this.body.velocity.x = 0;
     this.animations.stop();
-    if (this.direction > 0) {
+    if (level.xDirection > 0) {
         this.frame = this.stopRightFrameIndex;
     }else {
         this.frame = this.stopLeftFrameIndex;
@@ -221,7 +231,7 @@ Character.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
         this.updateCurrentWeapon(weapon.key);
-        if (this.direction === RIGHT_DIRECTION) {
+        if (level.xDirection > 0) {
             this.currentWeapon.pointToRight();
         }else {
             this.currentWeapon.pointToLeft();
@@ -230,6 +240,10 @@ Character.prototype.useWeapon = function(weapon) {
         //weapon.kill();
         this.weapons[weapon.key].addBullets(weapon.numberOfBullets);
     }
+};
+
+Character.prototype.jump = function() {
+    this.body.velocity.y = -350;
 };
 
 module.exports = Character;

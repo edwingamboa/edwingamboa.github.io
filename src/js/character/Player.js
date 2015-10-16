@@ -19,14 +19,11 @@ var Player = function() {
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
     this.score = MINIMUM_SCORE;
+    this.frame = this.stopRightFrameIndex;
 };
 
 Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.jump = function() {
-    this.body.velocity.y = -350;
-};
 
 Player.prototype.crouch = function() {
     this.animations.stop();
@@ -43,19 +40,18 @@ Player.prototype.decreaseScore = function(decrease) {
     level.updateScoreText();
 };
 
-Player.prototype.updateHealhtLevel = function() {
+Player.prototype.updateHealthLevel = function() {
     level.updateHealthLevel();
 };
 
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
-        this.currentWeapon.updateCoordinates(this.x + (this.direction * 25),
+        this.currentWeapon.updateCoordinates(this.x + (level.xDirection * 25),
             this.y + 20);
     }
 };
 
 Player.prototype.killCharacter = function() {
-
     Character.prototype.killCharacter.call(this);
 };
 

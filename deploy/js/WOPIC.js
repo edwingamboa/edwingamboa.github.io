@@ -21,7 +21,7 @@ game.state.add('levelOne', LevelOne);
 game.state.add('levelOneIntro', LevelOneIntro);
 game.state.start('boot');
 
-},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/LevelOne":32,"./states/levels/LevelOneIntro":33}],2:[function(require,module,exports){
+},{"./states/Boot":27,"./states/Menu":28,"./states/Preloader":29,"./states/levels/LevelOne":31,"./states/levels/LevelOneIntro":32}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -32,8 +32,6 @@ var INITIAL_HEALTH_LEVEL = 100;
 var MAX_HEALTH_LEVEL = 100;
 var BOUNCE = 0.2;
 var GRAVITY = 300;
-var RIGHT_DIRECTION = 1;
-var LEFT_DIRECTION = -1;
 
 /**
  * Handles game characters general behaviour.
@@ -62,7 +60,7 @@ var Character = function(x, y, spriteKey, optionsArgs) {
 
     this.weapons = [];
     this.weaponsKeys = [];
-    this.direction = RIGHT_DIRECTION;
+    this.onVehicle = false;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -72,9 +70,12 @@ Character.prototype.constructor = Character;
  * Moves the character in the left direction using normal speed.
  */
 Character.prototype.moveLeft = function() {
-    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.speed;
-    this.animations.play('left');
+    if (!this.onVehicle) {
+        this.animations.play('left');
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToLeft();
     }
@@ -84,9 +85,12 @@ Character.prototype.moveLeft = function() {
  * Moves the character in the right direction using normal speed.
  */
 Character.prototype.moveRight = function() {
-    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.speed;
-    this.animations.play('right');
+    if (!this.onVehicle) {
+        this.animations.play('right');
+    }else {
+        this.frame = this.stopRightFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToRight();
     }
@@ -96,9 +100,12 @@ Character.prototype.moveRight = function() {
  * Moves the character in the left direction using running speed.
  */
 Character.prototype.runLeft = function() {
-    this.direction = LEFT_DIRECTION;
     this.body.velocity.x = -this.maxSpeed;
-    this.animations.play('left');
+    if (!this.onVehicle) {
+        this.animations.play('left');
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToLeft();
     }
@@ -108,9 +115,12 @@ Character.prototype.runLeft = function() {
  * Moves the character in the right direction using running speed.
  */
 Character.prototype.runRight = function() {
-    this.direction = RIGHT_DIRECTION;
     this.body.velocity.x = this.maxSpeed;
-    this.animations.play('right');
+    if (!this.onVehicle) {
+        this.animations.play('right');
+    }else {
+        this.frame = this.stopRightFrameIndex;
+    }
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.pointToRight();
     }
@@ -122,7 +132,7 @@ Character.prototype.runRight = function() {
 Character.prototype.stop = function() {
     this.body.velocity.x = 0;
     this.animations.stop();
-    if (this.direction > 0) {
+    if (level.xDirection > 0) {
         this.frame = this.stopRightFrameIndex;
     }else {
         this.frame = this.stopLeftFrameIndex;
@@ -245,7 +255,7 @@ Character.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
         this.updateCurrentWeapon(weapon.key);
-        if (this.direction === RIGHT_DIRECTION) {
+        if (level.xDirection > 0) {
             this.currentWeapon.pointToRight();
         }else {
             this.currentWeapon.pointToLeft();
@@ -256,6 +266,10 @@ Character.prototype.useWeapon = function(weapon) {
     }
 };
 
+Character.prototype.jump = function() {
+    this.body.velocity.y = -350;
+};
+
 module.exports = Character;
 
 },{}],3:[function(require,module,exports){
@@ -263,6 +277,10 @@ module.exports = Character;
  * Created by Edwin Gamboa on 08/07/2015.
  */
 var Character = require('./Character');
+var ResourceBar = require('./../util/ResourceBar');
+
+var RIGHT_DIRECTION = 1;
+var LEFT_DIRECTION = -1;
 
 var Enemy = function(spriteKey,
                      maxHealthLevel,
@@ -281,12 +299,14 @@ var Enemy = function(spriteKey,
     this.animations.add('right', [2, 3], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 2;
-    this.healthLevelText = level.game.add.text(this.body.x, this.body.y - 20,
-        '' + this.healthLevel, {fontSize: '12px', fill: '#000'});
     this.rangeDetection = level.game.rnd.integerInRange(minRangeDetection,
         maxRangeDetection);
     this.rangeAttack = level.game.rnd.integerInRange(minRangeAttack,
         maxRangeAttack);
+    this.heatlthBar = new ResourceBar(-this.width / 2, -this.height / 2 - 10,
+        {width: 40, height: 5});
+    this.addChild(this.heatlthBar);
+    this.direction = RIGHT_DIRECTION;
 };
 
 Enemy.prototype = Object.create(Character.prototype);
@@ -294,25 +314,24 @@ Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.update = function() {
     if (this.body.velocity.x > 0) {
+        this.direction = RIGHT_DIRECTION;
         this.animations.play('right');
-
+        this.currentWeapon.pointToRight();
     }else if (this.body.velocity.x < 0) {
+        this.direction = LEFT_DIRECTION;
         this.animations.play('left');
+        this.currentWeapon.pointToLeft();
     }
-    this.healthLevelText.x = this.body.x;
-    this.healthLevelText.y = this.body.y - 20;
     this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
-Enemy.prototype.updateHealhtLevel = function() {
-    if (this.healthLevel > 0) {
-        this.healthLevelText.text = '' + this.healthLevel;
-    }
+Enemy.prototype.updateHealthLevel = function() {
+    this.heatlthBar.updateResourceBarLevel(this.healthLevel /
+        this.maxHealthLevel);
 };
 
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
-    this.healthLevelText.text = '';
     level.player.increaseScore(this.maxHealthLevel * 0.1);
     Character.prototype.killCharacter.call(this);
 };
@@ -322,33 +341,19 @@ Enemy.prototype.rotateWeapon = function(x, y) {
         level.game.physics.arcade.angleToXY(this, x, y);
 };
 
+Enemy.prototype.stop = function() {
+    this.body.velocity.x = 0;
+    this.animations.stop();
+    if (this.direction === RIGHT_DIRECTION) {
+        this.frame = this.stopRightFrameIndex;
+    }else {
+        this.frame = this.stopLeftFrameIndex;
+    }
+};
+
 module.exports = Enemy;
 
-},{"./Character":2}],4:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 15/10/2015.
- */
-
-var HealthBar = function(x, y, size) {
-    Phaser.Sprite.call(this, level.game, x, y, 'healthBarBackground');
-    this.bar = level.game.make.sprite(0, 0, 'healthBar');
-    var sizeOps = size || [];
-    var width = sizeOps.width || 1;
-    var height = sizeOps.height || 1;
-
-    this.addChild(this.bar);
-};
-
-HealthBar.prototype = Object.create(Phaser.Sprite.prototype);
-HealthBar.prototype.constructor = HealthBar;
-
-HealthBar.prototype.updateHealthBarLevel = function(barLevel) {
-    this.bar.scale.x = barLevel;
-};
-
-module.exports = HealthBar;
-
-},{}],5:[function(require,module,exports){
+},{"./../util/ResourceBar":42,"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -366,7 +371,7 @@ NPC.prototype.constructor = NPC;
 
 module.exports = NPC;
 
-},{"./Character":2}],6:[function(require,module,exports){
+},{"./Character":2}],5:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -388,14 +393,11 @@ var Player = function() {
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
     this.score = MINIMUM_SCORE;
+    this.frame = this.stopRightFrameIndex;
 };
 
 Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.jump = function() {
-    this.body.velocity.y = -350;
-};
 
 Player.prototype.crouch = function() {
     this.animations.stop();
@@ -412,19 +414,18 @@ Player.prototype.decreaseScore = function(decrease) {
     level.updateScoreText();
 };
 
-Player.prototype.updateHealhtLevel = function() {
+Player.prototype.updateHealthLevel = function() {
     level.updateHealthLevel();
 };
 
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
-        this.currentWeapon.updateCoordinates(this.x + (this.direction * 25),
+        this.currentWeapon.updateCoordinates(this.x + (level.xDirection * 25),
             this.y + 20);
     }
 };
 
 Player.prototype.killCharacter = function() {
-
     Character.prototype.killCharacter.call(this);
 };
 
@@ -457,7 +458,7 @@ Player.prototype.buyItem = function(item) {
 
 module.exports = Player;
 
-},{"./Character":2}],7:[function(require,module,exports){
+},{"./Character":2}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -468,7 +469,7 @@ var SPRITE_KEY = 'simple_enemy';
 var MAX_HEALTH_LEVEL = 5;
 var MIN_RANGE_DETECTION = 200;
 var MAX_RANGE_DETECTION = 700;
-var MIN_RANGE_ATTACK = 50;
+var MIN_RANGE_ATTACK = 100;
 var MAX_RANGE_ATTACK = 300;
 
 var SimpleEnemy = function(x, y) {
@@ -490,7 +491,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":26,"./Enemy":3}],8:[function(require,module,exports){
+},{"../items/weapons/Revolver":25,"./Enemy":3}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -525,7 +526,7 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":25,"./Enemy":3}],9:[function(require,module,exports){
+},{"../items/weapons/MachineGun":24,"./Enemy":3}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -630,7 +631,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":13}],10:[function(require,module,exports){
+},{"../util/Button":33,"../util/GridLayoutPanel":36,"./dragAndDrop/DragAndDropChallenge":12}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -680,7 +681,7 @@ EnglishChallenge.prototype.incomplete = function(parent) {
 
 module.exports = EnglishChallenge;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -771,7 +772,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":45,"./dragAndDrop/DragAndDropChallenge":13}],12:[function(require,module,exports){
+},{"../util/Button":33,"../util/GridLayoutPanel":36,"../util/VerticalLayoutPanel":45,"./dragAndDrop/DragAndDropChallenge":12}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -852,7 +853,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":13}],13:[function(require,module,exports){
+},{"../util/Button":33,"../util/GridLayoutPanel":36,"./dragAndDrop/DragAndDropChallenge":12}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -922,7 +923,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":10,"../../util/GridLayoutPopUp":38,"./DragAndDropController":14}],14:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":9,"../../util/GridLayoutPopUp":37,"./DragAndDropController":13}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1024,7 +1025,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":43}],15:[function(require,module,exports){
+},{"../../util/Utilities":43}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1065,7 +1066,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPopUp":38,"../ContextGroups":9,"../ImageWordMatch":11,"../WordUnscramble":12,"./MenuItem":16}],16:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":37,"../ContextGroups":8,"../ImageWordMatch":10,"../WordUnscramble":11,"./MenuItem":15}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1110,7 +1111,7 @@ MenuItem.prototype.updateScoreText = function() {
 module.exports = MenuItem;
 
 
-},{"../../items/ItemGroupView":19}],17:[function(require,module,exports){
+},{"../../items/ItemGroupView":18}],16:[function(require,module,exports){
 var Item = require('./Item');
 
 var PRCE_INCREASE_RATE = 10;
@@ -1141,7 +1142,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"./Item":18}],18:[function(require,module,exports){
+},{"./Item":17}],17:[function(require,module,exports){
 var BOUNCE = 0.7 + Math.random() * 0.2;
 
 var Item = function(x, y, key, price) {
@@ -1159,7 +1160,7 @@ Item.prototype.constructor = Item;
 
 module.exports = Item;
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1199,7 +1200,7 @@ ItemGroupView.prototype.buttonAction = function() {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37}],20:[function(require,module,exports){
+},{"../util/Button":33,"../util/GridLayoutPanel":36}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1255,7 +1256,7 @@ Inventory.prototype.showHealthPacks = function() {
 
 module.exports = Inventory;
 
-},{"../../util/GridLayoutPopUp":38,"../HealthPack":17,"../weapons/Revolver":26,"./InventoryItem":21}],21:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":37,"../HealthPack":16,"../weapons/Revolver":25,"./InventoryItem":20}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1287,7 +1288,7 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../ItemGroupView":19}],22:[function(require,module,exports){
+},{"../ItemGroupView":18}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1343,7 +1344,7 @@ Store.prototype.showHealthPacks = function() {
 
 module.exports = Store;
 
-},{"../../util/GridLayoutPopUp":38,"../HealthPack":17,"../weapons/Revolver":26,"./StoreItem":23}],23:[function(require,module,exports){
+},{"../../util/GridLayoutPopUp":37,"../HealthPack":16,"../weapons/Revolver":25,"./StoreItem":22}],22:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1375,7 +1376,7 @@ StoreItem.prototype.buttonAction = function() {
 
 module.exports = StoreItem;
 
-},{"../ItemGroupView":19}],24:[function(require,module,exports){
+},{"../ItemGroupView":18}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -1396,7 +1397,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1433,7 +1434,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":27}],26:[function(require,module,exports){
+},{"./Weapon":26}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1470,7 +1471,7 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":27}],27:[function(require,module,exports){
+},{"./Weapon":26}],26:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
@@ -1561,7 +1562,7 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":18,"./Bullet":24}],28:[function(require,module,exports){
+},{"../Item":17,"./Bullet":23}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -1583,7 +1584,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1610,7 +1611,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -1733,7 +1734,7 @@ Preloader.prototype = {
 
 module.exports = Preloader;
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1751,7 +1752,7 @@ var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
-var HealthBar = require('../../character/HealthBar');
+var ResourceBar = require('../../util/ResourceBar');
 
 var Level = function(game) {
     this.game = game;
@@ -1771,6 +1772,8 @@ Level.prototype.create = function() {
     this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
+    this.activePopUps = 0;
+    this.xDirection = 1;
 
     this.createHealthPacksGroup();
     this.createEnemiesGroup();
@@ -1789,7 +1792,8 @@ Level.prototype.create = function() {
 };
 
 Level.prototype.updateEnemies = function() {
-    for (var i = 0; i < this.enemies.children.length; i++) {
+    var i;
+    for (i = 0; i < this.enemies.children.length; i++) {
         var enemy = this.enemies.children[i];
         for (var enemyWeaponKey in enemy.weapons) {
             this.game.physics.arcade.overlap(
@@ -1801,17 +1805,15 @@ Level.prototype.updateEnemies = function() {
         }
         var distanceEnemyPlayer = this.game.physics.arcade.distanceBetween(
             this.player, enemy);
-        if (distanceEnemyPlayer <= enemy.rangeDetection &&
-            distanceEnemyPlayer > enemy.rangeAttack) {
+        if (distanceEnemyPlayer <= enemy.rangeAttack) {
+            enemy.stop();
+            enemy.fireToXY(this.player.x, this.player.y);
+        }else if (distanceEnemyPlayer <= enemy.rangeDetection) {
             this.game.physics.arcade.moveToXY(
                 enemy,
                 this.player.x + enemy.rangeAttack,
                 enemy.y);
             enemy.rotateWeapon(this.player.x, this.player.y);
-        }
-        if (distanceEnemyPlayer <= enemy.rangeAttack) {
-            enemy.stop();
-            enemy.fireToXY(this.player.x, this.player.y);
         }
     }
 };
@@ -1887,7 +1889,7 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.fireToXY(this.player.x + (100 * this.player.direction));
+        this.player.fireToXY(this.player.x + (100 * this.xDirection));
         //  Add and update the score
         this.updateAmmoText();
     }
@@ -1896,7 +1898,7 @@ Level.prototype.update = function() {
 Level.prototype.addHealthBar = function() {
     var x = this.healthLevelText.x + this.healthLevelText.width;
     var y = this.healthLevelText.y;
-    this.healthBar = new HealthBar(x, y);
+    this.healthBar = new ResourceBar(x, y);
     this.addObject(this.healthBar);
     this.healthBar.fixedToCamera = true;
 };
@@ -1941,10 +1943,12 @@ Level.prototype.addPlatforms = function() {
     this.ground.scale.setTo(40, 2);
     this.ground.body.immovable = true;
 
+    /*
     this.ledge = this.platforms.create(400, 300, 'ground');
     this.ledge.body.immovable = true;
     this.ledge = this.platforms.create(-150, 200, 'ground');
     this.ledge.body.immovable = true;
+    */
 };
 
 Level.prototype.addObject = function(object) {
@@ -2042,7 +2046,7 @@ Level.prototype.createStore = function() {
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevel();
+    character.updateHealthLevel();
     bullet.kill();
 };
 
@@ -2081,7 +2085,7 @@ Level.prototype.updateHealthLevel = function() {
         this.game.state.start('menu');
     }
     this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
-    this.healthBar.updateHealthBarLevel(this.player.healthLevel /
+    this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
 };
 
@@ -2129,15 +2133,12 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../character/HealthBar":4,"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../englishChallenges/menu/EnglishChallengesMenu":15,"../../items/HealthPack":17,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../worldElements/InteractiveCar":46}],32:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":19,"../../items/store/Store":21,"../../items/weapons/MachineGun":24,"../../items/weapons/Revolver":25,"../../util/Dialog":34,"../../util/PopUp":41,"../../util/ResourceBar":42,"../../worldElements/InteractiveCar":46}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
-
-var CHECK_POINT_X_ONE;
-var CHECK_POINTS_DISTANCE;
 
 var LevelOne = function(game) {
     Level.call(this, game);
@@ -2148,8 +2149,8 @@ LevelOne.prototype.constructor = LevelOne;
 
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
-    CHECK_POINT_X_ONE = this.game.camera.width * 1.7;
-    CHECK_POINTS_DISTANCE = this.game.camera.width + 200;
+    this.firstCheckPointX = this.game.camera.width * 1.3;
+    this.checkPointsDistance = this.game.camera.width + 140;
     this.addNPCs();
     this.addEnemies();
     this.addObjects();
@@ -2160,7 +2161,7 @@ LevelOne.prototype.create = function() {
 
 LevelOne.prototype.addObjects = function() {
     var gunsStore = new InteractiveHouse(
-        CHECK_POINT_X_ONE + 1.5 * CHECK_POINTS_DISTANCE,
+        this.firstCheckPointX + 1.5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,
         'house'
     );
@@ -2168,36 +2169,40 @@ LevelOne.prototype.addObjects = function() {
     this.addObject(gunsStore);
 
     var friendsHouse = new InteractiveHouse(
-        CHECK_POINT_X_ONE + 5 * CHECK_POINTS_DISTANCE,
+        this.firstCheckPointX + 5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,
         'house'
     );
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
 
-    this.addCar(CHECK_POINT_X_ONE + 3 * CHECK_POINTS_DISTANCE, 'jeep');
+    this.addCar(this.firstCheckPointX + 3 * this.checkPointsDistance, 'jeep');
+    //this.addCar(40, 'jeep');
 };
 
 LevelOne.prototype.addNPCs = function() {
     this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
-    this.addNPC(CHECK_POINT_X_ONE + CHECK_POINTS_DISTANCE, 'friend', 'comic2');
+    this.addNPC(this.firstCheckPointX + this.checkPointsDistance, 'friend',
+        'comic2');
 };
 
 LevelOne.prototype.addEnemies = function() {
-    var x = CHECK_POINT_X_ONE;
+    var x = this.firstCheckPointX;
     var y = 350;
-    for (var i = 0; i < 3; i++) {
-        for (var j = 0; j < 5; j++) {
+    var numberOfEnemies = 3;
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < numberOfEnemies; j++) {
             x += 30;
             this.addSimpleEnemy(x, y);
         }
-        x += 2 * CHECK_POINTS_DISTANCE;
+        numberOfEnemies ++;
+        x += 2 * this.checkPointsDistance;
     }
 };
 
 module.exports = LevelOne;
 
-},{"../../worldElements/InteractiveHouse":47,"../levels/Level":31}],33:[function(require,module,exports){
+},{"../../worldElements/InteractiveHouse":47,"../levels/Level":30}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2234,7 +2239,7 @@ LevelOneIntro.prototype.continue = function() {
 
 module.exports = LevelOneIntro;
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -2270,7 +2275,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -2299,7 +2304,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":41}],36:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":40}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2373,7 +2378,7 @@ GridLayout.prototype.restartsIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2410,7 +2415,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":36}],38:[function(require,module,exports){
+},{"./GridLayout":35}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2472,7 +2477,7 @@ GridLayoutPopUp.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":36,"./PopUp":42}],39:[function(require,module,exports){
+},{"./GridLayout":35,"./PopUp":41}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2495,7 +2500,7 @@ HorizontalLayout.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayout;
 
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -2529,7 +2534,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":39}],41:[function(require,module,exports){
+},{"./HorizontalLayout":38}],40:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -2554,7 +2559,7 @@ HorizontalLayoutPopUP.prototype.addElement = function(element) {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":39,"./PopUp":42}],42:[function(require,module,exports){
+},{"./HorizontalLayout":38,"./PopUp":41}],41:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -2592,7 +2597,8 @@ PopUp.prototype.constructor = PopUp;
 
 PopUp.prototype.close = function() {
     this.visible = false;
-    if (this.withoutParent) {
+    level.activePopUps --;
+    if (level.activePopUps === 0) {
         level.resume();
     }
     this.kill();
@@ -2601,13 +2607,52 @@ PopUp.prototype.close = function() {
 PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
+    }if (level.activePopUps === 0) {
+        level.pause();
     }
-    level.pause();
+    level.activePopUps ++;
     this.bringToTop();
     this.visible = true;
 };
 
 module.exports = PopUp;
+
+},{}],42:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 15/10/2015.
+ */
+
+/**
+ * Bar that shows the remaining part of a resource, for example a Health Bar
+ * @param x {number} X coordinate of the bar.
+ * @param y {number} Y coordinate of the bar.
+ * @param size {Array} Array containing width and height of the bar,
+ * it is optional
+ * @constructor
+ */
+var ResourceBar = function(x, y, size) {
+    Phaser.Sprite.call(this, level.game, x, y, 'healthBarBackground');
+    this.bar = level.game.make.sprite(0, 0, 'healthBar');
+    var sizeOps = size || [];
+    if (sizeOps.width !== undefined && sizeOps.height !== undefined) {
+        this.width =  sizeOps.width;
+        this.height =  sizeOps.height;
+    }
+    this.addChild(this.bar);
+};
+
+ResourceBar.prototype = Object.create(Phaser.Sprite.prototype);
+ResourceBar.prototype.constructor = ResourceBar;
+
+/**
+ * Updates the current level of the bar.
+ * @param barLevel
+ */
+ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
+    this.bar.scale.x = barLevel;
+};
+
+module.exports = ResourceBar;
 
 },{}],43:[function(require,module,exports){
 /**
@@ -2723,10 +2768,12 @@ module.exports = VerticalLayoutPanel;
  * Created by Edwin Gamboa on 29/08/2015.
  */
 var PopUp = require('../util/PopUp');
+var ResourceBar = require('../util/ResourceBar');
 
 var DEFAULT_CAR_SPEED = 400;
 var DEFAULT_CAR_MAX_SPEED = 500;
 var CAR_GRAVITY = 30000;
+var MAX_DISTANCE = 400;
 
 var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
@@ -2748,16 +2795,34 @@ var InteractiveCar = function(x, y, backgroundKey) {
     this.animations.add('left', [0], 10, true);
     this.animations.add('right', [1], 10, true);
     this.occupied = false;
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 1;
+    this.remainingGas = MAX_DISTANCE;
+    this.maxDistance = MAX_DISTANCE;
+
+    this.gasBar = new ResourceBar(-this.width / 2, -this.height - 10,
+        {width: 80, height: 8});
+    this.addChild(this.gasBar);
 };
 
 InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 InteractiveCar.prototype.getOn = function() {
+    level.player.onVehicle = true;
     level.player.relocate(this.x, this.y - 100);
     level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
     level.player.changeGravity(CAR_GRAVITY);
     this.occupied = true;
+};
+
+InteractiveCar.prototype.getOff = function() {
+    this.stop();
+    level.player.onVehicle = false;
+    level.player.relocate(this.x + 100, this.y - 100);
+    level.player.resetSpeed();
+    level.player.resetGravity();
+    this.occupied = false;
 };
 
 InteractiveCar.prototype.update = function() {
@@ -2765,9 +2830,20 @@ InteractiveCar.prototype.update = function() {
         this.body.velocity.x = level.player.body.velocity.x;
         if (this.body.velocity.x < 0) {
             this.animations.play('left');
-        }else {
+            this.remainingGas --;
+        }else if (this.body.velocity.x > 0) {
             this.animations.play('right');
+            this.remainingGas --;
+        }else if (level.direction > 0) {
+            this.frame = this.stopRightFrameIndex;
+        }else {
+            this.frame = this.stopLeftFrameIndex;
         }
+        if (this.remainingGas <= 0) {
+            this.getOff();
+        }
+        this.gasBar.updateResourceBarLevel(this.remainingGas /
+            this.maxDistance);
     }
 };
 
@@ -2775,9 +2851,13 @@ InteractiveCar.prototype.isStopped = function() {
     return this.body.velocity.x === 0;
 };
 
+InteractiveCar.prototype.stop = function() {
+    this.body.velocity.x = 0;
+};
+
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":42}],47:[function(require,module,exports){
+},{"../util/PopUp":41,"../util/ResourceBar":42}],47:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2809,4 +2889,4 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":22}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]);
+},{"../items/store/Store":21}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]);

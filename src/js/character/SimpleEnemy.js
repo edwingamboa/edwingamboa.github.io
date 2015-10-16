@@ -8,7 +8,7 @@ var SPRITE_KEY = 'simple_enemy';
 var MAX_HEALTH_LEVEL = 5;
 var MIN_RANGE_DETECTION = 200;
 var MAX_RANGE_DETECTION = 700;
-var MIN_RANGE_ATTACK = 50;
+var MIN_RANGE_ATTACK = 100;
 var MAX_RANGE_ATTACK = 300;
 
 var SimpleEnemy = function(x, y) {

@@ -35,7 +35,8 @@ PopUp.prototype.constructor = PopUp;
 
 PopUp.prototype.close = function() {
     this.visible = false;
-    if (this.withoutParent) {
+    level.activePopUps --;
+    if (level.activePopUps === 0) {
         level.resume();
     }
     this.kill();
@@ -44,8 +45,10 @@ PopUp.prototype.close = function() {
 PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
+    }if (level.activePopUps === 0) {
+        level.pause();
     }
-    level.pause();
+    level.activePopUps ++;
     this.bringToTop();
     this.visible = true;
 };

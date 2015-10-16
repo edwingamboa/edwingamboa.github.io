@@ -15,7 +15,7 @@ var InteractiveCar = require ('../../worldElements/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
-var HealthBar = require('../../character/HealthBar');
+var ResourceBar = require('../../util/ResourceBar');
 
 var Level = function(game) {
     this.game = game;
@@ -35,6 +35,8 @@ Level.prototype.create = function() {
     this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
+    this.activePopUps = 0;
+    this.xDirection = 1;
 
     this.createHealthPacksGroup();
     this.createEnemiesGroup();
@@ -53,7 +55,8 @@ Level.prototype.create = function() {
 };
 
 Level.prototype.updateEnemies = function() {
-    for (var i = 0; i < this.enemies.children.length; i++) {
+    var i;
+    for (i = 0; i < this.enemies.children.length; i++) {
         var enemy = this.enemies.children[i];
         for (var enemyWeaponKey in enemy.weapons) {
             this.game.physics.arcade.overlap(
@@ -65,17 +68,15 @@ Level.prototype.updateEnemies = function() {
         }
         var distanceEnemyPlayer = this.game.physics.arcade.distanceBetween(
             this.player, enemy);
-        if (distanceEnemyPlayer <= enemy.rangeDetection &&
-            distanceEnemyPlayer > enemy.rangeAttack) {
+        if (distanceEnemyPlayer <= enemy.rangeAttack) {
+            enemy.stop();
+            enemy.fireToXY(this.player.x, this.player.y);
+        }else if (distanceEnemyPlayer <= enemy.rangeDetection) {
             this.game.physics.arcade.moveToXY(
                 enemy,
                 this.player.x + enemy.rangeAttack,
                 enemy.y);
             enemy.rotateWeapon(this.player.x, this.player.y);
-        }
-        if (distanceEnemyPlayer <= enemy.rangeAttack) {
-            enemy.stop();
-            enemy.fireToXY(this.player.x, this.player.y);
         }
     }
 };
@@ -151,7 +152,7 @@ Level.prototype.update = function() {
         //this.player.crouch();
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        this.player.fireToXY(this.player.x + (100 * this.player.direction));
+        this.player.fireToXY(this.player.x + (100 * this.xDirection));
         //  Add and update the score
         this.updateAmmoText();
     }
@@ -160,7 +161,7 @@ Level.prototype.update = function() {
 Level.prototype.addHealthBar = function() {
     var x = this.healthLevelText.x + this.healthLevelText.width;
     var y = this.healthLevelText.y;
-    this.healthBar = new HealthBar(x, y);
+    this.healthBar = new ResourceBar(x, y);
     this.addObject(this.healthBar);
     this.healthBar.fixedToCamera = true;
 };
@@ -205,10 +206,12 @@ Level.prototype.addPlatforms = function() {
     this.ground.scale.setTo(40, 2);
     this.ground.body.immovable = true;
 
+    /*
     this.ledge = this.platforms.create(400, 300, 'ground');
     this.ledge.body.immovable = true;
     this.ledge = this.platforms.create(-150, 200, 'ground');
     this.ledge.body.immovable = true;
+    */
 };
 
 Level.prototype.addObject = function(object) {
@@ -306,7 +309,7 @@ Level.prototype.createStore = function() {
 
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
-    character.updateHealhtLevel();
+    character.updateHealthLevel();
     bullet.kill();
 };
 
@@ -345,7 +348,7 @@ Level.prototype.updateHealthLevel = function() {
         this.game.state.start('menu');
     }
     this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
-    this.healthBar.updateHealthBarLevel(this.player.healthLevel /
+    this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
 };
 
