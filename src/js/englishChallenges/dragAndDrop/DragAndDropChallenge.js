@@ -18,7 +18,8 @@ var DragAndDropController = require('./DragAndDropController');
  */
 var DragAndDropChallenge = function(iconKey, challengeName, score,
                                     dimensions) {
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', challengeName,
+        dimensions);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,

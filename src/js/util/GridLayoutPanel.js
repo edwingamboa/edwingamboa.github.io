@@ -14,7 +14,8 @@ var GridLayoutPanel = function(backgroundKey, optionals) {
     this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
     this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
 
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0, 0,
+        this);
 };
 
 GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);

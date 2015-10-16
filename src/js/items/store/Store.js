@@ -8,7 +8,7 @@ var Revolver = require('../weapons/Revolver');
 
 var Store = function() {
     var dimensions = {numberOfColumns: 5, numberOfRows: 2};
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', 'Store', dimensions);
 
     this.healthPacks = [];
     this.items = [];

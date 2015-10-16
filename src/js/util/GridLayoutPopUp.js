@@ -19,22 +19,22 @@ var MIN_NUMBER_OF_ROWS = 1;
 
 /**
  * Represents a PopUpLayout that contains a grid layout to arrange its elements.
- * @param level
  * @param backgroundKey {string} Texture's key of the background
+ * @param title {string} Name or title of the PopUp
  * @param dimensions {Array} Array containing the number of rows and columns
  * @param parent {Sprite} View or Sprite that opened this PopUp
  * @constructor
  */
-var GridLayoutPopUp = function(backgroundKey, dimensions, parent) {
-    PopUp.call(this, backgroundKey, parent);
+var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
+    PopUp.call(this, backgroundKey, parent, title);
     this.currentRow = 0;
     this.currentColumn = 0;
 
     var dims = dimensions || {};
     this.numberOfColumns = dims.numberOfColumns || MIN_NUMBER_OF_COLUMNS;
     this.numberOfRows = dims.numberOfRows || MIN_NUMBER_OF_ROWS;
-
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0,
+        this.title.height, this);
 
 };
 

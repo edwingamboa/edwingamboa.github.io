@@ -874,7 +874,8 @@ var DragAndDropController = require('./DragAndDropController');
  */
 var DragAndDropChallenge = function(iconKey, challengeName, score,
                                     dimensions) {
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', challengeName,
+        dimensions);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
@@ -1041,7 +1042,8 @@ var ImageWordMatch = require('../ImageWordMatch');
  */
 var EnglishChallengesMenu = function() {
     var dimensions = {numberOfRows: 2, numberOfColumns: 2};
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', 'English Challenges',
+        dimensions);
     this.createGames();
 };
 
@@ -1211,7 +1213,7 @@ var Revolver = require('../weapons/Revolver');
 
 var Inventory = function() {
     var dimensions = {numberOfColumns: 5, numberOfRows: 2};
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', 'Inventory', dimensions);
 
     this.healthPacks = [];
     this.items = [];
@@ -1299,7 +1301,7 @@ var Revolver = require('../weapons/Revolver');
 
 var Store = function() {
     var dimensions = {numberOfColumns: 5, numberOfRows: 2};
-    GridLayoutPopUp.call(this, 'inventory_background', dimensions);
+    GridLayoutPopUp.call(this, 'inventory_background', 'Store', dimensions);
 
     this.healthPacks = [];
     this.items = [];
@@ -2322,24 +2324,27 @@ var MARGIN = 10;
  * @param numberOfColumns {number} Number of columns for the grid.
  * @param numberOfRows {number} Number of rows for the grid.
  * @param container {Sprite} Container in which elements are added
+ * @param xOrigin {number} X coordinate where the grid starts
+ * @param yOrigin {number} Y coordinate where the grid starts
  * @constructor
  */
-var GridLayout = function(numberOfColumns, numberOfRows, container) {
+var GridLayout = function(numberOfColumns, numberOfRows, xOrigin, yOrigin,
+                          container) {
     this.currentRow = 0;
     this.currentColumn = 0;
     this.numberOfColumns = numberOfColumns;
     this.numberOfRows = numberOfRows;
-    this.rowWidth = (container.width - MARGIN * this.numberOfColumns) /
-        this.numberOfColumns;
-    this.rowHeight = (container.height - MARGIN * this.numberOfRows) /
-        this.numberOfRows;
     if (numberOfColumns === 1 && numberOfRows === 1) {
         this.xOrigin = 0;
         this.yOrigin = 0;
     } else {
-        this.xOrigin = MARGIN;
-        this.yOrigin = MARGIN;
+        this.xOrigin = MARGIN + xOrigin;
+        this.yOrigin = MARGIN + yOrigin;
     }
+    this.rowWidth = (container.width - xOrigin * this.numberOfColumns) /
+        this.numberOfColumns;
+    this.rowHeight = (container.height - yOrigin * this.numberOfRows) /
+        this.numberOfRows;
     this.container = container;
 };
 
@@ -2395,7 +2400,8 @@ var GridLayoutPanel = function(backgroundKey, optionals) {
     this.numberOfColumns = ops.numberOfColumns || NUMBER_OF_COLUMNS;
     this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
 
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0, 0,
+        this);
 };
 
 GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
@@ -2437,22 +2443,22 @@ var MIN_NUMBER_OF_ROWS = 1;
 
 /**
  * Represents a PopUpLayout that contains a grid layout to arrange its elements.
- * @param level
  * @param backgroundKey {string} Texture's key of the background
+ * @param title {string} Name or title of the PopUp
  * @param dimensions {Array} Array containing the number of rows and columns
  * @param parent {Sprite} View or Sprite that opened this PopUp
  * @constructor
  */
-var GridLayoutPopUp = function(backgroundKey, dimensions, parent) {
-    PopUp.call(this, backgroundKey, parent);
+var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
+    PopUp.call(this, backgroundKey, parent, title);
     this.currentRow = 0;
     this.currentColumn = 0;
 
     var dims = dimensions || {};
     this.numberOfColumns = dims.numberOfColumns || MIN_NUMBER_OF_COLUMNS;
     this.numberOfRows = dims.numberOfRows || MIN_NUMBER_OF_ROWS;
-
-    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, this);
+    this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0,
+        this.title.height, this);
 
 };
 
@@ -2564,7 +2570,7 @@ module.exports = HorizontalLayoutPopUP;
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
-var PopUp = function(backgroundKey, parent) {
+var PopUp = function(backgroundKey, parent, title) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
     this.xCenter = this.width / 2;
@@ -2579,6 +2585,14 @@ var PopUp = function(backgroundKey, parent) {
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);
 
+    if (title !== undefined) {
+        this.title = level.game.make.text(this.xCenter, 10, title);
+        this.title.font = 'Shojumaru';
+        this.title.fontSize = 30;
+        this.title.fill = '#FFFFFF';
+        this.title.anchor.set(0.5, 0);
+        this.addChild(this.title);
+    }
     this.addChild(this.closeButton);
 
     this.fixedToCamera = true;

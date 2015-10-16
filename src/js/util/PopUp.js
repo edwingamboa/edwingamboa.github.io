@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var MARGIN = 10;
-var PopUp = function(backgroundKey, parent) {
+var PopUp = function(backgroundKey, parent, title) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
     this.xCenter = this.width / 2;
@@ -17,6 +17,14 @@ var PopUp = function(backgroundKey, parent) {
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);
 
+    if (title !== undefined) {
+        this.title = level.game.make.text(this.xCenter, 10, title);
+        this.title.font = 'Shojumaru';
+        this.title.fontSize = 30;
+        this.title.fill = '#FFFFFF';
+        this.title.anchor.set(0.5, 0);
+        this.addChild(this.title);
+    }
     this.addChild(this.closeButton);
 
     this.fixedToCamera = true;

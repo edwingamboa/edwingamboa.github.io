@@ -15,24 +15,27 @@ var MARGIN = 10;
  * @param numberOfColumns {number} Number of columns for the grid.
  * @param numberOfRows {number} Number of rows for the grid.
  * @param container {Sprite} Container in which elements are added
+ * @param xOrigin {number} X coordinate where the grid starts
+ * @param yOrigin {number} Y coordinate where the grid starts
  * @constructor
  */
-var GridLayout = function(numberOfColumns, numberOfRows, container) {
+var GridLayout = function(numberOfColumns, numberOfRows, xOrigin, yOrigin,
+                          container) {
     this.currentRow = 0;
     this.currentColumn = 0;
     this.numberOfColumns = numberOfColumns;
     this.numberOfRows = numberOfRows;
-    this.rowWidth = (container.width - MARGIN * this.numberOfColumns) /
-        this.numberOfColumns;
-    this.rowHeight = (container.height - MARGIN * this.numberOfRows) /
-        this.numberOfRows;
     if (numberOfColumns === 1 && numberOfRows === 1) {
         this.xOrigin = 0;
         this.yOrigin = 0;
     } else {
-        this.xOrigin = MARGIN;
-        this.yOrigin = MARGIN;
+        this.xOrigin = MARGIN + xOrigin;
+        this.yOrigin = MARGIN + yOrigin;
     }
+    this.rowWidth = (container.width - xOrigin * this.numberOfColumns) /
+        this.numberOfColumns;
+    this.rowHeight = (container.height - yOrigin * this.numberOfRows) /
+        this.numberOfRows;
     this.container = container;
 };
 
