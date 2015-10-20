@@ -4,16 +4,18 @@
 var ItemGroupView = require('../ItemGroupView');
 
 var StoreItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key, 'Buy', parentView);
+    ItemGroupView.call(this, item.key + 'Icon', 'Buy', parentView);
     this.item = item;
     this.updatePriceText();
+    this.setTitle(this.item.name);
+    this.setDescription(this.item.description);
 };
 
 StoreItem.prototype = Object.create(ItemGroupView.prototype);
 StoreItem.prototype.constructor = StoreItem;
 
 StoreItem.prototype.updatePriceText = function() {
-    this.message.text = this.item.price;
+    this.setAuxText('$ ' + this.item.price);
 };
 
 StoreItem.prototype.buttonAction = function() {

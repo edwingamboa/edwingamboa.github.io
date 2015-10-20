@@ -6,17 +6,13 @@ var VerticalLayout = require('./VerticalLayout');
 
 /**
  * Represents a panel that has a VerticalLayout to arrange its elements.
- * @param {string} backgroundKey Texture's key for panel's background
- * @param {Array} optionals array containing optional parameters x and/or y
- * coordinates for the panel, it can be undefined (optional)
+ * @param {string} backgroundKey - Texture's key for panel's background
+ * @param {number} margin - Margin or space between elements, optional
  * @constructor
  */
-var VerticalLayoutPanel = function(backgroundKey, optionals) {
-    var ops = optionals || [];
-    var x = ops.x || 0;
-    var y = ops.y || 0;
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.layout = new VerticalLayout(this);
+var VerticalLayoutPanel = function(backgroundKey, margin) {
+    Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
+    this.layout = new VerticalLayout(this, margin);
 };
 
 VerticalLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);

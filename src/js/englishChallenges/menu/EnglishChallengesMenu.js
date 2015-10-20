@@ -12,7 +12,7 @@ var ImageWordMatch = require('../ImageWordMatch');
  * @constructor
  */
 var EnglishChallengesMenu = function() {
-    var dimensions = {numberOfRows: 2, numberOfColumns: 2};
+    var dimensions = {numberOfRows: 2, numberOfColumns: 5};
     GridLayoutPopUp.call(this, 'inventory_background', 'English Challenges',
         dimensions);
     this.createGames();

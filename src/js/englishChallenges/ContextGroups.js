@@ -20,7 +20,7 @@ var NUMBER_OF_CONTEXTS = 2;
  */
 var ContextGroups = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'son', 'Context Groups', 10,
+    DragAndDropChallenge.call(this, 'contexts', 'Contexts', 10,
         dimensions);
 };
 

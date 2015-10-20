@@ -24,6 +24,7 @@
                 root:   'assets/',
                 images:  'assets/images/',
 				sprites:  'assets/sprites',
+                icons:  'assets/icons/',
                 maps:   'assets/maps/**/*.json',
                 audio:  'assets/audio/'
             }
@@ -35,7 +36,7 @@
                     mode: 0700,
                     create: [
                         'assets/images', 'assets/sprites', 'assets/maps',
-                        'assets/audio',
+                        'assets/audio', 'assets/icons',
                         'deploy',
                         'resources',
                         'src/css', 'src/js', 'src/lib',
@@ -73,6 +74,12 @@
 					{
                         cwd: '<%= dir.assets.root %>',
                         src: ['sprites/**/*.*'],
+                        dest: '<%= dir.deploy.assets %>',
+                        expand: true
+                    },
+                    {
+                        cwd: '<%= dir.assets.root %>',
+                        src: ['icons/**/*.*'],
                         dest: '<%= dir.deploy.assets %>',
                         expand: true
                     },

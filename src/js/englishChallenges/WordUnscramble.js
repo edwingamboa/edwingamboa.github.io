@@ -12,7 +12,7 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
  */
 var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'father', 'Word Unscramble', 10,
+    DragAndDropChallenge.call(this, 'unscramble', 'Unscrambler', 10,
         dimensions);
 };
 

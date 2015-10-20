@@ -31,6 +31,9 @@ var Weapon = function(x,
     this.bulletSpeed = bulletSpeed;
     this.fireRate = fireRate;
     this.infinite = infinite;
+    this.description = 'Damage: ' + this.power +
+        '\nAmmo: ' + this.numberOfBullets;
+    this.category = 'weapons';
 };
 
 Weapon.prototype = Object.create(Item.prototype);

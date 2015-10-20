@@ -12,10 +12,13 @@ var ItemGroupView = require('../../items/ItemGroupView');
  * @constructor
  */
 var MenuItem = function(challenge, parentView) {
-    ItemGroupView.call(this, challenge.englishChallenge.iconKey,
-        challenge.englishChallenge.name, parentView);
+    ItemGroupView.call(this, challenge.englishChallenge.iconKey, 'Play',
+        parentView);
+
     this.challenge = challenge;
     this.updateScoreText();
+    this.setTitle(challenge.englishChallenge.name);
+    //this.setDescription(challenge.englishChallenge.description);
 };
 
 MenuItem.prototype = Object.create(ItemGroupView.prototype);
@@ -36,7 +39,7 @@ MenuItem.prototype.buttonAction = function() {
  * completing the challenge.
  */
 MenuItem.prototype.updateScoreText = function() {
-    this.message.text = '' + this.challenge.englishChallenge.score;
+    this.setAuxText('+ $' + this.challenge.englishChallenge.score);
 };
 
 module.exports = MenuItem;

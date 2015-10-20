@@ -65,9 +65,9 @@ Preloader.prototype = {
             'assets/sprites/strong_enemy.png', 64, 64);
         this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
             150);
-        this.game.load.spritesheet('revolverSprite',
-            'assets/sprites/revolver.png', 30, 16);
-        this.game.load.spritesheet('machineGunSprite',
+        this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
+            30, 16);
+        this.game.load.spritesheet('machineGun',
             'assets/sprites/machineGun.png', 60, 42);
 
         for (var i = 1; i <= 2; i++) {
@@ -100,6 +100,18 @@ Preloader.prototype = {
         this.game.load.image('healthBarBackground',
             'assets/images/healthBarBackground.png');
         this.game.load.image('healthBar', 'assets/images/healthBar.png');
+
+        this.game.load.image('healthPack5Icon',
+            'assets/icons/healthPack5Icon.png');
+        this.game.load.image('healthPack20Icon',
+            'assets/icons/healthPack20Icon.png');
+        this.game.load.image('revolverIcon', 'assets/icons/revolverIcon.png');
+        this.game.load.image('unscramble', 'assets/icons/unscramble.png');
+        this.game.load.image('contexts', 'assets/icons/contexts.png');
+        this.game.load.image('imageWord', 'assets/icons/imageWord.png');
+        this.game.load.image('inventoryPanelBg',
+            'assets/images/inventoryPanelBg.png');
+        this.game.load.image('tab', 'assets/images/tab.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

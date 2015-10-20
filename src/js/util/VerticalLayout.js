@@ -10,11 +10,13 @@ var MARGIN = 10;
 
 /**
  * Allow control for a Vertical Layout Sprite.
- * @param {Phaser.Sprite} parent Sprite that contatins the layout.
+ * @param parent {Phaser.Sprite} Sprite that contains the layout.
+ * @param margin {number} Margin or space between elements, optional.
  * @constructor
  */
-var VerticalLayout = function(parent) {
-    this.currentY = MARGIN;
+var VerticalLayout = function(parent, margin) {
+    this.margin = margin || MARGIN;
+    this.currentY = this.margin;
     this.parent = parent;
 };
 
@@ -27,7 +29,7 @@ VerticalLayout.prototype.constructor = VerticalLayout;
  */
 VerticalLayout.prototype.addElement = function(element) {
     element.y = this.currentY;
-    this.currentY += element.height + MARGIN;
+    this.currentY += element.height + this.margin;
     element.x = this.parent.width / 2 - element.width / 2;
 
     this.parent.addChild(element);

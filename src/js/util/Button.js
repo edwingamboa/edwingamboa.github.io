@@ -2,30 +2,23 @@
  * Created by Edwin Gamboa on 10/10/2015.
  */
 
-var Button = function(text, action, parent, optionals) {
-    var ops = optionals || [];
-    var x = ops.x || 0;
-    var y = ops.y || 0;
+var Button = function(text, action, parent, iconKey) {
+    var key = iconKey || 'button';
+    Phaser.Sprite.call(this, level.game, 0, 0, key);
 
-    Phaser.Sprite.call(this, level.game, x, y, 'transparent');
-
-    this.text = level.game.make.text(10, 10, text);
+    this.text = level.game.make.text(this.width / 2, this.height / 2, text);
+    this.text.anchor.set(0.5, 0.5);
     this.text.font = 'Shojumaru';
-    this.text.fontSize = 20;
+    this.text.fontSize = 18;
     this.text.fill = '#FFFFFF';
-
-    this.background = level.game.make.sprite(0, 0, 'button');
 
     this.inputEnabled = true;
     this.events.onInputDown.add(action, parent);
 
-    var scale = (this.text.width + 20) / this.background.width;
-    this.background.scale.x = scale;
-
-    //this.background.width = this.text.width + 20;
-
-    this.addChild(this.background);
+    var scale = (this.text.width + 20) / this.width;
+    this.scale.x = scale;
     this.addChild(this.text);
+    this.text.scale.x = 1 / scale;
 };
 
 Button.prototype = Object.create(Phaser.Sprite.prototype);

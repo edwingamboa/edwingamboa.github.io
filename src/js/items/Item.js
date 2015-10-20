@@ -8,9 +8,19 @@ var Item = function(x, y, key, price) {
     this.body.collideWorldBounds = true;
     this.level = level;
     this.price = price;
+    this.name = '';
+    this.description = '';
 };
 
 Item.prototype = Object.create(Phaser.Sprite.prototype);
 Item.prototype.constructor = Item;
+
+Item.prototype.setDescription = function(description) {
+    this.description = description;
+};
+
+Item.prototype.setName = function(name) {
+    this.name = name;
+};
 
 module.exports = Item;

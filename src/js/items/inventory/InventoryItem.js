@@ -4,11 +4,13 @@
 var ItemGroupView = require('../ItemGroupView');
 
 var InventoryItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key, 'Use', parentView);
+    ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
 
     this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
+    this.setTitle(this.item.name);
+    this.setDescription(this.item.description);
 };
 
 InventoryItem.prototype = Object.create(ItemGroupView.prototype);
@@ -19,12 +21,15 @@ InventoryItem.prototype.buttonAction = function() {
         this.item.use();
         this.amountAvailable --;
         this.updateAmountAvailableText();
-        this.parent.close();
+        this.parentView.close();
+    }else {
+        level.showErrorMessage('You do not have more of this item.',
+            this.parent);
     }
 };
 
 InventoryItem.prototype.updateAmountAvailableText = function() {
-    this.message.text = '' + this.amountAvailable;
+    this.setAuxText('x ' + this.amountAvailable);
 };
 
 module.exports = InventoryItem;

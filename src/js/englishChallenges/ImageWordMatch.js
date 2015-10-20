@@ -14,7 +14,7 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
  */
 var ImageWordMatch = function() {
     var dimensions = {numberOfRows: 3};
-    DragAndDropChallenge.call(this, 'mother', 'Word-Image Match', 10,
+    DragAndDropChallenge.call(this, 'imageWord', 'Image Match', 10,
         dimensions);
 };
 

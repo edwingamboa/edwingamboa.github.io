@@ -4,7 +4,7 @@
 var Weapon = require('./Weapon');
 
 var REVOLVER_NUMBER_OF_BULLETS = 20;
-var REVOLVER_KEY = 'revolverSprite';
+var REVOLVER_KEY = 'revolver';
 var REVOLVER_BULLET_KEY = 'bullet1';
 var REVOLVER_NEXT_FIRE = 0;
 var REVOLVER_BULLET_SPEED = 400;
@@ -27,6 +27,7 @@ var Revolver = function(x, y, inifinite) {
         inifinite,
         PRICE
     );
+    this.name = 'Revolver';
 };
 
 Revolver.prototype = Object.create(Weapon.prototype);
