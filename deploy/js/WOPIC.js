@@ -533,7 +533,7 @@ module.exports = StrongEnemy;
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
-var Button = require('../util/Button');
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 
 /**
  * The number of contexts allowed for this challenge
@@ -562,15 +562,17 @@ ContextGroups.prototype.constructor = ContextGroups;
 ContextGroups.prototype.newChallenge = function() {
     this.clearChallenge();
 
+    var contextsNames = ['Family', 'House'];
     var words = ['Mother', 'Son', 'Father', 'Living room', 'Dining room',
         'Kitchen'];
 
     this.contexts = [];
-    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
-    this.source = new GridLayoutPanel('wordField', optionals);
+    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2,
+        margin: 5};
+    this.source = new GridLayoutPanel('wordsBg', optionals);
 
-    optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
-    var contextsPanels = new GridLayoutPanel('wordField',
+    optionals = {numberOfColumns: NUMBER_OF_CONTEXTS, margin: 0};
+    var contextsPanels = new GridLayoutPanel('englishChallengePanelBg',
         optionals);
 
     var i;
@@ -578,11 +580,15 @@ ContextGroups.prototype.newChallenge = function() {
     var word;
     var wordShade;
     var context;
+    var contextTitle;
     this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
-    optionals = {numberOfRows: this.numberOfWords};
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
-        context = new GridLayoutPanel('itemGroupBackGround',
-            optionals);
+        context = new VerticalLayoutPanel('contextBg', 5);
+        contextTitle = level.game.make.text(0, 0, contextsNames[i]);
+        contextTitle.font = 'Shojumaru';
+        contextTitle.fontSize = 20;
+        contextTitle.fill = '#0040FF';
+        context.addElement(contextTitle);
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
@@ -600,7 +606,7 @@ ContextGroups.prototype.newChallenge = function() {
             word.code = '' + i;
             this.elements.push(word);
 
-            wordShade = new GridLayoutPanel('useButtonShade');
+            wordShade = new VerticalLayoutPanel('wordBg', 2);
             wordShade.code = '' + i;
             this.destinations.push(wordShade);
             context.addElement(wordShade);
@@ -608,18 +614,14 @@ ContextGroups.prototype.newChallenge = function() {
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
-
-    this.confirmButton = new Button('Confirm', this.confirm, this);
-    //this.addElement(Description);
-    this.addElement(contextsPanels);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(contextsPanels);
+    this.mainPanel.addElement(this.source);
 };
 
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @param {Sprite} element - element that is being dragged by the player
  */
 ContextGroups.prototype.bringItemToTop = function(item) {
     if (ContextGroups.prototype.isPrototypeOf(item.parent)) {
@@ -631,7 +633,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":12}],9:[function(require,module,exports){
+},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -714,9 +716,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     var familyMembersCells = [];
 
     for (var key in familyKeys) {
-        var cell = new VerticalLayoutPanel('itemGroupBackGround');
+        var cell = new VerticalLayoutPanel('imageWordBg');
         var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
-        var shade = level.game.make.sprite(0, 0, 'useButtonShade');
+        var shade = new VerticalLayoutPanel('wordBg', 2);
         shade.code = key;
 
         this.destinations.push(shade);
@@ -740,9 +742,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     }
 
     var optionals = {numberOfColumns: this.elements.length};
-    this.source = new GridLayoutPanel('wordField', optionals);
+    this.source = new GridLayoutPanel('wordsBg', optionals);
 
-    var images = new GridLayoutPanel('wordField', optionals);
+    var images = new GridLayoutPanel('englishChallengePanelBg', optionals);
 
     var familyMemberCell;
     for (familyMemberCell in familyMembersCells) {
@@ -750,11 +752,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
-    this.confirmButton = new Button('Confirm', this.confirm, this);
 
-    this.addElement(images);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(images);
+    this.mainPanel.addElement(this.source);
 };
 
 /**
@@ -777,7 +777,7 @@ module.exports = ImageWordMatch;
  * Created by Edwin Gamboa on 08/10/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
-var Button = require('../util/Button');
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 
 /**
@@ -802,15 +802,15 @@ WordUnscramble.prototype.newChallenge = function() {
     var word = 'mother';
     var wordImage = level.game.make.sprite(0, 0, 'mother');
 
-    var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridLayoutPanel('wordField', optionals);
+    var optionals = {numberOfColumns: word.length, margin: 5};
+    var wordFieldAnswer = new GridLayoutPanel('lettersBg', optionals);
 
-    this.source = new GridLayoutPanel('wordField', optionals);
+    this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = new GridLayoutPanel('letterShade');
+        letterShade = new VerticalLayoutPanel('letterBg', 2);
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
@@ -831,11 +831,9 @@ WordUnscramble.prototype.newChallenge = function() {
 
     this.dragAndDropControl.addElementsToSourceRandomly();
 
-    this.confirmButton = new Button('Confirm', this.confirm, this);
-    this.addElement(wordImage);
-    this.addElement(wordFieldAnswer);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(wordImage);
+    this.mainPanel.addElement(wordFieldAnswer);
+    this.mainPanel.addElement(this.source);
 };
 
 /**
@@ -853,14 +851,16 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"./dragAndDrop/DragAndDropChallenge":12}],12:[function(require,module,exports){
+},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
 
-var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var VerticalLayoutPanel = require('../../util/VerticalLayoutPanel');
 var EnglishChallenge = require('../../englishChallenges/EnglishChallenge');
 var DragAndDropController = require('./DragAndDropController');
+var Button = require('../../util/Button');
 
 /**
  * Represents an EnglishChallenge that have draggable elements, which need to be
@@ -868,14 +868,11 @@ var DragAndDropController = require('./DragAndDropController');
  * @param iconKey {string} Texture key of the Challenge icon
  * @param challengeName {string} Challenge name to show in UI.
  * @param score {number} Score to be increased in case of success.
- * @param dimensions {Array} Array containing number of rows and columns needed
  * for the challenge UI.
  * @constructor
  */
-var DragAndDropChallenge = function(iconKey, challengeName, score,
-                                    dimensions) {
-    GridLayoutPopUp.call(this, 'inventory_background', challengeName,
-        dimensions);
+var DragAndDropChallenge = function(iconKey, challengeName, score) {
+    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
@@ -884,9 +881,13 @@ var DragAndDropChallenge = function(iconKey, challengeName, score,
     this.destinations = [];
     this.elements = [];
     this.dragAndDropControl = new DragAndDropController(this);
+    this.mainPanel = new VerticalLayoutPanel('popUpPanelBg');
+    this.addElement(this.mainPanel);
+    this.confirmButton = new Button('Confirm', this.confirm, this);
+    this.addElement(this.confirmButton);
 };
 
-DragAndDropChallenge.prototype = Object.create(GridLayoutPopUp.prototype);
+DragAndDropChallenge.prototype = Object.create(VerticalLayoutPopUp.prototype);
 DragAndDropChallenge.prototype.constructor = DragAndDropChallenge;
 
 /**
@@ -903,7 +904,7 @@ DragAndDropChallenge.prototype.confirm = function() {
         return;
     }
     this.englishChallenge.success();
-    this.close(this);
+    this.close();
 };
 
 /**
@@ -911,8 +912,8 @@ DragAndDropChallenge.prototype.confirm = function() {
  * challenge can be created.
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
-    if (this.children.length > 1) {
-        this.removeAllElements();
+    if (this.mainPanel.children.length > 0) {
+        this.mainPanel.removeAllElements();
     }
     if (this.elements.length > 0) {
         this.elements.splice(0, this.elements.length);
@@ -924,7 +925,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":9,"../../util/GridLayoutPopUp":38,"./DragAndDropController":13}],13:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":9,"../../util/Button":34,"../../util/VerticalLayoutPanel":46,"../../util/VerticalLayoutPopUp":47,"./DragAndDropController":13}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -948,9 +949,8 @@ var DragAndDropController = function(container) {
  */
 DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
-    element.x = 0;
-    element.y = 0;
-    this.container.destinations[destinationIndex].addChild(element);
+    this.container.destinations[destinationIndex].restartPosition();
+    this.container.destinations[destinationIndex].addElement(element);
 };
 
 /**
@@ -1030,7 +1030,8 @@ module.exports = DragAndDropController;
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
-var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var PopUp = require('../../util/PopUp');
+var GridLayoutPanel = require('../../util/GridLayoutPanel');
 var MenuItem = require('./MenuItem');
 var WordUnscramble = require('../WordUnscramble');
 var ContextGroups = require('../ContextGroups');
@@ -1041,13 +1042,16 @@ var ImageWordMatch = require('../ImageWordMatch');
  * @constructor
  */
 var EnglishChallengesMenu = function() {
-    var dimensions = {numberOfRows: 2, numberOfColumns: 5};
-    GridLayoutPopUp.call(this, 'inventory_background', 'English Challenges',
-        dimensions);
+    PopUp.call(this, 'popUpBg', null, 'English Challenges');
+    var dimensions = {numberOfRows: 2, numberOfColumns: 4};
+    this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
+    this.panel.x = 20;
+    this.panel.y = 80;
+    this.addChild(this.panel);
     this.createGames();
 };
 
-EnglishChallengesMenu.prototype = Object.create(GridLayoutPopUp.prototype);
+EnglishChallengesMenu.prototype = Object.create(PopUp.prototype);
 EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
 
 /**
@@ -1061,14 +1065,14 @@ EnglishChallengesMenu.prototype.createGames = function() {
     challenges.push(new ImageWordMatch());
     var i;
     for (i in challenges) {
-        this.addElement(new MenuItem(challenges[i], this));
+        this.panel.addElement(new MenuItem(challenges[i], this));
         level.game.add.existing(challenges[i]);
     }
 };
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPopUp":38,"../ContextGroups":8,"../ImageWordMatch":10,"../WordUnscramble":11,"./MenuItem":15}],15:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":37,"../../util/PopUp":42,"../ContextGroups":8,"../ImageWordMatch":10,"../WordUnscramble":11,"./MenuItem":15}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1100,7 +1104,7 @@ MenuItem.prototype.constructor = MenuItem;
  * a new challenge and displays it to the player.
  */
 MenuItem.prototype.buttonAction = function() {
-    this.parent.close();
+    this.parentView.close();
     this.challenge.newChallenge();
     this.challenge.open();
 };
@@ -1186,7 +1190,7 @@ var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var Button = require('../util/Button');
 
 var ItemGroupView = function(iconKey, buttonText, parentView) {
-    VerticalLayoutPanel.call(this, 'itemGroupBackGround', 2);
+    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
 
@@ -1254,15 +1258,15 @@ var Button = require('../util/Button');
 var HealthPack = require('./HealthPack');
 var Revolver = require('./weapons/Revolver');
 
-var ItemsPopUp = function(tabsLabels, categories) {
-    PopUp.call(this, 'inventory_background', null, 'ItemsPopUp');
+var ItemsPopUp = function(tabsLabels, categories, title) {
+    PopUp.call(this, 'popUpBg', null, title);
 
     this.items = [];
     var i;
     var tab;
     var x = 20;
     for (i = 0; i < tabsLabels.length; i++) {
-        tab = new Button(tabsLabels[i], this.showTab, this, 'tab');
+        tab = new Button(tabsLabels[i], this.showTab, this, 'tabBg');
         tab.category = categories[i];
         tab.x = x;
         tab.y = 58;
@@ -1271,8 +1275,8 @@ var ItemsPopUp = function(tabsLabels, categories) {
         this.items[categories[i]] = [];
     }
 
-    var dimensions = {numberOfColumns: 5, numberOfRows: 1};
-    this.panel = new GridLayoutPanel('inventoryPanelBg', dimensions);
+    var dimensions = {numberOfColumns: 4, numberOfRows: 2};
+    this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
     this.panel.x = 20;
     this.panel.y = 100;
     this.createItemGroups();
@@ -1323,7 +1327,7 @@ var InventoryItem = require ('./InventoryItem');
 var Inventory = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
-    ItemsPopUp.call(this, tabsLabels, categories);
+    ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
 };
 
 Inventory.prototype = Object.create(ItemsPopUp.prototype);
@@ -1386,13 +1390,13 @@ var StoreItem = require ('./StoreItem');
 var Store = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
-    ItemsPopUp.call(this, tabsLabels, categories);
+    ItemsPopUp.call(this, tabsLabels, categories, 'Store');
 
     this.cash = level.game.make.text(this.width - 20, 58,
-        '$ ' + level.player.score);
-    this.cash.font = 'Arial';
-    this.cash.fontSize = 25;
-    this.cash.fill = '#000000';
+        'Cash: $ ' + level.player.score);
+    this.cash.font = 'Shojumaru';
+    this.cash.fontSize = 20;
+    this.cash.fill = '#FFFFFF';
     this.cash.anchor.set(1, 0);
     this.addChild(this.cash);
 };
@@ -1729,16 +1733,13 @@ Preloader.prototype = {
         this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
         this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
         this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
-        this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
-        this.game.load.image('buyButton', 'assets/images/buyButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
         this.game.load.image('storeButton', 'assets/images/store.png');
-        this.game.load.image('inventory_background',
-            'assets/images/inventoryBackground.png');
+        this.game.load.image('popUpBg',
+            'assets/images/popUpBg.png');
         this.game.load.image('close', 'assets/images/close.png');
-        this.game.load.image('itemGroupBackGround',
-            'assets/images/itemGroupBackGround.png');
-        this.game.load.image('dialog', 'assets/images/dialog.png');
+        this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
+        this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
         this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
         this.game.load.image('successIcon', 'assets/images/successIcon.png');
 
@@ -1775,16 +1776,16 @@ Preloader.prototype = {
         this.game.load.image('openDoor', 'assets/images/openDoor.png');
         this.game.load.image('working', 'assets/images/working.png');
         this.game.load.image('addCashButton', 'assets/images/addCash.png');
-        this.game.load.image('useButtonShade',
-            'assets/images/useButtonShade.png');
         this.game.load.image('button', 'assets/images/button.png');
         this.game.load.image('mother', 'assets/images/mother.png');
         this.game.load.image('father', 'assets/images/father.png');
         this.game.load.image('daughter', 'assets/images/daughter.png');
         this.game.load.image('son', 'assets/images/son.png');
 
-        this.game.load.image('wordField', 'assets/images/wordField.png');
-        this.game.load.image('letterShade', 'assets/images/letterShade.png');
+        this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
+        this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
+        this.game.load.image('wordBg', 'assets/images/wordBg.png');
+        this.game.load.image('letterBg', 'assets/images/letterBg.png');
         this.game.load.image('transparent', 'assets/images/transparent.png');
         this.game.load.image('healthBarBackground',
             'assets/images/healthBarBackground.png');
@@ -1798,9 +1799,14 @@ Preloader.prototype = {
         this.game.load.image('unscramble', 'assets/icons/unscramble.png');
         this.game.load.image('contexts', 'assets/icons/contexts.png');
         this.game.load.image('imageWord', 'assets/icons/imageWord.png');
-        this.game.load.image('inventoryPanelBg',
-            'assets/images/inventoryPanelBg.png');
-        this.game.load.image('tab', 'assets/images/tab.png');
+        this.game.load.image('popUpPanelBg',
+            'assets/images/popUpPanelBg.png');
+        this.game.load.image('tabBg', 'assets/images/tabBg.png');
+        this.game.load.image('contextBg', 'assets/images/contextBg.png');
+
+        this.game.load.image('englishChallengePanelBg',
+            'assets/images/englishChallengePanelBg.png');
+        this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -2220,7 +2226,7 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":47}],32:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -2289,7 +2295,7 @@ LevelOne.prototype.addEnemies = function() {
 
 module.exports = LevelOne;
 
-},{"../../worldElements/InteractiveHouse":48,"../levels/Level":31}],33:[function(require,module,exports){
+},{"../../worldElements/InteractiveHouse":49,"../levels/Level":31}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2362,7 +2368,7 @@ module.exports = Button;
 var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
 var Dialog = function(iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, 'dialog', parent);
+    HorizontalLayoutPopUp.call(this, 'dialogBg', parent);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
     this.message = level.game.make.text(0, 0, '');
@@ -2399,29 +2405,32 @@ var MARGIN = 10;
 /**
  * Represents a grid with a fixed number of rows and columns. All the cells have
  * the same height and width.
- * @param numberOfColumns {number} Number of columns for the grid.
- * @param numberOfRows {number} Number of rows for the grid.
- * @param container {Sprite} Container in which elements are added
- * @param xOrigin {number} X coordinate where the grid starts
- * @param yOrigin {number} Y coordinate where the grid starts
  * @constructor
+ * @param {number} numberOfColumns - Number of columns for the grid.
+ * @param {number} numberOfRows - Number of rows for the grid.
+ * @param {Sprite} container - Container in which elements are added
+ * @param {number} xOrigin - X coordinate where the grid starts
+ * @param {number} yOrigin - Y coordinate where the grid starts
+ * @param {number} margin - Space between elements, optional.
+
  */
 var GridLayout = function(numberOfColumns, numberOfRows, xOrigin, yOrigin,
-                          container) {
+                          container, margin) {
     this.currentRow = 0;
     this.currentColumn = 0;
     this.numberOfColumns = numberOfColumns;
     this.numberOfRows = numberOfRows;
+    this.margin = margin || MARGIN;
     if (numberOfColumns === 1 && numberOfRows === 1) {
         this.xOrigin = 0;
         this.yOrigin = 0;
     } else {
-        this.xOrigin = MARGIN + xOrigin;
-        this.yOrigin = MARGIN + yOrigin;
+        this.xOrigin = this.margin + xOrigin;
+        this.yOrigin = this.margin + yOrigin;
     }
-    this.rowWidth = (container.width - xOrigin * this.numberOfColumns) /
+    this.rowWidth = (container.width - xOrigin - this.margin * 2) /
         this.numberOfColumns;
-    this.rowHeight = (container.height - yOrigin * this.numberOfRows) /
+    this.rowHeight = (container.height - yOrigin - this.margin * 2) /
         this.numberOfRows;
     this.container = container;
 };
@@ -2441,10 +2450,10 @@ GridLayout.prototype.addElement = function(element) {
         }
     }
     var xCentered = (this.rowWidth / 2) - (element.width / 2);
-    element.x = this.xOrigin + (this.rowWidth + MARGIN) *
+    element.x = this.xOrigin + (this.rowWidth) *
         this.currentColumn + xCentered;
     var yCentered = this.yOrigin + (this.rowHeight / 2) - (element.height / 2);
-    element.y = (this.rowHeight + MARGIN) *
+    element.y = (this.rowHeight) *
         this.currentRow + yCentered;
 
     this.container.addChild(element);
@@ -2454,7 +2463,7 @@ GridLayout.prototype.addElement = function(element) {
 /**
  * Restarts the indexes, currentRow and currentColumn
  */
-GridLayout.prototype.restartsIndexes = function() {
+GridLayout.prototype.restartIndexes = function() {
     this.currentColumn = 0;
     this.currentRow = 0;
 };
@@ -2479,7 +2488,7 @@ var GridLayoutPanel = function(backgroundKey, optionals) {
     this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
 
     this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0, 0,
-        this);
+        this, ops.margin);
 };
 
 GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
@@ -2494,7 +2503,7 @@ GridLayoutPanel.prototype.addElement = function(element) {
  */
 GridLayoutPanel.prototype.removeAllElements = function() {
     this.removeChildren();
-    this.grid.restartsIndexes();
+    this.grid.restartIndexes();
 };
 
 module.exports = GridLayoutPanel;
@@ -2536,7 +2545,7 @@ var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
     this.numberOfColumns = dims.numberOfColumns || MIN_NUMBER_OF_COLUMNS;
     this.numberOfRows = dims.numberOfRows || MIN_NUMBER_OF_ROWS;
     this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0,
-        this.title.height, this);
+        this.title.height + this.title.y, this, dims.margin);
 
 };
 
@@ -2552,10 +2561,10 @@ GridLayoutPopUp.prototype.addElement = function(element) {
 };
 
 /**
- * Remove all the elements that contains the PopUp
+ * Restarts the positions x and y to the origin, so that next elements will be
+ * added in the first position.
  */
-GridLayoutPopUp.prototype.removeAllElements = function() {
-    this.removeChildren(1);
+GridLayoutPopUp.prototype.restartPositions = function() {
     this.grid.restartsIndexes();
 };
 
@@ -2567,19 +2576,24 @@ module.exports = GridLayoutPopUp;
  */
 var MARGIN = 10;
 
-var HorizontalLayout = function(parent) {
-    this.currentY = MARGIN;
+var HorizontalLayout = function(parent, margin) {
+    this.margin = margin || MARGIN;
+    this.currentX = this.margin;
     this.parent = parent;
 };
 
 HorizontalLayout.prototype.constructor = HorizontalLayout;
 
 HorizontalLayout.prototype.addElement = function(element) {
-    element.x = this.currentY;
-    this.currentY += element.width + MARGIN;
+    element.x = this.currentX;
+    this.currentX += element.width + this.margin ;
     element.y = this.parent.height / 2 - element.height / 2;
 
     this.parent.addChild(element);
+};
+
+HorizontalLayout.prototype.restartPosition = function() {
+    this.currentX = this.margin;
 };
 
 module.exports = HorizontalLayout;
@@ -2622,14 +2636,11 @@ module.exports = HorizontalLayoutPanel;
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
-/**
- * Created by Edwin Gamboa on 16/07/2015.
- */
 var PopUp = require('./PopUp');
 var Horizontalayout = require('./HorizontalLayout');
 
-var HorizontalLayoutPopUP = function(backgroundKey, parent) {
-    PopUp.call(this, backgroundKey, parent);
+var HorizontalLayoutPopUP = function(backgroundKey, parent, title) {
+    PopUp.call(this, backgroundKey, parent, title);
     this.layout = new Horizontalayout(this);
 };
 
@@ -2638,6 +2649,14 @@ HorizontalLayoutPopUP.prototype.constructor = HorizontalLayoutPopUP;
 
 HorizontalLayoutPopUP.prototype.addElement = function(element) {
     this.layout.addElement(element);
+};
+
+/**
+ * Restarts the positions x and y to the origin, so that next elements will be
+ * added in the first position.
+ */
+HorizontalLayoutPopUP.prototype.restartPositions = function() {
+    this.layout.restartPosition();
 };
 
 module.exports = HorizontalLayoutPopUP;
@@ -2657,8 +2676,8 @@ var PopUp = function(backgroundKey, parent, title) {
     this.x = level.game.camera.width / 2 - this.xCenter;
     this.y = level.game.camera.height / 2 - this.yCenter;
 
-    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
-    this.closeButton.anchor.set(0.5, 0.5);
+    this.closeButton = level.game.make.sprite(this.width - 5, 5, 'close');
+    this.closeButton.anchor.set(1, 0);
     this.closeButton.inputEnabled = true;
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);
@@ -2705,6 +2724,18 @@ PopUp.prototype.open = function() {
     level.activePopUps ++;
     this.bringToTop();
     this.visible = true;
+};
+
+/**
+ * Remove all the elements that contains the PopUp
+ */
+PopUp.prototype.removeAllElements = function() {
+    var index = 1;
+    if (this.title !== undefined) {
+        index = 2;
+    }
+    this.removeChildren(index);
+    this.restartPositions();
 };
 
 module.exports = PopUp;
@@ -2794,13 +2825,16 @@ var MARGIN = 10;
 
 /**
  * Allow control for a Vertical Layout Sprite.
- * @param parent {Phaser.Sprite} Sprite that contains the layout.
- * @param margin {number} Margin or space between elements, optional.
  * @constructor
+ * @param {Phaser.Sprite} parent - Sprite that contains the layout.
+ * @param {number} margin - Margin or space between elements, optional.
+ * @param {number} yOrigin - Where layout should start adding elements,
+ * optional.
  */
-var VerticalLayout = function(parent, margin) {
+var VerticalLayout = function(parent, margin, yOrigin) {
+    var y = yOrigin || 0;
     this.margin = margin || MARGIN;
-    this.currentY = this.margin;
+    this.currentY = this.margin + y;
     this.parent = parent;
 };
 
@@ -2819,6 +2853,10 @@ VerticalLayout.prototype.addElement = function(element) {
     this.parent.addChild(element);
 };
 
+VerticalLayout.prototype.restartPosition = function() {
+    this.currentY = this.margin;
+};
+
 module.exports = VerticalLayout;
 
 },{}],46:[function(require,module,exports){
@@ -2830,13 +2868,15 @@ var VerticalLayout = require('./VerticalLayout');
 
 /**
  * Represents a panel that has a VerticalLayout to arrange its elements.
+ * @constructor
  * @param {string} backgroundKey - Texture's key for panel's background
  * @param {number} margin - Margin or space between elements, optional
- * @constructor
+ * @param {number} yOrigin - Where layout should start adding elements,
+ * optional.
  */
-var VerticalLayoutPanel = function(backgroundKey, margin) {
+var VerticalLayoutPanel = function(backgroundKey, margin, yOrigin) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
-    this.layout = new VerticalLayout(this, margin);
+    this.layout = new VerticalLayout(this, margin, yOrigin);
 };
 
 VerticalLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
@@ -2850,10 +2890,55 @@ VerticalLayoutPanel.prototype.addElement = function(element) {
     this.layout.addElement(element);
 };
 
+/**
+ * Remove all the elements that contains the panel
+ */
+VerticalLayoutPanel.prototype.removeAllElements = function() {
+    this.removeChildren();
+    this.layout.restartPosition();
+};
+
+/**
+ * Restatrs the positions of x and y to the origin.
+ */
+VerticalLayoutPanel.prototype.restartPosition = function() {
+    this.layout.restartPosition();
+};
+
 module.exports = VerticalLayoutPanel;
 
 
 },{"./VerticalLayout":45}],47:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 21/10/2015.
+ */
+var PopUp = require('./PopUp');
+var VerticalLayout = require('./VerticalLayout');
+
+var VerticalLayoutPopUP = function(backgroundKey, parent, title) {
+    PopUp.call(this, backgroundKey, parent, title);
+    var yOrigin = this.title.y + this.title.height || 0;
+    this.layout = new VerticalLayout(this, null, yOrigin);
+};
+
+VerticalLayoutPopUP.prototype = Object.create(PopUp.prototype);
+VerticalLayoutPopUP.prototype.constructor = VerticalLayoutPopUP;
+
+VerticalLayoutPopUP.prototype.addElement = function(element) {
+    this.layout.addElement(element);
+};
+
+/**
+ * Restarts the positions x and y to the origin, so that next elements will be
+ * added in the first position.
+ */
+VerticalLayoutPopUP.prototype.restartPositions = function() {
+    this.layout.restartPosition();
+};
+
+module.exports = VerticalLayoutPopUP;
+
+},{"./PopUp":42,"./VerticalLayout":45}],48:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2947,7 +3032,7 @@ InteractiveCar.prototype.stop = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":42,"../util/ResourceBar":43}],48:[function(require,module,exports){
+},{"../util/PopUp":42,"../util/ResourceBar":43}],49:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2979,4 +3064,4 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":22}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48]);
+},{"../items/store/Store":22}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49]);

@@ -5,7 +5,7 @@ var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var Button = require('../util/Button');
 
 var ItemGroupView = function(iconKey, buttonText, parentView) {
-    VerticalLayoutPanel.call(this, 'itemGroupBackGround', 2);
+    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
 

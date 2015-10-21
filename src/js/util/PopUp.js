@@ -11,8 +11,8 @@ var PopUp = function(backgroundKey, parent, title) {
     this.x = level.game.camera.width / 2 - this.xCenter;
     this.y = level.game.camera.height / 2 - this.yCenter;
 
-    this.closeButton = level.game.make.sprite(this.width, 0, 'close');
-    this.closeButton.anchor.set(0.5, 0.5);
+    this.closeButton = level.game.make.sprite(this.width - 5, 5, 'close');
+    this.closeButton.anchor.set(1, 0);
     this.closeButton.inputEnabled = true;
     this.closeButton.input.priorityID = 2;
     this.closeButton.events.onInputDown.add(this.close, this);
@@ -59,6 +59,18 @@ PopUp.prototype.open = function() {
     level.activePopUps ++;
     this.bringToTop();
     this.visible = true;
+};
+
+/**
+ * Remove all the elements that contains the PopUp
+ */
+PopUp.prototype.removeAllElements = function() {
+    var index = 1;
+    if (this.title !== undefined) {
+        index = 2;
+    }
+    this.removeChildren(index);
+    this.restartPositions();
 };
 
 module.exports = PopUp;

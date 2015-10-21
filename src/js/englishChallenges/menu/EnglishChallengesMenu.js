@@ -1,7 +1,8 @@
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
-var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var PopUp = require('../../util/PopUp');
+var GridLayoutPanel = require('../../util/GridLayoutPanel');
 var MenuItem = require('./MenuItem');
 var WordUnscramble = require('../WordUnscramble');
 var ContextGroups = require('../ContextGroups');
@@ -12,13 +13,16 @@ var ImageWordMatch = require('../ImageWordMatch');
  * @constructor
  */
 var EnglishChallengesMenu = function() {
-    var dimensions = {numberOfRows: 2, numberOfColumns: 5};
-    GridLayoutPopUp.call(this, 'inventory_background', 'English Challenges',
-        dimensions);
+    PopUp.call(this, 'popUpBg', null, 'English Challenges');
+    var dimensions = {numberOfRows: 2, numberOfColumns: 4};
+    this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
+    this.panel.x = 20;
+    this.panel.y = 80;
+    this.addChild(this.panel);
     this.createGames();
 };
 
-EnglishChallengesMenu.prototype = Object.create(GridLayoutPopUp.prototype);
+EnglishChallengesMenu.prototype = Object.create(PopUp.prototype);
 EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
 
 /**
@@ -32,7 +36,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
     challenges.push(new ImageWordMatch());
     var i;
     for (i in challenges) {
-        this.addElement(new MenuItem(challenges[i], this));
+        this.panel.addElement(new MenuItem(challenges[i], this));
         level.game.add.existing(challenges[i]);
     }
 };

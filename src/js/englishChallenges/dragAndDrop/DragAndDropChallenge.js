@@ -2,9 +2,11 @@
  * Created by Edwin Gamboa on 13/10/2015.
  */
 
-var GridLayoutPopUp = require('../../util/GridLayoutPopUp');
+var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var VerticalLayoutPanel = require('../../util/VerticalLayoutPanel');
 var EnglishChallenge = require('../../englishChallenges/EnglishChallenge');
 var DragAndDropController = require('./DragAndDropController');
+var Button = require('../../util/Button');
 
 /**
  * Represents an EnglishChallenge that have draggable elements, which need to be
@@ -12,14 +14,11 @@ var DragAndDropController = require('./DragAndDropController');
  * @param iconKey {string} Texture key of the Challenge icon
  * @param challengeName {string} Challenge name to show in UI.
  * @param score {number} Score to be increased in case of success.
- * @param dimensions {Array} Array containing number of rows and columns needed
  * for the challenge UI.
  * @constructor
  */
-var DragAndDropChallenge = function(iconKey, challengeName, score,
-                                    dimensions) {
-    GridLayoutPopUp.call(this, 'inventory_background', challengeName,
-        dimensions);
+var DragAndDropChallenge = function(iconKey, challengeName, score) {
+    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
@@ -28,9 +27,13 @@ var DragAndDropChallenge = function(iconKey, challengeName, score,
     this.destinations = [];
     this.elements = [];
     this.dragAndDropControl = new DragAndDropController(this);
+    this.mainPanel = new VerticalLayoutPanel('popUpPanelBg');
+    this.addElement(this.mainPanel);
+    this.confirmButton = new Button('Confirm', this.confirm, this);
+    this.addElement(this.confirmButton);
 };
 
-DragAndDropChallenge.prototype = Object.create(GridLayoutPopUp.prototype);
+DragAndDropChallenge.prototype = Object.create(VerticalLayoutPopUp.prototype);
 DragAndDropChallenge.prototype.constructor = DragAndDropChallenge;
 
 /**
@@ -47,7 +50,7 @@ DragAndDropChallenge.prototype.confirm = function() {
         return;
     }
     this.englishChallenge.success();
-    this.close(this);
+    this.close();
 };
 
 /**
@@ -55,8 +58,8 @@ DragAndDropChallenge.prototype.confirm = function() {
  * challenge can be created.
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
-    if (this.children.length > 1) {
-        this.removeAllElements();
+    if (this.mainPanel.children.length > 0) {
+        this.mainPanel.removeAllElements();
     }
     if (this.elements.length > 0) {
         this.elements.splice(0, this.elements.length);

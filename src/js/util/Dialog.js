@@ -4,7 +4,7 @@
 var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
 var Dialog = function(iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, 'dialog', parent);
+    HorizontalLayoutPopUp.call(this, 'dialogBg', parent);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
     this.message = level.game.make.text(0, 0, '');

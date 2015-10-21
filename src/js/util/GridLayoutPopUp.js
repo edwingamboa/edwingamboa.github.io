@@ -34,7 +34,7 @@ var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
     this.numberOfColumns = dims.numberOfColumns || MIN_NUMBER_OF_COLUMNS;
     this.numberOfRows = dims.numberOfRows || MIN_NUMBER_OF_ROWS;
     this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0,
-        this.title.height, this);
+        this.title.height + this.title.y, this, dims.margin);
 
 };
 
@@ -50,10 +50,10 @@ GridLayoutPopUp.prototype.addElement = function(element) {
 };
 
 /**
- * Remove all the elements that contains the PopUp
+ * Restarts the positions x and y to the origin, so that next elements will be
+ * added in the first position.
  */
-GridLayoutPopUp.prototype.removeAllElements = function() {
-    this.removeChildren(1);
+GridLayoutPopUp.prototype.restartPositions = function() {
     this.grid.restartsIndexes();
 };
 

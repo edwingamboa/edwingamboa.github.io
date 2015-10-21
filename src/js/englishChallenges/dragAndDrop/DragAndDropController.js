@@ -21,9 +21,8 @@ var DragAndDropController = function(container) {
  */
 DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
-    element.x = 0;
-    element.y = 0;
-    this.container.destinations[destinationIndex].addChild(element);
+    this.container.destinations[destinationIndex].restartPosition();
+    this.container.destinations[destinationIndex].addElement(element);
 };
 
 /**

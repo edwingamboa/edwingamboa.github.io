@@ -2,7 +2,7 @@
  * Created by Edwin Gamboa on 08/10/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
-var Button = require('../util/Button');
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 
 /**
@@ -27,15 +27,15 @@ WordUnscramble.prototype.newChallenge = function() {
     var word = 'mother';
     var wordImage = level.game.make.sprite(0, 0, 'mother');
 
-    var optionals = {numberOfColumns: word.length};
-    var wordFieldAnswer = new GridLayoutPanel('wordField', optionals);
+    var optionals = {numberOfColumns: word.length, margin: 5};
+    var wordFieldAnswer = new GridLayoutPanel('lettersBg', optionals);
 
-    this.source = new GridLayoutPanel('wordField', optionals);
+    this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
     var letterShade;
     for (i = 0; i < word.length; i++) {
-        letterShade = new GridLayoutPanel('letterShade');
+        letterShade = new VerticalLayoutPanel('letterBg', 2);
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
@@ -56,11 +56,9 @@ WordUnscramble.prototype.newChallenge = function() {
 
     this.dragAndDropControl.addElementsToSourceRandomly();
 
-    this.confirmButton = new Button('Confirm', this.confirm, this);
-    this.addElement(wordImage);
-    this.addElement(wordFieldAnswer);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(wordImage);
+    this.mainPanel.addElement(wordFieldAnswer);
+    this.mainPanel.addElement(this.source);
 };
 
 /**

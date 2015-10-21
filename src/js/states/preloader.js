@@ -40,16 +40,13 @@ Preloader.prototype = {
         this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
         this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
         this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
-        this.game.load.image('useOneButton', 'assets/images/useOneButton.png');
-        this.game.load.image('buyButton', 'assets/images/buyButton.png');
         this.game.load.image('inventory_button', 'assets/images/inventory.png');
         this.game.load.image('storeButton', 'assets/images/store.png');
-        this.game.load.image('inventory_background',
-            'assets/images/inventoryBackground.png');
+        this.game.load.image('popUpBg',
+            'assets/images/popUpBg.png');
         this.game.load.image('close', 'assets/images/close.png');
-        this.game.load.image('itemGroupBackGround',
-            'assets/images/itemGroupBackGround.png');
-        this.game.load.image('dialog', 'assets/images/dialog.png');
+        this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
+        this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
         this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
         this.game.load.image('successIcon', 'assets/images/successIcon.png');
 
@@ -86,16 +83,16 @@ Preloader.prototype = {
         this.game.load.image('openDoor', 'assets/images/openDoor.png');
         this.game.load.image('working', 'assets/images/working.png');
         this.game.load.image('addCashButton', 'assets/images/addCash.png');
-        this.game.load.image('useButtonShade',
-            'assets/images/useButtonShade.png');
         this.game.load.image('button', 'assets/images/button.png');
         this.game.load.image('mother', 'assets/images/mother.png');
         this.game.load.image('father', 'assets/images/father.png');
         this.game.load.image('daughter', 'assets/images/daughter.png');
         this.game.load.image('son', 'assets/images/son.png');
 
-        this.game.load.image('wordField', 'assets/images/wordField.png');
-        this.game.load.image('letterShade', 'assets/images/letterShade.png');
+        this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
+        this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
+        this.game.load.image('wordBg', 'assets/images/wordBg.png');
+        this.game.load.image('letterBg', 'assets/images/letterBg.png');
         this.game.load.image('transparent', 'assets/images/transparent.png');
         this.game.load.image('healthBarBackground',
             'assets/images/healthBarBackground.png');
@@ -109,9 +106,14 @@ Preloader.prototype = {
         this.game.load.image('unscramble', 'assets/icons/unscramble.png');
         this.game.load.image('contexts', 'assets/icons/contexts.png');
         this.game.load.image('imageWord', 'assets/icons/imageWord.png');
-        this.game.load.image('inventoryPanelBg',
-            'assets/images/inventoryPanelBg.png');
-        this.game.load.image('tab', 'assets/images/tab.png');
+        this.game.load.image('popUpPanelBg',
+            'assets/images/popUpPanelBg.png');
+        this.game.load.image('tabBg', 'assets/images/tabBg.png');
+        this.game.load.image('contextBg', 'assets/images/contextBg.png');
+
+        this.game.load.image('englishChallengePanelBg',
+            'assets/images/englishChallengePanelBg.png');
+        this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
 
         this.game.load.script('webfont',
             '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

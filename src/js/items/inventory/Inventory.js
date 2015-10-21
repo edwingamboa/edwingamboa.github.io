@@ -7,7 +7,7 @@ var InventoryItem = require ('./InventoryItem');
 var Inventory = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
-    ItemsPopUp.call(this, tabsLabels, categories);
+    ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
 };
 
 Inventory.prototype = Object.create(ItemsPopUp.prototype);

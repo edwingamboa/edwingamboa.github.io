@@ -15,7 +15,7 @@ var GridLayoutPanel = function(backgroundKey, optionals) {
     this.numberOfRows = ops.numberOfRows || NUMBER_OF_ROWS;
 
     this.grid = new GridLayout(this.numberOfColumns, this.numberOfRows, 0, 0,
-        this);
+        this, ops.margin);
 };
 
 GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
@@ -30,7 +30,7 @@ GridLayoutPanel.prototype.addElement = function(element) {
  */
 GridLayoutPanel.prototype.removeAllElements = function() {
     this.removeChildren();
-    this.grid.restartsIndexes();
+    this.grid.restartIndexes();
 };
 
 module.exports = GridLayoutPanel;

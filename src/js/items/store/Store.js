@@ -7,13 +7,13 @@ var StoreItem = require ('./StoreItem');
 var Store = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
-    ItemsPopUp.call(this, tabsLabels, categories);
+    ItemsPopUp.call(this, tabsLabels, categories, 'Store');
 
     this.cash = level.game.make.text(this.width - 20, 58,
-        '$ ' + level.player.score);
-    this.cash.font = 'Arial';
-    this.cash.fontSize = 25;
-    this.cash.fill = '#000000';
+        'Cash: $ ' + level.player.score);
+    this.cash.font = 'Shojumaru';
+    this.cash.fontSize = 20;
+    this.cash.fill = '#FFFFFF';
     this.cash.anchor.set(1, 0);
     this.addChild(this.cash);
 };

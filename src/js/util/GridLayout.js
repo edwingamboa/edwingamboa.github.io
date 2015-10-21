@@ -12,29 +12,32 @@ var MARGIN = 10;
 /**
  * Represents a grid with a fixed number of rows and columns. All the cells have
  * the same height and width.
- * @param numberOfColumns {number} Number of columns for the grid.
- * @param numberOfRows {number} Number of rows for the grid.
- * @param container {Sprite} Container in which elements are added
- * @param xOrigin {number} X coordinate where the grid starts
- * @param yOrigin {number} Y coordinate where the grid starts
  * @constructor
+ * @param {number} numberOfColumns - Number of columns for the grid.
+ * @param {number} numberOfRows - Number of rows for the grid.
+ * @param {Sprite} container - Container in which elements are added
+ * @param {number} xOrigin - X coordinate where the grid starts
+ * @param {number} yOrigin - Y coordinate where the grid starts
+ * @param {number} margin - Space between elements, optional.
+
  */
 var GridLayout = function(numberOfColumns, numberOfRows, xOrigin, yOrigin,
-                          container) {
+                          container, margin) {
     this.currentRow = 0;
     this.currentColumn = 0;
     this.numberOfColumns = numberOfColumns;
     this.numberOfRows = numberOfRows;
+    this.margin = margin || MARGIN;
     if (numberOfColumns === 1 && numberOfRows === 1) {
         this.xOrigin = 0;
         this.yOrigin = 0;
     } else {
-        this.xOrigin = MARGIN + xOrigin;
-        this.yOrigin = MARGIN + yOrigin;
+        this.xOrigin = this.margin + xOrigin;
+        this.yOrigin = this.margin + yOrigin;
     }
-    this.rowWidth = (container.width - xOrigin * this.numberOfColumns) /
+    this.rowWidth = (container.width - xOrigin - this.margin * 2) /
         this.numberOfColumns;
-    this.rowHeight = (container.height - yOrigin * this.numberOfRows) /
+    this.rowHeight = (container.height - yOrigin - this.margin * 2) /
         this.numberOfRows;
     this.container = container;
 };
@@ -54,10 +57,10 @@ GridLayout.prototype.addElement = function(element) {
         }
     }
     var xCentered = (this.rowWidth / 2) - (element.width / 2);
-    element.x = this.xOrigin + (this.rowWidth + MARGIN) *
+    element.x = this.xOrigin + (this.rowWidth) *
         this.currentColumn + xCentered;
     var yCentered = this.yOrigin + (this.rowHeight / 2) - (element.height / 2);
-    element.y = (this.rowHeight + MARGIN) *
+    element.y = (this.rowHeight) *
         this.currentRow + yCentered;
 
     this.container.addChild(element);
@@ -67,7 +70,7 @@ GridLayout.prototype.addElement = function(element) {
 /**
  * Restarts the indexes, currentRow and currentColumn
  */
-GridLayout.prototype.restartsIndexes = function() {
+GridLayout.prototype.restartIndexes = function() {
     this.currentColumn = 0;
     this.currentRow = 0;
 };

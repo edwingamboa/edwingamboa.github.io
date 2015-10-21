@@ -4,7 +4,7 @@
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
-var Button = require('../util/Button');
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 
 /**
  * The number of contexts allowed for this challenge
@@ -33,15 +33,17 @@ ContextGroups.prototype.constructor = ContextGroups;
 ContextGroups.prototype.newChallenge = function() {
     this.clearChallenge();
 
+    var contextsNames = ['Family', 'House'];
     var words = ['Mother', 'Son', 'Father', 'Living room', 'Dining room',
         'Kitchen'];
 
     this.contexts = [];
-    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2};
-    this.source = new GridLayoutPanel('wordField', optionals);
+    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2,
+        margin: 5};
+    this.source = new GridLayoutPanel('wordsBg', optionals);
 
-    optionals = {numberOfColumns: NUMBER_OF_CONTEXTS};
-    var contextsPanels = new GridLayoutPanel('wordField',
+    optionals = {numberOfColumns: NUMBER_OF_CONTEXTS, margin: 0};
+    var contextsPanels = new GridLayoutPanel('englishChallengePanelBg',
         optionals);
 
     var i;
@@ -49,11 +51,15 @@ ContextGroups.prototype.newChallenge = function() {
     var word;
     var wordShade;
     var context;
+    var contextTitle;
     this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
-    optionals = {numberOfRows: this.numberOfWords};
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
-        context = new GridLayoutPanel('itemGroupBackGround',
-            optionals);
+        context = new VerticalLayoutPanel('contextBg', 5);
+        contextTitle = level.game.make.text(0, 0, contextsNames[i]);
+        contextTitle.font = 'Shojumaru';
+        contextTitle.fontSize = 20;
+        contextTitle.fill = '#0040FF';
+        context.addElement(contextTitle);
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
@@ -71,7 +77,7 @@ ContextGroups.prototype.newChallenge = function() {
             word.code = '' + i;
             this.elements.push(word);
 
-            wordShade = new GridLayoutPanel('useButtonShade');
+            wordShade = new VerticalLayoutPanel('wordBg', 2);
             wordShade.code = '' + i;
             this.destinations.push(wordShade);
             context.addElement(wordShade);
@@ -79,18 +85,14 @@ ContextGroups.prototype.newChallenge = function() {
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
-
-    this.confirmButton = new Button('Confirm', this.confirm, this);
-    //this.addElement(Description);
-    this.addElement(contextsPanels);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(contextsPanels);
+    this.mainPanel.addElement(this.source);
 };
 
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @param {Sprite} element - element that is being dragged by the player
  */
 ContextGroups.prototype.bringItemToTop = function(item) {
     if (ContextGroups.prototype.isPrototypeOf(item.parent)) {

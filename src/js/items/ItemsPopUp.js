@@ -8,15 +8,15 @@ var Button = require('../util/Button');
 var HealthPack = require('./HealthPack');
 var Revolver = require('./weapons/Revolver');
 
-var ItemsPopUp = function(tabsLabels, categories) {
-    PopUp.call(this, 'inventory_background', null, 'ItemsPopUp');
+var ItemsPopUp = function(tabsLabels, categories, title) {
+    PopUp.call(this, 'popUpBg', null, title);
 
     this.items = [];
     var i;
     var tab;
     var x = 20;
     for (i = 0; i < tabsLabels.length; i++) {
-        tab = new Button(tabsLabels[i], this.showTab, this, 'tab');
+        tab = new Button(tabsLabels[i], this.showTab, this, 'tabBg');
         tab.category = categories[i];
         tab.x = x;
         tab.y = 58;
@@ -25,8 +25,8 @@ var ItemsPopUp = function(tabsLabels, categories) {
         this.items[categories[i]] = [];
     }
 
-    var dimensions = {numberOfColumns: 5, numberOfRows: 1};
-    this.panel = new GridLayoutPanel('inventoryPanelBg', dimensions);
+    var dimensions = {numberOfColumns: 4, numberOfRows: 2};
+    this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
     this.panel.x = 20;
     this.panel.y = 100;
     this.createItemGroups();

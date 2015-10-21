@@ -29,7 +29,7 @@ MenuItem.prototype.constructor = MenuItem;
  * a new challenge and displays it to the player.
  */
 MenuItem.prototype.buttonAction = function() {
-    this.parent.close();
+    this.parentView.close();
     this.challenge.newChallenge();
     this.challenge.open();
 };

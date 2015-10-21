@@ -30,9 +30,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     var familyMembersCells = [];
 
     for (var key in familyKeys) {
-        var cell = new VerticalLayoutPanel('itemGroupBackGround');
+        var cell = new VerticalLayoutPanel('imageWordBg');
         var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
-        var shade = level.game.make.sprite(0, 0, 'useButtonShade');
+        var shade = new VerticalLayoutPanel('wordBg', 2);
         shade.code = key;
 
         this.destinations.push(shade);
@@ -56,9 +56,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     }
 
     var optionals = {numberOfColumns: this.elements.length};
-    this.source = new GridLayoutPanel('wordField', optionals);
+    this.source = new GridLayoutPanel('wordsBg', optionals);
 
-    var images = new GridLayoutPanel('wordField', optionals);
+    var images = new GridLayoutPanel('englishChallengePanelBg', optionals);
 
     var familyMemberCell;
     for (familyMemberCell in familyMembersCells) {
@@ -66,11 +66,9 @@ ImageWordMatch.prototype.newChallenge = function() {
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
-    this.confirmButton = new Button('Confirm', this.confirm, this);
 
-    this.addElement(images);
-    this.addElement(this.source);
-    this.addElement(this.confirmButton);
+    this.mainPanel.addElement(images);
+    this.mainPanel.addElement(this.source);
 };
 
 /**
