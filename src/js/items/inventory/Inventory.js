@@ -4,6 +4,12 @@
 var ItemsPopUp = require('../ItemsPopUp');
 var InventoryItem = require ('./InventoryItem');
 
+/**
+ * Ui and control for the game Inventory.
+ * @class Inventory
+ * @extends ItemsPopUp
+ * @constructor
+ */
 var Inventory = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
@@ -13,6 +19,11 @@ var Inventory = function() {
 Inventory.prototype = Object.create(ItemsPopUp.prototype);
 Inventory.prototype.constructor = Inventory;
 
+/**
+ * Adds a new item to the inventory to be displayed for the player.
+ * @method Inventory.addItem
+ * @param {Item} item - Item to be added to the inventory.
+ */
 Inventory.prototype.addItem = function(item) {
     if (this.items[item.category][item.key] === undefined) {
         this.items[item.category][item.key] = new InventoryItem(item, this);

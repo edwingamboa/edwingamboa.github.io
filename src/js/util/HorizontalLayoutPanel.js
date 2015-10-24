@@ -5,9 +5,13 @@
 var HorizontalLayout = require('./HorizontalLayout');
 /**
  * Represents a panel that has a HorizontalLayout to arrange its elements.
- * @param backgroundKey {string} Texture's key for panel's background
- * @param optionals {Array} array containing optional parameters x and/or y
- * coordinates for the panel, it can be undefined (optional)
+ * @class HorizontalLayoutPanel
+ * @extends Phaser.Sprite
+ * @param {string} backgroundKey - Texture's key for panel's background
+ * @param {Object} [optionals.x = 0] - X coordinate for the panel within its
+ * parent view.
+ * @param {Object} [optionals.y = 0] - Y coordinate for the panel within its
+ * parent view.
  * @constructor
  */
 var HorizontalLayoutPanel = function(backgroundKey, optionals) {
@@ -23,7 +27,8 @@ HorizontalLayoutPanel.prototype.constructor = HorizontalLayoutPanel;
 
 /**
  * Adds an element to the Panel horizontally.
- * @param element
+ * @method HorizontalLayoutPanel.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the panel.
  */
 HorizontalLayoutPanel.prototype.addElement = function(element) {
     this.layout.addElement(element);

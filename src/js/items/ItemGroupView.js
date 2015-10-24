@@ -4,6 +4,16 @@
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var Button = require('../util/Button');
 
+/**
+ * View for an item in a menu of items.
+ * @class ItemGroupView
+ * @extends VerticalLayoutPanel
+ * @constructor
+ * @param {string} iconKey - Texture's key for the item icon.
+ * @param {string} buttonText - Text to show on the action button.
+ * @param {ItemsPopUp} parentView - View on which the ItemGroupView will be
+ * displayed.
+ */
 var ItemGroupView = function(iconKey, buttonText, parentView) {
     VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
@@ -43,19 +53,38 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
 ItemGroupView.prototype = Object.create(VerticalLayoutPanel.prototype);
 ItemGroupView.prototype.constructor = ItemGroupView;
 
+/**
+ * Action to be performed when the button action is clicked.
+ * @method ItemGroupView.buttonAction
+ */
 ItemGroupView.prototype.buttonAction = function() {};
 
+/**
+ * Sets the description text to be displayed to the player.
+ * @method ItemGroupView.setDescription
+ * @param {string} description - Text that describes the item.
+ */
 ItemGroupView.prototype.setDescription = function(description) {
     this.description.text = description;
     this.description.x = this.width / 2 - this.description.width / 2;
 };
 
+/**
+ * Sets the items title to be displayed to the player.
+ * @method ItemGroupView.setTitle
+ * @param {string} title - Item title.
+ */
 ItemGroupView.prototype.setTitle = function(title) {
     this.title.text = title;
     this.title.x = this.width / 2 - this.title.width / 2;
 
 };
 
+/**
+ * Sets the auxiliary or secondary text.
+ * @method ItemGroupView.setAuxText
+ * @param {string} auxText - Auxiliary or secondary text of this view.
+ */
 ItemGroupView.prototype.setAuxText = function(auxText) {
     this.auxText.text = auxText;
 };

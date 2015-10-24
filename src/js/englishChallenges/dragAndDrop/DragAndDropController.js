@@ -5,19 +5,23 @@ var Utilities = require('../../util/Utilities');
 
 /**
  * Controls draggable elements that are dropped in some destinations.
+ * @class DragAndDropController
  * @constructor
- * @param container {Phaser.Sprite} Sprite tha contains the draggable elements,
- * their initial location (source) and their possible destinations.
+ * @param {Phaser.Sprite} container - Sprite tha contains the draggable
+ * elements, their initial location (source) and their possible destinations.
  */
 var DragAndDropController = function(container) {
     this.container = container;
 };
 
+DragAndDropController.prototype.constructor = DragAndDropController;
+
 /**
  * Adds a draggable element to a destination.
- * @param element {Phaser.Sprite} element to be added.
- * @param destinationIndex {string} index (key) to of the destination, where the
- * element will be added.
+ * @method DragAndDropController.addToADestination
+ * @param {Phaser.Sprite} element - element to be added.
+ * @param {string} destinationIndex - index (key) to of the destination, where
+ * the element will be added.
  */
 DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
@@ -27,7 +31,8 @@ DragAndDropController.prototype.addToADestination = function(element,
 
 /**
  * Controls where to locate an element after it is dropped by the player.
- * @param element {Phaser.Sprite} Dropped element to locate
+ * @method DragAndDropController.fixLocation
+ * @param {Phaser.Sprite} element - Dropped element to locate
  */
 DragAndDropController.prototype.fixLocation = function(element) {
     var key;
@@ -43,7 +48,9 @@ DragAndDropController.prototype.fixLocation = function(element) {
 
 /**
  * Determines whether all the destinations have the correct element as children.
- * @returns {boolean}
+ * @method DragAndDropController.elementsInCorrectDestination
+ * @returns {boolean} - true if elements are correctly arranged, otherwise
+ * false.
  */
 DragAndDropController.prototype.elementsInCorrectDestination = function() {
     var key;
@@ -58,7 +65,8 @@ DragAndDropController.prototype.elementsInCorrectDestination = function() {
 
 /**
  * Determines whether any destination is empty.
- * @returns {boolean}
+ * @method DragAndDropController.emptyDestinations
+ * @returns {boolean} - true if any destination is empty, otherwise false
  */
 DragAndDropController.prototype.emptyDestinations = function() {
     var key;
@@ -72,7 +80,8 @@ DragAndDropController.prototype.emptyDestinations = function() {
 
 /**
  * Locates an element within its source container.
- * @param element {Phaser.Sprite} element to relocate.
+ * @method DragAndDropController.returnElementToSource
+ * @param {Phaser.Sprite} element - element to relocate.
  */
 DragAndDropController.prototype.returnElementToSource = function(element) {
     element.x = element.sourceX;
@@ -82,6 +91,7 @@ DragAndDropController.prototype.returnElementToSource = function(element) {
 
 /**
  * Add every element to the source but in a random order.
+ * @method DragAndDropController.addElementsToSourceRandomly
  */
 DragAndDropController.prototype.addElementsToSourceRandomly = function() {
     var utils = new Utilities();

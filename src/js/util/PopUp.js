@@ -1,7 +1,15 @@
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var MARGIN = 10;
+/**
+ * Represents a pop up window.
+ * @class PopUp
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} backgroundKey - Background texture key.
+ * @param {PopUP} [parent] - View that creates this PopUP.
+ * @param {string} [title] - PopUp title.
+ */
 var PopUp = function(backgroundKey, parent, title) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
@@ -41,6 +49,10 @@ var PopUp = function(backgroundKey, parent, title) {
 PopUp.prototype = Object.create(Phaser.Sprite.prototype);
 PopUp.prototype.constructor = PopUp;
 
+/**
+ * Closes or disposes this PopUp window.
+ * @method PopUp.close
+ */
 PopUp.prototype.close = function() {
     this.visible = false;
     level.activePopUps --;
@@ -50,6 +62,10 @@ PopUp.prototype.close = function() {
     this.kill();
 };
 
+/**
+ * Opens or displays this PopUp window.
+ * @method PopUp.open
+ */
 PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
@@ -63,6 +79,7 @@ PopUp.prototype.open = function() {
 
 /**
  * Remove all the elements that contains the PopUp
+ * @method PopUp.removeAllElements
  */
 PopUp.prototype.removeAllElements = function() {
     var index = 1;

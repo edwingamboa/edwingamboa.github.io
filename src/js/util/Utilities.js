@@ -5,14 +5,16 @@
 /**
  * Tha class Utilities contains different functions or utilities that are useful
  * within other classes.
+ * @class Utilities
  * @constructor
  */
 var Utilities = function() {};
 
 /**
- * Returns a list with random indexes for an array of length = size
- * @param {number} size array's length
- * @returns {Array} array containing the random indexes
+ * Returns a list with random indexes for an array of length = size.
+ * @method Utilities.randomIndexesArray
+ * @param {number} size - Array's length.
+ * @returns {number[]} Array containing the random indexes.
  */
 Utilities.prototype.randomIndexesArray = function(size) {
     var randomIndex;

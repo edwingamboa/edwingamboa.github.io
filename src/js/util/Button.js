@@ -2,6 +2,16 @@
  * Created by Edwin Gamboa on 10/10/2015.
  */
 
+/**
+ * Represents a Button for the views.
+ * @class Button
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} text - Buttons label.
+ * @param {function} action - Action to be carried out when button is clicked.
+ * @param {Phaser.Sprite} parent - View that contains this button.
+ * @param {string} iconKey - Button's texture key.
+ */
 var Button = function(text, action, parent, iconKey) {
     var key = iconKey || 'button';
     Phaser.Sprite.call(this, level.game, 0, 0, key);

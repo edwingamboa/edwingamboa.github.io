@@ -4,11 +4,40 @@
 var PopUp = require('../util/PopUp');
 var ResourceBar = require('../util/ResourceBar');
 
+/**
+ * Default car speed.
+ * @constant
+ * @type {number}
+ */
 var DEFAULT_CAR_SPEED = 400;
+/**
+ * Default greatest car speed.
+ * @constant
+ * @type {number}
+ */
 var DEFAULT_CAR_MAX_SPEED = 500;
+/**
+ * Car gravity.
+ * @constant
+ * @type {number}
+ */
 var CAR_GRAVITY = 30000;
+/**
+ * Longest distance that car can go.
+ * @constant
+ * @type {number}
+ */
 var MAX_DISTANCE = 400;
 
+/**
+ * Represents a car, which player can interact with.
+ * @class InteractiveCar
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - Car x coordinate within the world.
+ * @param {number} y - Car y coordinate within the world.
+ * @param {string} backgroundKey - Car texture key.
+ */
 var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -42,6 +71,10 @@ var InteractiveCar = function(x, y, backgroundKey) {
 InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
+/**
+ * Allows the player to get on the car.
+ * @method InteractiveCar.getOn
+ */
 InteractiveCar.prototype.getOn = function() {
     level.player.onVehicle = true;
     level.player.relocate(this.x, this.y - 100);
@@ -50,6 +83,10 @@ InteractiveCar.prototype.getOn = function() {
     this.occupied = true;
 };
 
+/**
+ * Allows the player to get off the car.
+ * @method InteractiveCar.getOff
+ */
 InteractiveCar.prototype.getOff = function() {
     this.stop();
     level.player.onVehicle = false;
@@ -59,6 +96,11 @@ InteractiveCar.prototype.getOff = function() {
     this.occupied = false;
 };
 
+/**
+ * Updates car current state, animations and traveled distance, to stop it when
+ * it has traveled the longest possible distance.
+ * @method InteractiveCar.update
+ */
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
         this.body.velocity.x = level.player.body.velocity.x;
@@ -81,10 +123,19 @@ InteractiveCar.prototype.update = function() {
     }
 };
 
+/**
+ * Determines whether the car is stopped or not.
+ * @method InteractiveCar.isStopped
+ * @returns {boolean} - True if car speed = 0, otherwise false.
+ */
 InteractiveCar.prototype.isStopped = function() {
     return this.body.velocity.x === 0;
 };
 
+/**
+ * Stops the car, making speed = 0.
+ * @method InteractiveCar.stop
+ */
 InteractiveCar.prototype.stop = function() {
     this.body.velocity.x = 0;
 };

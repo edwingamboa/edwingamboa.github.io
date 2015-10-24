@@ -9,7 +9,9 @@ var ContextGroups = require('../ContextGroups');
 var ImageWordMatch = require('../ImageWordMatch');
 
 /**
- * Menu that allows accessing to all the EnglishChallenges.
+ * Menu UI that allows accessing to all the EnglishChallenges.
+ * @class EnglishChallengesMenu
+ * @extends PopUp
  * @constructor
  */
 var EnglishChallengesMenu = function() {
@@ -28,6 +30,7 @@ EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
 /**
  * Creates the menu, it adds an icon for every EnglishChallenge, so the player
  * can access them.
+ * @method EnglishChallengesMenu.createGames
  */
 EnglishChallengesMenu.prototype.createGames = function() {
     var challenges = [];

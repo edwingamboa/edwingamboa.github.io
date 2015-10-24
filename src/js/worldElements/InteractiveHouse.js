@@ -3,6 +3,15 @@
  */
 var Store = require('../items/store/Store');
 
+/**
+ * Represents a House, which player can interact with.
+ * @class InteractiveHouse
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - House x coordinate within the world.
+ * @param {number} y - House y coordinate within the world.
+ * @param {string} backgroundKey - House texture key.
+ */
 var InteractiveHouse = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -21,10 +30,11 @@ var InteractiveHouse = function(x, y, backgroundKey) {
 InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
+/**
+ *
+ */
 InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new Store(level);
-    level.game.add.existing(popUp);
-    popUp.open();
+    //TODO
 };
 
 module.exports = InteractiveHouse;

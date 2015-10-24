@@ -12,6 +12,7 @@ var MARGIN = 10;
 /**
  * Represents a grid with a fixed number of rows and columns. All the cells have
  * the same height and width.
+ * @class GridLayout
  * @constructor
  * @param {number} numberOfColumns - Number of columns for the grid.
  * @param {number} numberOfRows - Number of rows for the grid.
@@ -46,6 +47,7 @@ GridLayout.prototype.constructor = GridLayout;
 
 /**
  * Adds an element to the container on the next possible cell of the grid.
+ * @method GridLayout.addElement
  * @param element {Sprite} Element to be added to the container
  */
 GridLayout.prototype.addElement = function(element) {
@@ -68,7 +70,8 @@ GridLayout.prototype.addElement = function(element) {
 };
 
 /**
- * Restarts the indexes, currentRow and currentColumn
+ * Restarts the indexes, currentRow and currentColumn.
+ * @method GridLayout.restartIndexes
  */
 GridLayout.prototype.restartIndexes = function() {
     this.currentColumn = 0;

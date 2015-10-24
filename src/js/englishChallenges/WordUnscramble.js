@@ -8,6 +8,8 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 /**
  * Represents the EnglishChallenge in which player is presented with a set of
  * letters that should be correctly arranged in order to form a word.
+ * @class WordUnscramble
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var WordUnscramble = function() {
@@ -21,6 +23,7 @@ WordUnscramble.prototype.constructor = WordUnscramble;
 
 /**
  * Create a new challenge to the player.
+ * @method WordUnscramble.newChallenge
  */
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -64,7 +67,8 @@ WordUnscramble.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @method WordUnscramble.bringItemToTop
+ * @param {Sprite} item - Element that is being dragged by the player.
  */
 WordUnscramble.prototype.bringItemToTop = function(item) {
     if (WordUnscramble.prototype.isPrototypeOf(item.parent)) {

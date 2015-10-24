@@ -19,11 +19,15 @@ var MIN_NUMBER_OF_ROWS = 1;
 
 /**
  * Represents a PopUpLayout that contains a grid layout to arrange its elements.
- * @param backgroundKey {string} Texture's key of the background
- * @param title {string} Name or title of the PopUp
- * @param dimensions {Array} Array containing the number of rows and columns
- * @param parent {Sprite} View or Sprite that opened this PopUp
+ * @class GridLayoutPopUp
+ * @extends PopUp
  * @constructor
+ * @param {string} backgroundKey - Texture's key of the background
+ * @param {string} title - Name or title of the PopUp.
+ * @param {Object} [dimensions.numberOfColumns] - Number of columns for the
+ * PopUp.
+ * @param {Object} [dimensions.numberOfRows] - Number of rows for the PopUp.
+ * @param {Phaser.Sprite} parent - View or Sprite that opened this PopUp.
  */
 var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
     PopUp.call(this, backgroundKey, parent, title);
@@ -43,7 +47,8 @@ GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
 
 /**
  * Add an element to the container in the next possible cell of the grid.
- * @param element
+ * @method GridLayoutPopUp.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the view.
  */
 GridLayoutPopUp.prototype.addElement = function(element) {
     this.grid.addElement(element);
@@ -52,6 +57,7 @@ GridLayoutPopUp.prototype.addElement = function(element) {
 /**
  * Restarts the positions x and y to the origin, so that next elements will be
  * added in the first position.
+ * @method GridLayoutPopUp.restartPositions
  */
 GridLayoutPopUp.prototype.restartPositions = function() {
     this.grid.restartsIndexes();

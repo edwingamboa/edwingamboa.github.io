@@ -8,6 +8,15 @@ var Button = require('../util/Button');
 var HealthPack = require('./HealthPack');
 var Revolver = require('./weapons/Revolver');
 
+/**
+ * View that contains a menu of items, grouped by category.
+ * @class ItemsPopUp
+ * @extends PopUp
+ * @constructor
+ * @param {Object[]} tabsLabels - Items categories names.
+ * @param {Object[]} categories - Items categories (code Names).
+ * @param {string} title - This view's title.
+ */
 var ItemsPopUp = function(tabsLabels, categories, title) {
     PopUp.call(this, 'popUpBg', null, title);
 
@@ -37,6 +46,11 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
 ItemsPopUp.prototype = Object.create(PopUp.prototype);
 ItemsPopUp.prototype.constructor = ItemsPopUp;
 
+/**
+ * Displays a tab's content, before that it cleans the current content.
+ * @method ItemsPopUp.showTab
+ * @param {Button} tab - Button that represents a tab on the view.
+ */
 ItemsPopUp.prototype.showTab = function(tab) {
     var key;
     for (key in this.panel.children) {
@@ -46,6 +60,11 @@ ItemsPopUp.prototype.showTab = function(tab) {
     this.fillPanel(tab.category);
 };
 
+/**
+ * Fills the main panel with the items that belongs to a category.
+ * @method ItemsPopUp.fillPanel
+ * @param {string} category - Categories code name or key.
+ */
 ItemsPopUp.prototype.fillPanel = function(category) {
     var key;
     for (key in this.items[category]) {
@@ -56,6 +75,10 @@ ItemsPopUp.prototype.fillPanel = function(category) {
     }
 };
 
+/**
+ * Creates all items views.
+ * @method ItemsPopUp.createItemGroups
+ */
 ItemsPopUp.prototype.createItemGroups = function() {
     var revolverItem = new Revolver(0, 0, false);
     this.addItem(revolverItem);

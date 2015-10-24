@@ -1,11 +1,19 @@
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
+
 /**
- * Created by Edwin Gamboa on 22/07/2015.
+ * Manages Game Intro, in which is presented background game story.
+ * @class LevelOneIntro
+ * @constructor
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelOneIntro = function(game) {};
 
+/**
+ * Creates the comic for the intro and a button to continue.
+ * @method LevelOneIntro.create
+ */
 LevelOneIntro.prototype.create = function() {
     var centerX = this.game.camera.width / 2;
     var centerY = this.game.camera.height / 2;
@@ -28,6 +36,10 @@ LevelOneIntro.prototype.create = function() {
     continueButton.events.onInputDown.add(this.continue, this);
 };
 
+/**
+ * Allows the player to start level one.
+ * @method LevelOneIntro.continue
+ */
 LevelOneIntro.prototype.continue = function() {
     this.game.state.start('levelOne');
 };

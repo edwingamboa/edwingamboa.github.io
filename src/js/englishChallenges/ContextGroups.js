@@ -16,6 +16,8 @@ var NUMBER_OF_CONTEXTS = 2;
 /**
  * Represents the EnglishChallenge in which the player should associate each
  * word to one context. This is a drag and drop kind of challenge.
+ * @class ContextGroups
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var ContextGroups = function() {
@@ -29,6 +31,7 @@ ContextGroups.prototype.constructor = ContextGroups;
 
 /**
  * Create a new challenge to the player.
+ * @method ContextGroups.newChallenge
  */
 ContextGroups.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -92,7 +95,8 @@ ContextGroups.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param {Sprite} element - element that is being dragged by the player
+ * @method ContextGroups.bringItemToTop
+ * @param {Phaser.Sprite} item - element that is being dragged by the player
  */
 ContextGroups.prototype.bringItemToTop = function(item) {
     if (ContextGroups.prototype.isPrototypeOf(item.parent)) {

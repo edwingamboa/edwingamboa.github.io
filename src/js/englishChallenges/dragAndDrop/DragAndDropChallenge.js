@@ -9,13 +9,14 @@ var DragAndDropController = require('./DragAndDropController');
 var Button = require('../../util/Button');
 
 /**
- * Represents an EnglishChallenge that have draggable elements, which need to be
- * arranged in a certain destinations.
- * @param iconKey {string} Texture key of the Challenge icon
- * @param challengeName {string} Challenge name to show in UI.
- * @param score {number} Score to be increased in case of success.
- * for the challenge UI.
+ * Represents the UI for an EnglishChallenge that have draggable elements, which
+ * need to be arranged in a certain destinations.
+ * @class DragAndDropChallenge
+ * @extends VerticalLayoutPopUp
  * @constructor
+ * @param {string} iconKey - Texture key of the Challenge icon
+ * @param {string} challengeName - Challenge name to show in UI.
+ * @param {number} score - Score to be increased in case of success.
  */
 var DragAndDropChallenge = function(iconKey, challengeName, score) {
     VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
@@ -37,8 +38,9 @@ DragAndDropChallenge.prototype = Object.create(VerticalLayoutPopUp.prototype);
 DragAndDropChallenge.prototype.constructor = DragAndDropChallenge;
 
 /**
- * Controls if the Challenge is complete and successfully overcome.
+ * Controls whether the Challenge is completed and successfully overcome.
  * messages
+ * @method DragAndDropChallenge.confirm
  */
 DragAndDropChallenge.prototype.confirm = function() {
     if (this.dragAndDropControl.emptyDestinations()) {
@@ -56,6 +58,7 @@ DragAndDropChallenge.prototype.confirm = function() {
 /**
  * Clear all the containers and elements of the challenge, so that a new
  * challenge can be created.
+ * @method DragAndDropChallenge.
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
     if (this.mainPanel.children.length > 0) {

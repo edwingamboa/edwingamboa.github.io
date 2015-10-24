@@ -6,6 +6,8 @@ var VerticalLayout = require('./VerticalLayout');
 
 /**
  * Represents a panel that has a VerticalLayout to arrange its elements.
+ * @class VerticalLayoutPanel
+ * @extends Phaser.Sprite
  * @constructor
  * @param {string} backgroundKey - Texture's key for panel's background
  * @param {number} margin - Margin or space between elements, optional
@@ -22,7 +24,8 @@ VerticalLayoutPanel.prototype.constructor = VerticalLayoutPanel;
 
 /**
  * Adds an element to the Panel vertically.
- * @param element
+ * @method VerticalLayoutPanel.addElement
+ * @param {Phaser.Sprite} element - Element to be added.
  */
 VerticalLayoutPanel.prototype.addElement = function(element) {
     this.layout.addElement(element);
@@ -30,6 +33,7 @@ VerticalLayoutPanel.prototype.addElement = function(element) {
 
 /**
  * Remove all the elements that contains the panel
+ * @method VerticalLayoutPanel.removeAllElements
  */
 VerticalLayoutPanel.prototype.removeAllElements = function() {
     this.removeChildren();
@@ -37,7 +41,8 @@ VerticalLayoutPanel.prototype.removeAllElements = function() {
 };
 
 /**
- * Restatrs the positions of x and y to the origin.
+ * Restarts the positions of x and y to the origin.
+ * @method VerticalLayoutPanel.restartPosition
  */
 VerticalLayoutPanel.prototype.restartPosition = function() {
     this.layout.restartPosition();

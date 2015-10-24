@@ -1,26 +1,71 @@
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-
+/**
+ * Default speed for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var SPEED = 150;
+/**
+ * Default greatest speed for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var MAX_SPEED = 250;
+/**
+ * Default initial health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var INITIAL_HEALTH_LEVEL = 100;
+/**
+ * Default greatest health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var MAX_HEALTH_LEVEL = 100;
+/**
+ * Default bounce value for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var BOUNCE = 0.2;
+/**
+ * Default gravity value for aby character.
+ * @constant
+ * @type {number}
+ * @default
+ */
 var GRAVITY = 300;
 
 /**
  * Handles game characters general behaviour.
- * @param x {number} - character's x coordinate within the world
- * @param y {number} - character's y coordinate within the world
- * @param spriteKey {string} - key that represents the character sprite (preload)
- * @param  optionsArgs {object}  - character's physic properties
+ * @class Character
+ * @extends Phaser.Sprite
  * @constructor
+ * @param {number} x - Character's x coordinate within the world.
+ * @param {number} y - Character's y coordinate within the world.
+ * @param {string} spriteKey - Key that represents the character sprite.
+ * @param {Object} [optionals] - Character's physic properties.
+ * @param {Object} [optionals.healthLevel = INITIAL_HEALTH_LEVEL] - Character's
+ * initial health level, when it is 100 at the beginning of a level.
+ * @param {Object} [optionals.maxHealthLevel = MAX_HEALTH_LEVEL] - Character's
+ * greatest health level, use to increase health level till this number.
+ * @param {Object} [optionals.speed = SPEED] - Character's speed, is used when
+ * he walks.
+ * @param {Object} [optionals.maxSpeed = MAX_SPEED] - Character's maximal speed,
+ * it is used when he runs.
  */
-var Character = function(x, y, spriteKey, optionsArgs) {
+var Character = function(x, y, spriteKey, optionals) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
-    var options = optionsArgs || {};
+    var options = optionals || {};
     this.healthLevel = options.healthLevel || INITIAL_HEALTH_LEVEL;
     this.maxHealthLevel = options.maxHealthLevel || MAX_HEALTH_LEVEL;
     this.speed = options.speed || SPEED;
@@ -44,6 +89,7 @@ Character.prototype.constructor = Character;
 
 /**
  * Moves the character in the left direction using normal speed.
+ * @method Character.moveLeft
  */
 Character.prototype.moveLeft = function() {
     this.body.velocity.x = -this.speed;
@@ -59,6 +105,7 @@ Character.prototype.moveLeft = function() {
 
 /**
  * Moves the character in the right direction using normal speed.
+ * @method Character.moveRight
  */
 Character.prototype.moveRight = function() {
     this.body.velocity.x = this.speed;
@@ -74,6 +121,7 @@ Character.prototype.moveRight = function() {
 
 /**
  * Moves the character in the left direction using running speed.
+ * @method Character.runLeft
  */
 Character.prototype.runLeft = function() {
     this.body.velocity.x = -this.maxSpeed;
@@ -89,6 +137,7 @@ Character.prototype.runLeft = function() {
 
 /**
  * Moves the character in the right direction using running speed.
+ * @method Character.runRight
  */
 Character.prototype.runRight = function() {
     this.body.velocity.x = this.maxSpeed;
@@ -104,6 +153,7 @@ Character.prototype.runRight = function() {
 
 /**
  * Stops the character and its animations.
+ * @method Character.stop
  */
 Character.prototype.stop = function() {
     this.body.velocity.x = 0;
@@ -116,9 +166,11 @@ Character.prototype.stop = function() {
 };
 
 /**
- * Determines whether the character's current health level is maxHelathLevel (is
+ * Determines whether the character's current health level is maxHealthLevel (is
  * full) or not.
- * @returns {boolean}
+ * @method Character.fullHealthLevel
+ * @returns {boolean} True if player's health level is the greatest, otherwise
+ * false.
  */
 Character.prototype.fullHealthLevel = function() {
     return this.healthLevel === this.maxHealthLevel;
@@ -128,6 +180,7 @@ Character.prototype.fullHealthLevel = function() {
  * Increase the character health level. If after the increasing, the healthLevel
  * is greater than or equal to the maxHealthLevel property, then healthLevel
  * will be maxHealthLevel.
+ * @method Character.increaseHealthLevel
  * @param {number} increase - the amount to increase.
  */
 Character.prototype.increaseHealthLevel = function(increase) {
@@ -140,6 +193,7 @@ Character.prototype.increaseHealthLevel = function(increase) {
 /**
  * Decrease the character health level. If after the decreasing, the healthLevel
  * is lees than or equal to 0, then character and its elements will be killed.
+ * @method Character.decreaseHealthLevel
  * @param {number} decrease - the amount to decrease.
  */
 Character.prototype.decreaseHealthLevel = function(decrease) {
@@ -151,6 +205,7 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
 
 /**
  * Kill the character and his elements.
+ * @method Character.killCharacter
  */
 Character.prototype.killCharacter = function() {
     for (var weaponKey in this.weapons) {
@@ -161,6 +216,7 @@ Character.prototype.killCharacter = function() {
 
 /**
  * Set the character health level.
+ * @method Character.setHealthLevel
  * @param {number} healthLevel - the new caharacter's healthLevel.
  */
 Character.prototype.setHealthLevel = function(healthLevel) {
@@ -171,7 +227,7 @@ Character.prototype.setHealthLevel = function(healthLevel) {
  * Updates player's current weapon, the old weapon is killed (out of stage) and
  * the new one is shown on screen. If the new one is a weapon that was killed,
  * then it is revived and shown on screen.
- *
+ * @method Character.weaponKey
  * @param {string} weaponKey - new current weapon's key
  */
 Character.prototype.updateCurrentWeapon = function(weaponKey) {
@@ -188,6 +244,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 /**
  * Changes player's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
+ * @method Character.nextWeapon
  */
 Character.prototype.nextWeapon = function() {
     this.currentWeaponIndex++;
@@ -199,6 +256,7 @@ Character.prototype.nextWeapon = function() {
 
 /**
  * Add a new weapon to character's weapons.
+ * @method Character.addWeapon
  * @param newWeapon {object} The weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
@@ -210,6 +268,7 @@ Character.prototype.addWeapon = function(newWeapon) {
 
 /**
  * Fires the current weapon if it is defined
+ * @method Character.fireToXY
  * @param x {number} X coordinate on the point to fire
  * @param y {number} Y coordinate on the point to fire
  */
@@ -219,6 +278,7 @@ Character.prototype.fireToXY = function(x, y) {
 
 /**
  * Lets to relocate the character on the given coordinates
+ * @method Character.relocate
  * @param x {number} X coordinate to be relocated
  * @param y {number} Y coordinate to be relocated
  */
@@ -227,6 +287,11 @@ Character.prototype.relocate = function(x, y) {
     this.y = y;
 };
 
+/**
+ * Updates current weapon, so that character can use it.
+ * @method Character.useWeapon
+ * @param {Weapon} weapon - Weapon to be used by the character.
+ */
 Character.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
@@ -242,6 +307,10 @@ Character.prototype.useWeapon = function(weapon) {
     }
 };
 
+/**
+ * Allows the character to jump.
+ * @method Character.jump
+ */
 Character.prototype.jump = function() {
     this.body.velocity.y = -350;
 };

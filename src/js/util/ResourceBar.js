@@ -3,12 +3,14 @@
  */
 
 /**
- * Bar that shows the remaining part of a resource, for example a Health Bar
- * @param x {number} X coordinate of the bar.
- * @param y {number} Y coordinate of the bar.
- * @param size {Array} Array containing width and height of the bar,
- * it is optional
+ * Bar that shows the remaining part of a resource, for example a HealthBar.
+ * @class ResourceBar
+ * @extends Phaser.Sprite
  * @constructor
+ * @param {number} x - X coordinate of the bar.
+ * @param {number} y - Y coordinate of the bar.
+ * @param {Object} [size.width] - Bar width.
+ * @param {Object} [size.height] - Bar height.
  */
 var ResourceBar = function(x, y, size) {
     Phaser.Sprite.call(this, level.game, x, y, 'healthBarBackground');
@@ -26,7 +28,9 @@ ResourceBar.prototype.constructor = ResourceBar;
 
 /**
  * Updates the current level of the bar.
- * @param barLevel
+ * @method ResourceBar.updateResourceBarLevel
+ * @param {number} barLevel - Number between 0 (0%) and 1 (100%), that
+ * represents the bar current level.
  */
 ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
     this.bar.scale.x = barLevel;

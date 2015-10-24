@@ -3,6 +3,14 @@
  */
 var ItemGroupView = require('../ItemGroupView');
 
+/**
+ * View an inventory item.
+ * @class InventoryItem
+ * @extends ItemGroupView
+ * @constructor
+ * @param {Item} item - Item to be displayed by this class.
+ * @param {Inventory} parentView - View on which the item will be displayed.
+ */
 var InventoryItem = function(item, parentView) {
     ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
 
@@ -16,6 +24,10 @@ var InventoryItem = function(item, parentView) {
 InventoryItem.prototype = Object.create(ItemGroupView.prototype);
 InventoryItem.prototype.constructor = InventoryItem;
 
+/**
+ * Allows the player to use this item.
+ * @method InventoryItem.buttonAction
+ */
 InventoryItem.prototype.buttonAction = function() {
     if (this.amountAvailable > 0) {
         this.item.use();
@@ -28,6 +40,10 @@ InventoryItem.prototype.buttonAction = function() {
     }
 };
 
+/**
+ * Updates the remaining amount of this item.
+ * @method InventoryItem.updateAmountAvailableText
+ */
 InventoryItem.prototype.updateAmountAvailableText = function() {
     this.setAuxText('x ' + this.amountAvailable);
 };

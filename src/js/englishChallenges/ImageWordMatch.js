@@ -3,13 +3,14 @@
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
-var Button = require('../util/Button');
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 
 /**
  * Represents the EnglishChallenge in which player should match a word with its
  * corresponding image representation. This is a drag and drop challenge.
+ * @class ImageWordMatch
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var ImageWordMatch = function() {
@@ -23,6 +24,7 @@ ImageWordMatch.prototype.constructor = ImageWordMatch;
 
 /**
  * Create a new challenge to the player.
+ * @method ImageWordMatch.newChallenge
  */
 ImageWordMatch.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -74,7 +76,8 @@ ImageWordMatch.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @method ImageWordMatch.bringItemToTop
+ * @param {Sprite} element - element that is being dragged by the player
  */
 ImageWordMatch.prototype.bringItemToTop = function(element) {
     if (ImageWordMatch.prototype.isPrototypeOf(element.parent)) {

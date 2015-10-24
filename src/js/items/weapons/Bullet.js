@@ -1,8 +1,16 @@
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
-var Bullet;
-Bullet = function(power, imageKey) {
+
+/**
+ * Controls a bullet from a weapon.
+ * @class Bullet
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} power - Damage that can cause this bullet.
+ * @param {string} imageKey - Texture's key of this bullet.
+ */
+var Bullet = function(power, imageKey) {
     Phaser.Sprite.call(this, level.game, 0, 0, imageKey);
     this.power = power;
 

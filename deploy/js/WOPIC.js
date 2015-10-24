@@ -1,18 +1,40 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
-
 WebFontConfig = {
     google: {
         families: ['Shojumaru']
     }
 };
 
-//Game States
+/**
+ * Phaser variable game.
+ * @type {Phaser.Game}
+ */
+var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
+/**
+ * Game Boot state
+ * @type {Boot}
+ */
 var Boot = require('./states/Boot');
+/**
+ * Game preloader state, it loads all assets.
+ * @type {Preloader}
+ */
 var Preloader = require('./states/Preloader');
+/**
+ * Main menu state, allows the player start a game.
+ * @type {Menu|exports|module.exports}
+ */
 var Menu = require('./states/Menu');
-var LevelOne = require('./states/levels/LevelOne');
+/**
+ * Game Intro, introduces the game backgroudn story to the player.
+ * @type {LevelOneIntro}
+ */
 var LevelOneIntro = require('./states/levels/LevelOneIntro');
+/**
+ * Level one state.
+ * @type {LevelOne|exports|module.exports}
+ */
+var LevelOne = require('./states/levels/LevelOne');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
@@ -25,26 +47,71 @@ game.state.start('boot');
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
-
+/**
+ * Default speed for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var SPEED = 150;
+/**
+ * Default greatest speed for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var MAX_SPEED = 250;
+/**
+ * Default initial health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var INITIAL_HEALTH_LEVEL = 100;
+/**
+ * Default greatest health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var MAX_HEALTH_LEVEL = 100;
+/**
+ * Default bounce value for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
 var BOUNCE = 0.2;
+/**
+ * Default gravity value for aby character.
+ * @constant
+ * @type {number}
+ * @default
+ */
 var GRAVITY = 300;
 
 /**
  * Handles game characters general behaviour.
- * @param x {number} - character's x coordinate within the world
- * @param y {number} - character's y coordinate within the world
- * @param spriteKey {string} - key that represents the character sprite (preload)
- * @param  optionsArgs {object}  - character's physic properties
+ * @class Character
+ * @extends Phaser.Sprite
  * @constructor
+ * @param {number} x - Character's x coordinate within the world.
+ * @param {number} y - Character's y coordinate within the world.
+ * @param {string} spriteKey - Key that represents the character sprite.
+ * @param {Object} [optionals] - Character's physic properties.
+ * @param {Object} [optionals.healthLevel = INITIAL_HEALTH_LEVEL] - Character's
+ * initial health level, when it is 100 at the beginning of a level.
+ * @param {Object} [optionals.maxHealthLevel = MAX_HEALTH_LEVEL] - Character's
+ * greatest health level, use to increase health level till this number.
+ * @param {Object} [optionals.speed = SPEED] - Character's speed, is used when
+ * he walks.
+ * @param {Object} [optionals.maxSpeed = MAX_SPEED] - Character's maximal speed,
+ * it is used when he runs.
  */
-var Character = function(x, y, spriteKey, optionsArgs) {
+var Character = function(x, y, spriteKey, optionals) {
     Phaser.Sprite.call(this, level.game, x, y, spriteKey);
 
-    var options = optionsArgs || {};
+    var options = optionals || {};
     this.healthLevel = options.healthLevel || INITIAL_HEALTH_LEVEL;
     this.maxHealthLevel = options.maxHealthLevel || MAX_HEALTH_LEVEL;
     this.speed = options.speed || SPEED;
@@ -68,6 +135,7 @@ Character.prototype.constructor = Character;
 
 /**
  * Moves the character in the left direction using normal speed.
+ * @method Character.moveLeft
  */
 Character.prototype.moveLeft = function() {
     this.body.velocity.x = -this.speed;
@@ -83,6 +151,7 @@ Character.prototype.moveLeft = function() {
 
 /**
  * Moves the character in the right direction using normal speed.
+ * @method Character.moveRight
  */
 Character.prototype.moveRight = function() {
     this.body.velocity.x = this.speed;
@@ -98,6 +167,7 @@ Character.prototype.moveRight = function() {
 
 /**
  * Moves the character in the left direction using running speed.
+ * @method Character.runLeft
  */
 Character.prototype.runLeft = function() {
     this.body.velocity.x = -this.maxSpeed;
@@ -113,6 +183,7 @@ Character.prototype.runLeft = function() {
 
 /**
  * Moves the character in the right direction using running speed.
+ * @method Character.runRight
  */
 Character.prototype.runRight = function() {
     this.body.velocity.x = this.maxSpeed;
@@ -128,6 +199,7 @@ Character.prototype.runRight = function() {
 
 /**
  * Stops the character and its animations.
+ * @method Character.stop
  */
 Character.prototype.stop = function() {
     this.body.velocity.x = 0;
@@ -140,9 +212,11 @@ Character.prototype.stop = function() {
 };
 
 /**
- * Determines whether the character's current health level is maxHelathLevel (is
+ * Determines whether the character's current health level is maxHealthLevel (is
  * full) or not.
- * @returns {boolean}
+ * @method Character.fullHealthLevel
+ * @returns {boolean} True if player's health level is the greatest, otherwise
+ * false.
  */
 Character.prototype.fullHealthLevel = function() {
     return this.healthLevel === this.maxHealthLevel;
@@ -152,6 +226,7 @@ Character.prototype.fullHealthLevel = function() {
  * Increase the character health level. If after the increasing, the healthLevel
  * is greater than or equal to the maxHealthLevel property, then healthLevel
  * will be maxHealthLevel.
+ * @method Character.increaseHealthLevel
  * @param {number} increase - the amount to increase.
  */
 Character.prototype.increaseHealthLevel = function(increase) {
@@ -164,6 +239,7 @@ Character.prototype.increaseHealthLevel = function(increase) {
 /**
  * Decrease the character health level. If after the decreasing, the healthLevel
  * is lees than or equal to 0, then character and its elements will be killed.
+ * @method Character.decreaseHealthLevel
  * @param {number} decrease - the amount to decrease.
  */
 Character.prototype.decreaseHealthLevel = function(decrease) {
@@ -175,6 +251,7 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
 
 /**
  * Kill the character and his elements.
+ * @method Character.killCharacter
  */
 Character.prototype.killCharacter = function() {
     for (var weaponKey in this.weapons) {
@@ -185,6 +262,7 @@ Character.prototype.killCharacter = function() {
 
 /**
  * Set the character health level.
+ * @method Character.setHealthLevel
  * @param {number} healthLevel - the new caharacter's healthLevel.
  */
 Character.prototype.setHealthLevel = function(healthLevel) {
@@ -195,7 +273,7 @@ Character.prototype.setHealthLevel = function(healthLevel) {
  * Updates player's current weapon, the old weapon is killed (out of stage) and
  * the new one is shown on screen. If the new one is a weapon that was killed,
  * then it is revived and shown on screen.
- *
+ * @method Character.weaponKey
  * @param {string} weaponKey - new current weapon's key
  */
 Character.prototype.updateCurrentWeapon = function(weaponKey) {
@@ -212,6 +290,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 /**
  * Changes player's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
+ * @method Character.nextWeapon
  */
 Character.prototype.nextWeapon = function() {
     this.currentWeaponIndex++;
@@ -223,6 +302,7 @@ Character.prototype.nextWeapon = function() {
 
 /**
  * Add a new weapon to character's weapons.
+ * @method Character.addWeapon
  * @param newWeapon {object} The weapon to be added.
  */
 Character.prototype.addWeapon = function(newWeapon) {
@@ -234,6 +314,7 @@ Character.prototype.addWeapon = function(newWeapon) {
 
 /**
  * Fires the current weapon if it is defined
+ * @method Character.fireToXY
  * @param x {number} X coordinate on the point to fire
  * @param y {number} Y coordinate on the point to fire
  */
@@ -243,6 +324,7 @@ Character.prototype.fireToXY = function(x, y) {
 
 /**
  * Lets to relocate the character on the given coordinates
+ * @method Character.relocate
  * @param x {number} X coordinate to be relocated
  * @param y {number} Y coordinate to be relocated
  */
@@ -251,6 +333,11 @@ Character.prototype.relocate = function(x, y) {
     this.y = y;
 };
 
+/**
+ * Updates current weapon, so that character can use it.
+ * @method Character.useWeapon
+ * @param {Weapon} weapon - Weapon to be used by the character.
+ */
 Character.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
@@ -266,6 +353,10 @@ Character.prototype.useWeapon = function(weapon) {
     }
 };
 
+/**
+ * Allows the character to jump.
+ * @method Character.jump
+ */
 Character.prototype.jump = function() {
     this.body.velocity.y = -350;
 };
@@ -279,9 +370,37 @@ module.exports = Character;
 var Character = require('./Character');
 var ResourceBar = require('./../util/ResourceBar');
 
+/**
+ * Represents the right direction on the screen.
+ * @constant
+ * @type {number}
+ */
 var RIGHT_DIRECTION = 1;
+/**
+ * Represents the left direction on the screen.
+ * @constant
+ * @type {number}
+ */
 var LEFT_DIRECTION = -1;
 
+/**
+ * Represents an enemy within the game.
+ * @class Enemy
+ * @extends Character
+ * @constructor
+ * @param {string} spriteKey - Texture's key for the enemy sprite.
+ * @param {number} maxHealthLevel - Greatest health level for this enemy.
+ * @param {number} x - Enemy's x coordinate within the game world.
+ * @param {number} y - Enemy's y coordinate within the game world.
+ * @param {number} minRangeDetection - Lowest distance in which the enemy can
+ * detect the player.
+ * @param {number} maxRangeDetection - Longest distance in which the enemy can
+ * detect the player.
+ * @param {number} minRangeAttack - Lowest distance in which the enemy can
+ * shoot the player.
+ * @param {number} maxRangeAttack - Longest distance in which the enemy can
+ * shoot the player.
+ */
 var Enemy = function(spriteKey,
                      maxHealthLevel,
                      x,
@@ -312,6 +431,10 @@ var Enemy = function(spriteKey,
 Enemy.prototype = Object.create(Character.prototype);
 Enemy.prototype.constructor = Enemy;
 
+/**
+ * Update animations and current weapon of the enemy.
+ * @method Enemy.update
+ */
 Enemy.prototype.update = function() {
     if (this.body.velocity.x > 0) {
         this.direction = RIGHT_DIRECTION;
@@ -325,22 +448,43 @@ Enemy.prototype.update = function() {
     this.currentWeapon.updateCoordinates(this.x, this.y);
 };
 
+/**
+ * Updates enemy's health level bar.
+ * @method Enemy.updateHealthLevel
+ */
 Enemy.prototype.updateHealthLevel = function() {
     this.heatlthBar.updateResourceBarLevel(this.healthLevel /
         this.maxHealthLevel);
 };
 
+/**
+ * Kills the character, so that is not visible and functional in the game.
+ * @method Enemy.killCharacter
+ */
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
     level.player.increaseScore(this.maxHealthLevel * 0.1);
     Character.prototype.killCharacter.call(this);
 };
 
+/**
+ * Rotates enemies current weapon to  certain direction.
+ * @method Enemy.rotateWeapon
+ * @param {number} x - X coordinate of a point id the direction, where weapon
+ * will be rotate.
+ * @param {number} y - Y coordinate of a point id the direction, where weapon
+ * will be rotate.
+ */
 Enemy.prototype.rotateWeapon = function(x, y) {
     this.currentWeapon.rotation =
         level.game.physics.arcade.angleToXY(this, x, y);
 };
 
+/**
+ * Stops the enemy, its animations an chose the frame to display according to
+ * its direction.
+ * @method Enemy.stop
+ */
 Enemy.prototype.stop = function() {
     this.body.velocity.x = 0;
     this.animations.stop();
@@ -359,6 +503,18 @@ module.exports = Enemy;
  */
 var Character = require('./Character');
 
+/**
+ * Represents a non player character within the game, whom player will interact
+ * with.
+ * @class NPC
+ * @extends Character
+ * @constructor
+ * @param {number} x - NPC's x coordinate within game world.
+ * @param {number} y - NPC's y coordinate within game world.
+ * @param {string} key - NPC's texture key.
+ * @param {string} comicKey - Texture key of the comic that represents the
+ * interaction between this NPC and the player.
+ */
 var NPC = function(x, y, key, comicKey) {
     Character.call(this, x, y, key);
     this.comicKey = comicKey;
@@ -377,13 +533,38 @@ module.exports = NPC;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-var SPEED = 250;
-var MAX_SPEED = 300;
-var GRAVITY = 300;
 var Character = require('./Character');
-
+/**
+ * Default player speed
+ * @constant
+ * @type {number}
+ */
+var SPEED = 250;
+/**
+ * Default player running speed
+ * @constant
+ * @type {number}
+ */
+var MAX_SPEED = 300;
+/**
+ * Default player gravity
+ * @constant
+ * @type {number}
+ */
+var GRAVITY = 300;
+/**
+ * Default minimum player score, is used at the beginning of the game.
+ * @constant
+ * @type {number}
+ */
 var MINIMUM_SCORE = 10;
 
+/**
+ * Represents player's character within the game.
+ * @class Player
+ * @extends Character
+ * @constructor
+ */
 var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
     Character.call(this, 32, level.game.world.height - 150,
@@ -399,25 +580,47 @@ var Player = function() {
 Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
 
+/**
+ * Allows the player to crouch.
+ * @method Player.crouch
+ */
 Player.prototype.crouch = function() {
     this.animations.stop();
     this.frame = 9;
 };
 
+/**
+ * Increases player's score
+ * @method Player.increaseScore
+ * @param {number} increase - The amount to increase
+ */
 Player.prototype.increaseScore = function(increase) {
     this.score += increase;
     level.updateScoreText();
 };
 
+/**
+ * Increases player's score
+ * @method Player.decreaseScore
+ * @param {number} decrease - The amount to decrease
+ */
 Player.prototype.decreaseScore = function(decrease) {
     this.score += decrease;
     level.updateScoreText();
 };
 
+/**
+ * Updates player health level bar (in the main UI)
+ * @method Player.updateHealthLevel
+ */
 Player.prototype.updateHealthLevel = function() {
     level.updateHealthLevel();
 };
 
+/**
+ * Updates player's current weapon position.
+ * @method Player.update
+ */
 Player.prototype.update = function() {
     if (this.currentWeapon !== undefined) {
         this.currentWeapon.updateCoordinates(this.x + (level.xDirection * 25),
@@ -425,28 +628,48 @@ Player.prototype.update = function() {
     }
 };
 
-Player.prototype.killCharacter = function() {
-    Character.prototype.killCharacter.call(this);
-};
-
+/**
+ * Changes player walking and running speeds.
+ * @method Player.changeSpeed
+ * @param {number} speed - New Player's walking speed.
+ * @param {number} maxSpeed - New Player's running speed.
+ */
 Player.prototype.changeSpeed = function(speed, maxSpeed) {
     this.speed = speed;
     this.maxSpeed = maxSpeed;
 };
 
+/**
+ * Resets player walking and running speeds to default values.
+ * @method Player.resetSpeed
+ */
 Player.prototype.resetSpeed = function() {
     this.speed = SPEED;
     this.maxSpeed = MAX_SPEED;
 };
 
+/**
+ * Changes player gravity.
+ * @method Player.changeGravity
+ * @param {number} gravity - New player gravity.
+ */
 Player.prototype.changeGravity = function(gravity) {
     this.body.gravity.y = gravity;
 };
 
+/**
+ * Resets player gravity to default value.
+ * @method Player.resetGravity
+ */
 Player.prototype.resetGravity = function() {
     this.body.gravity.y = GRAVITY;
 };
 
+/**
+ * Allows the player to buy an item, when he has enough money (score) to do it.
+ * @param {Item} item - Item that is intended to be purchased.
+ * @returns {boolean} - true if purchase was successful, otherwise false.
+ */
 Player.prototype.buyItem = function(item) {
     if (this.score >= item.price) {
         this.score -= item.price;
@@ -465,13 +688,51 @@ module.exports = Player;
 var Enemy = require('./Enemy');
 var Revolver = require('../items/weapons/Revolver');
 
+/**
+ * Texture key for a simple enemy
+ * @constant
+ * @type {string}
+ */
 var SPRITE_KEY = 'simple_enemy';
+/**
+ * Greatest health level of a simple enemy
+ * @constant
+ * @type {number}
+ */
 var MAX_HEALTH_LEVEL = 5;
+/**
+ * Lowest distance in which a simple enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
 var MIN_RANGE_DETECTION = 200;
+/**
+ * Longest distance in which a simple enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
 var MAX_RANGE_DETECTION = 700;
+/**
+ * Lowest distance in which a simple enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
 var MIN_RANGE_ATTACK = 100;
+/**
+ * Longest distance in which a simple enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
 var MAX_RANGE_ATTACK = 300;
 
+/**
+ * Represents the weakest enemies of the game.
+ * @class SimpleEnemy
+ * @extends Enemy
+ * @param {number} x - Simple enemy's x coordinate within the game world.
+ * @param {number} y - Simple enemy's y coordinate within the game world.
+ * @constructor
+ */
 var SimpleEnemy = function(x, y) {
     Enemy.call(this,
         SPRITE_KEY,
@@ -498,13 +759,51 @@ module.exports = SimpleEnemy;
 var Enemy = require('./Enemy');
 var MachineGun = require('../items/weapons/MachineGun');
 
+/**
+ * Texture key for a strong  enemy
+ * @constant
+ * @type {string}
+ */
 var SPRITE_KEY = 'strong_enemy';
+/**
+ * Greatest health level of a strong enemy
+ * @constant
+ * @type {number}
+ */
 var MAX_HEALTH_LEVEL = 150;
+/**
+ * Lowest distance in which a strong enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
 var MIN_RANGE_DETECTION = 1000;
+/**
+ * Longest distance in which a simple enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
 var MIN_RANGE_ATTACK = 600;
+/**
+ * Lowest distance in which a strong enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
 var MAX_RANGE_DETECTION = 1000;
+/**
+ * Longest distance in which a simple enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
 var MAX_RANGE_ATTACK = 600;
 
+/**
+ * Represents the strongest enemies of the game.
+ * @class StrongEnemy
+ * @extends Enemy
+ * @param {number} x - Strong enemy's x coordinate within the game world.
+ * @param {number} y - Strong enemy's y coordinate within the game world.
+ * @constructor
+ */
 var StrongEnemy = function(x, y) {
     Enemy.call(
         this,
@@ -545,6 +844,8 @@ var NUMBER_OF_CONTEXTS = 2;
 /**
  * Represents the EnglishChallenge in which the player should associate each
  * word to one context. This is a drag and drop kind of challenge.
+ * @class ContextGroups
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var ContextGroups = function() {
@@ -558,6 +859,7 @@ ContextGroups.prototype.constructor = ContextGroups;
 
 /**
  * Create a new challenge to the player.
+ * @method ContextGroups.newChallenge
  */
 ContextGroups.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -621,7 +923,8 @@ ContextGroups.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param {Sprite} element - element that is being dragged by the player
+ * @method ContextGroups.bringItemToTop
+ * @param {Phaser.Sprite} item - element that is being dragged by the player
  */
 ContextGroups.prototype.bringItemToTop = function(item) {
     if (ContextGroups.prototype.isPrototypeOf(item.parent)) {
@@ -641,10 +944,11 @@ module.exports = ContextGroups;
 /**
  * Represents an EnglishChallenge within the game. An EnglishChallenge is used,
  * by the player to increase his/her score in a faster way.
- * @param iconKey {string} Texture's key for the icon of the challenge
- * @param name {string} Name of the challenge
- * @param score {number} Score to be increased in case of success.
+ * @class EnglishChallenge
  * @constructor
+ * @param iconKey {string} - Texture's key for the icon of the challenge
+ * @param name {string} - Name of the challenge
+ * @param score {number} - Score to be increased in case of success.
  */
 var EnglishChallenge = function(iconKey, name, score) {
     this.iconKey = iconKey;
@@ -652,10 +956,13 @@ var EnglishChallenge = function(iconKey, name, score) {
     this.score = score;
 };
 
+EnglishChallenge.prototype.constructor = EnglishChallenge;
+
 /**
  * Increases player score and shows a success message. It is called when player
  * overcome the challenge successfully.
- * @param parent Parent Ui to show dalog
+ * @method EnglishChallenge.success
+ * @param {Pahser.Sprite} parent - Current view
  */
 EnglishChallenge.prototype.success = function(parent) {
     level.increaseScore(this.score);
@@ -666,7 +973,8 @@ EnglishChallenge.prototype.success = function(parent) {
 /**
  * Shows a failure message. It is called when player has completed the challenge
  * but in a wrong way.
- * @param parent Parent Ui to show dalog
+ * @method EnglishChallenge.failure
+ * @param {Pahser.Sprite} parent - Current view
  */
 EnglishChallenge.prototype.failure = function(parent) {
     level.showErrorMessage('Sorry! Try Again.', parent);
@@ -675,7 +983,8 @@ EnglishChallenge.prototype.failure = function(parent) {
 /**
  * Shows a failure message. It is called when player has not completed the
  * challenge.
- * @param parent Parent Ui to show dalog
+ * @method EnglishChallenge.incomplete
+ * @param {Pahser.Sprite} parent - Current view
  */
 EnglishChallenge.prototype.incomplete = function(parent) {
     level.showErrorMessage('The challenge is not complete.', parent);
@@ -689,13 +998,14 @@ module.exports = EnglishChallenge;
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
-var Button = require('../util/Button');
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 
 /**
  * Represents the EnglishChallenge in which player should match a word with its
  * corresponding image representation. This is a drag and drop challenge.
+ * @class ImageWordMatch
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var ImageWordMatch = function() {
@@ -709,6 +1019,7 @@ ImageWordMatch.prototype.constructor = ImageWordMatch;
 
 /**
  * Create a new challenge to the player.
+ * @method ImageWordMatch.newChallenge
  */
 ImageWordMatch.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -760,7 +1071,8 @@ ImageWordMatch.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @method ImageWordMatch.bringItemToTop
+ * @param {Sprite} element - element that is being dragged by the player
  */
 ImageWordMatch.prototype.bringItemToTop = function(element) {
     if (ImageWordMatch.prototype.isPrototypeOf(element.parent)) {
@@ -772,7 +1084,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],11:[function(require,module,exports){
+},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -783,6 +1095,8 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
 /**
  * Represents the EnglishChallenge in which player is presented with a set of
  * letters that should be correctly arranged in order to form a word.
+ * @class WordUnscramble
+ * @extends DragAndDropChallenge
  * @constructor
  */
 var WordUnscramble = function() {
@@ -796,6 +1110,7 @@ WordUnscramble.prototype.constructor = WordUnscramble;
 
 /**
  * Create a new challenge to the player.
+ * @method WordUnscramble.newChallenge
  */
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
@@ -839,7 +1154,8 @@ WordUnscramble.prototype.newChallenge = function() {
 /**
  * Brings the element's container to the top. So that, when player drag the
  * element over other containers it is not hidden by them.
- * @param element {Sprite} element that is being dragged by the player
+ * @method WordUnscramble.bringItemToTop
+ * @param {Sprite} item - Element that is being dragged by the player.
  */
 WordUnscramble.prototype.bringItemToTop = function(item) {
     if (WordUnscramble.prototype.isPrototypeOf(item.parent)) {
@@ -863,13 +1179,14 @@ var DragAndDropController = require('./DragAndDropController');
 var Button = require('../../util/Button');
 
 /**
- * Represents an EnglishChallenge that have draggable elements, which need to be
- * arranged in a certain destinations.
- * @param iconKey {string} Texture key of the Challenge icon
- * @param challengeName {string} Challenge name to show in UI.
- * @param score {number} Score to be increased in case of success.
- * for the challenge UI.
+ * Represents the UI for an EnglishChallenge that have draggable elements, which
+ * need to be arranged in a certain destinations.
+ * @class DragAndDropChallenge
+ * @extends VerticalLayoutPopUp
  * @constructor
+ * @param {string} iconKey - Texture key of the Challenge icon
+ * @param {string} challengeName - Challenge name to show in UI.
+ * @param {number} score - Score to be increased in case of success.
  */
 var DragAndDropChallenge = function(iconKey, challengeName, score) {
     VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
@@ -891,8 +1208,9 @@ DragAndDropChallenge.prototype = Object.create(VerticalLayoutPopUp.prototype);
 DragAndDropChallenge.prototype.constructor = DragAndDropChallenge;
 
 /**
- * Controls if the Challenge is complete and successfully overcome.
+ * Controls whether the Challenge is completed and successfully overcome.
  * messages
+ * @method DragAndDropChallenge.confirm
  */
 DragAndDropChallenge.prototype.confirm = function() {
     if (this.dragAndDropControl.emptyDestinations()) {
@@ -910,6 +1228,7 @@ DragAndDropChallenge.prototype.confirm = function() {
 /**
  * Clear all the containers and elements of the challenge, so that a new
  * challenge can be created.
+ * @method DragAndDropChallenge.
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
     if (this.mainPanel.children.length > 0) {
@@ -933,19 +1252,23 @@ var Utilities = require('../../util/Utilities');
 
 /**
  * Controls draggable elements that are dropped in some destinations.
+ * @class DragAndDropController
  * @constructor
- * @param container {Phaser.Sprite} Sprite tha contains the draggable elements,
- * their initial location (source) and their possible destinations.
+ * @param {Phaser.Sprite} container - Sprite tha contains the draggable
+ * elements, their initial location (source) and their possible destinations.
  */
 var DragAndDropController = function(container) {
     this.container = container;
 };
 
+DragAndDropController.prototype.constructor = DragAndDropController;
+
 /**
  * Adds a draggable element to a destination.
- * @param element {Phaser.Sprite} element to be added.
- * @param destinationIndex {string} index (key) to of the destination, where the
- * element will be added.
+ * @method DragAndDropController.addToADestination
+ * @param {Phaser.Sprite} element - element to be added.
+ * @param {string} destinationIndex - index (key) to of the destination, where
+ * the element will be added.
  */
 DragAndDropController.prototype.addToADestination = function(element,
                                                              destinationIndex) {
@@ -955,7 +1278,8 @@ DragAndDropController.prototype.addToADestination = function(element,
 
 /**
  * Controls where to locate an element after it is dropped by the player.
- * @param element {Phaser.Sprite} Dropped element to locate
+ * @method DragAndDropController.fixLocation
+ * @param {Phaser.Sprite} element - Dropped element to locate
  */
 DragAndDropController.prototype.fixLocation = function(element) {
     var key;
@@ -971,7 +1295,9 @@ DragAndDropController.prototype.fixLocation = function(element) {
 
 /**
  * Determines whether all the destinations have the correct element as children.
- * @returns {boolean}
+ * @method DragAndDropController.elementsInCorrectDestination
+ * @returns {boolean} - true if elements are correctly arranged, otherwise
+ * false.
  */
 DragAndDropController.prototype.elementsInCorrectDestination = function() {
     var key;
@@ -986,7 +1312,8 @@ DragAndDropController.prototype.elementsInCorrectDestination = function() {
 
 /**
  * Determines whether any destination is empty.
- * @returns {boolean}
+ * @method DragAndDropController.emptyDestinations
+ * @returns {boolean} - true if any destination is empty, otherwise false
  */
 DragAndDropController.prototype.emptyDestinations = function() {
     var key;
@@ -1000,7 +1327,8 @@ DragAndDropController.prototype.emptyDestinations = function() {
 
 /**
  * Locates an element within its source container.
- * @param element {Phaser.Sprite} element to relocate.
+ * @method DragAndDropController.returnElementToSource
+ * @param {Phaser.Sprite} element - element to relocate.
  */
 DragAndDropController.prototype.returnElementToSource = function(element) {
     element.x = element.sourceX;
@@ -1010,6 +1338,7 @@ DragAndDropController.prototype.returnElementToSource = function(element) {
 
 /**
  * Add every element to the source but in a random order.
+ * @method DragAndDropController.addElementsToSourceRandomly
  */
 DragAndDropController.prototype.addElementsToSourceRandomly = function() {
     var utils = new Utilities();
@@ -1038,7 +1367,9 @@ var ContextGroups = require('../ContextGroups');
 var ImageWordMatch = require('../ImageWordMatch');
 
 /**
- * Menu that allows accessing to all the EnglishChallenges.
+ * Menu UI that allows accessing to all the EnglishChallenges.
+ * @class EnglishChallengesMenu
+ * @extends PopUp
  * @constructor
  */
 var EnglishChallengesMenu = function() {
@@ -1057,6 +1388,7 @@ EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
 /**
  * Creates the menu, it adds an icon for every EnglishChallenge, so the player
  * can access them.
+ * @method EnglishChallengesMenu.createGames
  */
 EnglishChallengesMenu.prototype.createGames = function() {
     var challenges = [];
@@ -1081,10 +1413,12 @@ var ItemGroupView = require('../../items/ItemGroupView');
 
 /**
  * Represents a challenge within the EnglishChallengesMenu.
- * @param challenge {EnglishChallenge} Challenge that can be accessed through
- * this item.
- * @param parentView {PopUp} PopUp that contatins this item.
+ * @class MenuItem
+ * @extends ItemGroupView
  * @constructor
+ * @param {EnglishChallenge} challenge - Challenge that can be accessed through
+ * this item.
+ * @param {PopUp} parentView - PopUp that contains this item.
  */
 var MenuItem = function(challenge, parentView) {
     ItemGroupView.call(this, challenge.englishChallenge.iconKey, 'Play',
@@ -1102,6 +1436,7 @@ MenuItem.prototype.constructor = MenuItem;
 /**
  * Called when the play button is clicked. It close the menu (PopUp), creates
  * a new challenge and displays it to the player.
+ * @method MenuItem.buttonAction
  */
 MenuItem.prototype.buttonAction = function() {
     this.parentView.close();
@@ -1112,6 +1447,7 @@ MenuItem.prototype.buttonAction = function() {
 /**
  * Updates the text that shows the number of points that player can get, after
  * completing the challenge.
+ * @method MenuItem.updateScoreText
  */
 MenuItem.prototype.updateScoreText = function() {
     this.setAuxText('+ $' + this.challenge.englishChallenge.score);
@@ -1123,12 +1459,33 @@ module.exports = MenuItem;
 },{"../../items/ItemGroupView":18}],16:[function(require,module,exports){
 var Item = require('./Item');
 
-var PRCE_INCREASE_RATE = 2;
+/**
+ * Rate use to calculate health pack prize, based on maxIncreasing value.
+ * @constant
+ * @type {number}
+ */
+var PRICE_INCREASE_RATE = 2;
+/**
+ * HealthPack's gravity value.
+ * @constant
+ * @type {number}
+ */
 var GRAVITY = 100;
 
+/**
+ * Represents a health pack that player can use to increase his/her current
+ * health level.
+ * @class HealthPack
+ * @extends Item
+ * @constructor
+ * @param {number} x - HealthPack's x coordinate within the game world.
+ * @param {number} y - HealthPack's y coordinate within the game world.
+ * @param {number} maxIncreasing - Greatest value to increase when player uses
+ * this HealthPack.
+ */
 var HealthPack = function(x, y, maxIncreasing) {
     Item.call(this, x, y, 'healthPack' + maxIncreasing,
-        maxIncreasing * PRCE_INCREASE_RATE);
+        maxIncreasing * PRICE_INCREASE_RATE);
     this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
     this.name = 'Health Pack';
@@ -1139,10 +1496,18 @@ var HealthPack = function(x, y, maxIncreasing) {
 HealthPack.prototype = Object.create(Item.prototype);
 HealthPack.prototype.constructor = HealthPack;
 
+/**
+ * Kills the this item whn player picks it up.
+ * @method HealthPack.pickUp
+ */
 HealthPack.prototype.pickUp = function() {
     this.kill();
 };
 
+/**
+ * Add this HealthPack to the game so that the player can pick it up.
+ * @method HealthPack.use
+ */
 HealthPack.prototype.use = function() {
     if (!this.alive) {
         this.revive();
@@ -1155,8 +1520,23 @@ HealthPack.prototype.use = function() {
 module.exports = HealthPack;
 
 },{"./Item":17}],17:[function(require,module,exports){
+/**
+ * Bounce value for an Item
+ * @constant
+ * @type {number}
+ */
 var BOUNCE = 0.7 + Math.random() * 0.2;
 
+/**
+ * Represents item that player can pick up an store it in inventory.
+ * @class Item
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - Item's x coordinate within the world.
+ * @param {number} y - Item's y coordinate within the world.
+ * @param {string} key - Item texture's key.
+ * @param {number} price - Price to purchase or buy this item.
+ */
 var Item = function(x, y, key, price) {
     Phaser.Sprite.call(this, level.game, x, y, key);
     this.anchor.set(0.5, 0.5);
@@ -1172,10 +1552,20 @@ var Item = function(x, y, key, price) {
 Item.prototype = Object.create(Phaser.Sprite.prototype);
 Item.prototype.constructor = Item;
 
+/**
+ * Sets the text description for this item.
+ * @method Item.setDescription
+ * @param {string} description - Text describing this item.
+ */
 Item.prototype.setDescription = function(description) {
     this.description = description;
 };
 
+/**
+ * Sets Item's name.
+ * @method Item.setName
+ * @param {string} name - Item name.
+ */
 Item.prototype.setName = function(name) {
     this.name = name;
 };
@@ -1189,6 +1579,16 @@ module.exports = Item;
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var Button = require('../util/Button');
 
+/**
+ * View for an item in a menu of items.
+ * @class ItemGroupView
+ * @extends VerticalLayoutPanel
+ * @constructor
+ * @param {string} iconKey - Texture's key for the item icon.
+ * @param {string} buttonText - Text to show on the action button.
+ * @param {ItemsPopUp} parentView - View on which the ItemGroupView will be
+ * displayed.
+ */
 var ItemGroupView = function(iconKey, buttonText, parentView) {
     VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
@@ -1228,19 +1628,38 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
 ItemGroupView.prototype = Object.create(VerticalLayoutPanel.prototype);
 ItemGroupView.prototype.constructor = ItemGroupView;
 
+/**
+ * Action to be performed when the button action is clicked.
+ * @method ItemGroupView.buttonAction
+ */
 ItemGroupView.prototype.buttonAction = function() {};
 
+/**
+ * Sets the description text to be displayed to the player.
+ * @method ItemGroupView.setDescription
+ * @param {string} description - Text that describes the item.
+ */
 ItemGroupView.prototype.setDescription = function(description) {
     this.description.text = description;
     this.description.x = this.width / 2 - this.description.width / 2;
 };
 
+/**
+ * Sets the items title to be displayed to the player.
+ * @method ItemGroupView.setTitle
+ * @param {string} title - Item title.
+ */
 ItemGroupView.prototype.setTitle = function(title) {
     this.title.text = title;
     this.title.x = this.width / 2 - this.title.width / 2;
 
 };
 
+/**
+ * Sets the auxiliary or secondary text.
+ * @method ItemGroupView.setAuxText
+ * @param {string} auxText - Auxiliary or secondary text of this view.
+ */
 ItemGroupView.prototype.setAuxText = function(auxText) {
     this.auxText.text = auxText;
 };
@@ -1258,6 +1677,15 @@ var Button = require('../util/Button');
 var HealthPack = require('./HealthPack');
 var Revolver = require('./weapons/Revolver');
 
+/**
+ * View that contains a menu of items, grouped by category.
+ * @class ItemsPopUp
+ * @extends PopUp
+ * @constructor
+ * @param {Object[]} tabsLabels - Items categories names.
+ * @param {Object[]} categories - Items categories (code Names).
+ * @param {string} title - This view's title.
+ */
 var ItemsPopUp = function(tabsLabels, categories, title) {
     PopUp.call(this, 'popUpBg', null, title);
 
@@ -1287,6 +1715,11 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
 ItemsPopUp.prototype = Object.create(PopUp.prototype);
 ItemsPopUp.prototype.constructor = ItemsPopUp;
 
+/**
+ * Displays a tab's content, before that it cleans the current content.
+ * @method ItemsPopUp.showTab
+ * @param {Button} tab - Button that represents a tab on the view.
+ */
 ItemsPopUp.prototype.showTab = function(tab) {
     var key;
     for (key in this.panel.children) {
@@ -1296,6 +1729,11 @@ ItemsPopUp.prototype.showTab = function(tab) {
     this.fillPanel(tab.category);
 };
 
+/**
+ * Fills the main panel with the items that belongs to a category.
+ * @method ItemsPopUp.fillPanel
+ * @param {string} category - Categories code name or key.
+ */
 ItemsPopUp.prototype.fillPanel = function(category) {
     var key;
     for (key in this.items[category]) {
@@ -1306,6 +1744,10 @@ ItemsPopUp.prototype.fillPanel = function(category) {
     }
 };
 
+/**
+ * Creates all items views.
+ * @method ItemsPopUp.createItemGroups
+ */
 ItemsPopUp.prototype.createItemGroups = function() {
     var revolverItem = new Revolver(0, 0, false);
     this.addItem(revolverItem);
@@ -1324,6 +1766,12 @@ module.exports = ItemsPopUp;
 var ItemsPopUp = require('../ItemsPopUp');
 var InventoryItem = require ('./InventoryItem');
 
+/**
+ * Ui and control for the game Inventory.
+ * @class Inventory
+ * @extends ItemsPopUp
+ * @constructor
+ */
 var Inventory = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
@@ -1333,6 +1781,11 @@ var Inventory = function() {
 Inventory.prototype = Object.create(ItemsPopUp.prototype);
 Inventory.prototype.constructor = Inventory;
 
+/**
+ * Adds a new item to the inventory to be displayed for the player.
+ * @method Inventory.addItem
+ * @param {Item} item - Item to be added to the inventory.
+ */
 Inventory.prototype.addItem = function(item) {
     if (this.items[item.category][item.key] === undefined) {
         this.items[item.category][item.key] = new InventoryItem(item, this);
@@ -1349,6 +1802,14 @@ module.exports = Inventory;
  */
 var ItemGroupView = require('../ItemGroupView');
 
+/**
+ * View an inventory item.
+ * @class InventoryItem
+ * @extends ItemGroupView
+ * @constructor
+ * @param {Item} item - Item to be displayed by this class.
+ * @param {Inventory} parentView - View on which the item will be displayed.
+ */
 var InventoryItem = function(item, parentView) {
     ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
 
@@ -1362,6 +1823,10 @@ var InventoryItem = function(item, parentView) {
 InventoryItem.prototype = Object.create(ItemGroupView.prototype);
 InventoryItem.prototype.constructor = InventoryItem;
 
+/**
+ * Allows the player to use this item.
+ * @method InventoryItem.buttonAction
+ */
 InventoryItem.prototype.buttonAction = function() {
     if (this.amountAvailable > 0) {
         this.item.use();
@@ -1374,6 +1839,10 @@ InventoryItem.prototype.buttonAction = function() {
     }
 };
 
+/**
+ * Updates the remaining amount of this item.
+ * @method InventoryItem.updateAmountAvailableText
+ */
 InventoryItem.prototype.updateAmountAvailableText = function() {
     this.setAuxText('x ' + this.amountAvailable);
 };
@@ -1387,6 +1856,12 @@ module.exports = InventoryItem;
 var ItemsPopUp = require('../ItemsPopUp');
 var StoreItem = require ('./StoreItem');
 
+/**
+ * View and control of the game store
+ * @class Store
+ * @extends StoreItem
+ * @constructor
+ */
 var Store = function() {
     var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
     var categories = ['healthPacks', 'weapons', 'objects'];
@@ -1404,14 +1879,15 @@ var Store = function() {
 Store.prototype = Object.create(ItemsPopUp.prototype);
 Store.prototype.constructor = Store;
 
+/**
+ * Add an item to the store to be displayed for the user.
+ * @method Store.addItem
+ * @param {Item} item - Item to be added to the inventory.
+ */
 Store.prototype.addItem = function(item) {
     if (this.items[item.category][item.key] === undefined) {
         this.items[item.category][item.key] = new StoreItem(item, this);
     }
-};
-
-Store.prototype.showHealthPacks = function() {
-    //TODO
 };
 
 module.exports = Store;
@@ -1422,6 +1898,14 @@ module.exports = Store;
  */
 var ItemGroupView = require('../ItemGroupView');
 
+/**
+ * View for a Store item.
+ * @class StoreItem
+ * @extends ItemGroupView
+ * @constructor
+ * @param {Item} item - Item to be displayed by this class.
+ * @param {Store} parentView - View on which the item will be displayed.
+ */
 var StoreItem = function(item, parentView) {
     ItemGroupView.call(this, item.key + 'Icon', 'Buy', parentView);
     this.item = item;
@@ -1433,10 +1917,18 @@ var StoreItem = function(item, parentView) {
 StoreItem.prototype = Object.create(ItemGroupView.prototype);
 StoreItem.prototype.constructor = StoreItem;
 
+/**
+ * Updates the price of the item to be displayed.
+ * @method StoreItem.updatePriceText
+ */
 StoreItem.prototype.updatePriceText = function() {
     this.setAuxText('$ ' + this.item.price);
 };
 
+/**
+ * Allows the player to buy this item.
+ * @method StoreItem.buttonAction
+ */
 StoreItem.prototype.buttonAction = function() {
     var successfulPurchase = level.player.buyItem(this.item);
     if (successfulPurchase) {
@@ -1454,8 +1946,16 @@ module.exports = StoreItem;
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
-var Bullet;
-Bullet = function(power, imageKey) {
+
+/**
+ * Controls a bullet from a weapon.
+ * @class Bullet
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} power - Damage that can cause this bullet.
+ * @param {string} imageKey - Texture's key of this bullet.
+ */
+var Bullet = function(power, imageKey) {
     Phaser.Sprite.call(this, level.game, 0, 0, imageKey);
     this.power = power;
 
@@ -1477,16 +1977,67 @@ module.exports = Bullet;
  */
 var Weapon = require('./Weapon');
 
+/**
+ * Default number of bullets for this weapon.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
+/**
+ * Texture's key for this weapon.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_KEY = 'machineGun';
+/**
+ * Texture's key for this weapon bullets.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_BULLET_KEY = 'bullet2';
+/**
+ * The time player is allowed to shoot again.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_NEXT_FIRE = 1;
+/**
+ * This weapon bullets' speed
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_BULLET_SPEED = 700;
+/**
+ * Rate at which this weapon fires, the lower the number, the higher the firing
+ * rate.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_FIRE_RATE = 100;
+/**
+ * Damage that can cause this weapon bullets.
+ * @constant
+ * @type {number}
+ */
 var MACHINE_GUN_BULLET_POWER = 10;
+/**
+ * The price that this weapon costs.
+ * @constant
+ * @type {number}
+ */
 var PRICE = 100;
 
-var MachineGun = function(x, y, inifinite) {
+/**
+ * Represents a MachineGun, which is a  kind of a Weapon.
+ * @class MachineGun
+ * @extends Weapon
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ */
+var MachineGun = function(x, y, infinite) {
     Weapon.call(
         this,
         x,
@@ -1498,7 +2049,7 @@ var MachineGun = function(x, y, inifinite) {
         MACHINE_GUN_BULLET_SPEED,
         MACHINE_GUN_FIRE_RATE,
         MACHINE_GUN_BULLET_POWER,
-        inifinite,
+        infinite,
         PRICE
     );
     this.name = 'Machine Gun';
@@ -1515,15 +2066,66 @@ module.exports = MachineGun;
  */
 var Weapon = require('./Weapon');
 
+/**
+ * Default number of bullets for this weapon.
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_NUMBER_OF_BULLETS = 20;
+/**
+ * Texture's key for this weapon
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_KEY = 'revolver';
+/**
+ * Texture's key for this weapon bullets.
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_BULLET_KEY = 'bullet1';
-var REVOLVER_NEXT_FIRE = 0;
+/**
+ * The time player is allowed to shoot again.
+ * @constant
+ * @type {number}
+ */
+var REVOLVER_NEXT_FIRE = 1;
+/**
+ * This weapon bullets' speed
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_BULLET_SPEED = 400;
+/**
+ * Rate at which this weapon fires, the lower the number, the higher the firing
+ * rate.
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_FIRE_RATE = 250;
+/**
+ * Damage that can cause this weapon bullets.
+ * @constant
+ * @type {number}
+ */
 var REVOLVER_BULLET_POWER = 1;
+/**
+ * The price that this weapon costs.
+ * @constant
+ * @type {number}
+ */
 var PRICE = 20;
 
+/**
+ * Represents a Revolver, which is a  kind of a Weapon.
+ * @class Revolver
+ * @extends Weapon
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ */
 var Revolver = function(x, y, inifinite) {
     Weapon.call(
         this,
@@ -1551,9 +2153,38 @@ module.exports = Revolver;
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
+/**
+ * The key of the frame to be displayed when weapon should point to right.
+ * @constant
+ * @type {number}
+ */
 var RIGHT_KEY = 0;
+/**
+ * The key of the frame to be displayed when weapon should point to left.
+ * @constant
+ * @type {number}
+ */
 var LEFT_KEY = 1;
 
+/**
+ * Represents a game weapon for characters.
+ * @class Weapon
+ * @extends Item
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {number} numberOfBullets - Number of bullets for this weapon.
+ * @param {string} weaponKey - Texture's key for this weapon.
+ * @param {string} bulletKey - Texture's key for this weapon bullets.
+ * @param {number} nextFire - The time player is allowed to shoot again.
+ * @param {number} bulletSpeed - This weapon bullets' speed
+ * @param {number} fireRate - Rate at which this weapon fires, the lower the
+ * number, the higher the firing rate.
+ * @param {number} power - Damage that can cause this weapon bullets.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ * @param {number} price - The price that this weapon costs.
+ */
 var Weapon = function(x,
                       y,
                       numberOfBullets,
@@ -1589,6 +2220,12 @@ var Weapon = function(x,
 Weapon.prototype = Object.create(Item.prototype);
 Weapon.prototype.constructor = Weapon;
 
+/**
+ * Allows the character to shoot or fire this weapon
+ * @method Weapon.fire
+ * @param {number} toX - X coordinate of the point to fire to.
+ * @param {number} toY - Y coordinate of the point to fire to.
+ */
 Weapon.prototype.fire = function(toX, toY) {
     var finalToY = toY || this.y;
     if (level.game.time.time > this.nextFire &&
@@ -1609,11 +2246,21 @@ Weapon.prototype.fire = function(toX, toY) {
     }
 };
 
+/**
+ * Relocates this weapon within the game world.
+ * @method Weapon.updateCoordinates
+ * @param {number} x - X coordinate of the new position.
+ * @param {number} y - Y  coordinate of the new position.
+ */
 Weapon.prototype.updateCoordinates = function(x, y) {
     this.x = x;
     this.y = y;
 };
 
+/**
+ * Allows the character to use this weapon.
+ * @method Weapon.use
+ */
 Weapon.prototype.use = function() {
     if (!this.alive) {
         this.revive();
@@ -1622,19 +2269,36 @@ Weapon.prototype.use = function() {
     level.updateAmmoText();
 };
 
+/**
+ * Add bullets to the weapon.
+ * @method Weapon.addBullets
+ * @param {number} amount - Number of bullets to be added.
+ */
 Weapon.prototype.addBullets = function(amount) {
     this.numberOfBullets += amount;
 };
 
+/**
+ * Kills this weapon so that it is not more accessible within the game.
+ * @method Weapon.killWeapon
+ */
 Weapon.prototype.killWeapon = function() {
     this.bullets.removeAll();
     this.kill();
 };
 
+/**
+ * Points the weapon to the right.
+ * @method Weapon.pointToRight
+ */
 Weapon.prototype.pointToRight = function() {
     this.frame = RIGHT_KEY;
 };
 
+/**
+ * Points the weapon to the left.
+ * @method Weapon.pointToLeft
+ */
 Weapon.prototype.pointToLeft = function() {
     this.frame = LEFT_KEY;
 };
@@ -1645,20 +2309,34 @@ module.exports = Weapon;
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
+
+/**
+ * Phaser state to boot game.
+ * @class Boot
+ * @constructor
+ * @param {Phaser.Game} game - Phaser game object.
+ */
 var Boot = function(game) {};
 
-Boot.prototype = {
-    preload: function() {
-        this.load.image('loading', 'assets/images/loading.png');
-        this.load.image('load_progress_bar_dark',
-            'assets/images/progress_bar_bg.png');
-        this.load.image('load_progress_bar',
-            'assets/images/progress_bar_fg.png');
-    },
-    create: function() {
-        this.game.input.maxPointers = 1;
-        this.game.state.start('preloader');
-    }
+/**
+ * Loads assets for preload screen.
+ * @method Boot.preload
+ */
+Boot.prototype.preload = function() {
+    this.load.image('loading', 'assets/images/loading.png');
+    this.load.image('load_progress_bar_dark',
+        'assets/images/progress_bar_bg.png');
+    this.load.image('load_progress_bar',
+        'assets/images/progress_bar_fg.png');
+};
+
+/**
+ * Starts preloader state.
+ * @method Boot.create
+ */
+Boot.prototype.create = function() {
+    this.game.input.maxPointers = 1;
+    this.game.state.start('preloader');
 };
 
 module.exports = Boot;
@@ -1667,25 +2345,37 @@ module.exports = Boot;
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
+/**
+ * Game main menu. It allows the player to start a new game.
+ * @class Menu
+ * @constructor
+ * @param {Phaser.Game} game - Phaser game object.
+ */
 var Menu = function(game) {};
 
-Menu.prototype = {
-    create: function() {
-        var newGame = this.game.add.text(this.game.camera.width / 2,
-                this.game.camera.height / 2, 'New Game');
-        //Font style
-        newGame.font = 'Arial';
-        newGame.fontSize = 50;
-        newGame.fontWeight = 'bold';
-        newGame.fill = '#0040FF';
-        newGame.anchor.set(0.5);
-        newGame.inputEnabled = true;
-        newGame.events.onInputDown.add(this.newGame, this);
-    },
+/**
+ * Creates the buttons for the menu items.
+ * @method Menu.create
+ */
+Menu.prototype.create = function() {
+    var newGame = this.game.add.text(this.game.camera.width / 2,
+            this.game.camera.height / 2, 'New Game');
+    //Font style
+    newGame.font = 'Arial';
+    newGame.fontSize = 50;
+    newGame.fontWeight = 'bold';
+    newGame.fill = '#0040FF';
+    newGame.anchor.set(0.5);
+    newGame.inputEnabled = true;
+    newGame.events.onInputDown.add(this.newGame, this);
+};
 
-    newGame: function() {
-        this.game.state.start('levelOneIntro');
-    }
+/**
+ * Starts a new game.
+ * @method Menu.newGame
+ */
+Menu.prototype.newGame = function() {
+    this.game.state.start('levelOneIntro');
 };
 
 module.exports = Menu;
@@ -1694,135 +2384,159 @@ module.exports = Menu;
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
+/**
+ * Phaser state to load all assets.
+ * @class Preloader
+ * @constructor
+ * @param {Phaser.Game} game - Phaser game object.
+ */
 var Preloader = function(game) {
     this.ready = false;
 };
 
-Preloader.prototype = {
-    preload: function() {
-        this.displayLoadScreen();
-        this.loadAssets();
-    },
+/**
+ * Manages this state behavior.
+ * @method Preloader.preload
+ */
+Preloader.prototype.preload = function() {
+    this.displayLoadScreen();
+    this.loadAssets();
+};
 
-    displayLoadScreen: function() {
-        var centerX = this.game.camera.width / 2;
-        var centerY = this.game.camera.height / 2;
+/**
+ * Displays loading bar while assets load.
+ * @method Preloader.displayLoadScreen
+ */
+Preloader.prototype.displayLoadScreen = function() {
+    var centerX = this.game.camera.width / 2;
+    var centerY = this.game.camera.height / 2;
 
-        this.loading = this.game.add.sprite(centerX, centerY - 20, 'loading');
-        this.loading.anchor.setTo(0.5, 0.5);
+    this.loading = this.game.add.sprite(centerX, centerY - 20, 'loading');
+    this.loading.anchor.setTo(0.5, 0.5);
 
-        this.barBg = this.game.add.sprite(centerX, centerY + 40,
-            'load_progress_bar_dark');
-        this.barBg.anchor.setTo(0.5, 0.5);
+    this.barBg = this.game.add.sprite(centerX, centerY + 40,
+        'load_progress_bar_dark');
+    this.barBg.anchor.setTo(0.5, 0.5);
 
-        this.bar = this.game.add.sprite(centerX - 192, centerY + 40,
-            'load_progress_bar');
-        this.bar.anchor.setTo(0, 0.5);
-        this.load.setPreloadSprite(this.bar);
+    this.bar = this.game.add.sprite(centerX - 192, centerY + 40,
+        'load_progress_bar');
+    this.bar.anchor.setTo(0, 0.5);
+    this.load.setPreloadSprite(this.bar);
 
-        // onLoadComplete is dispatched when the final file in the load queue
-        // has been loaded/failed. addOnce adds that function as a callback,
-        // but only to fire once.
-        this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
-    },
+    // onLoadComplete is dispatched when the final file in the load queue
+    // has been loaded/failed. addOnce adds that function as a callback,
+    // but only to fire once.
+    this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
+};
 
-    loadAssets: function() {
-        //Menu assets
-        //Level assets
-        this.game.load.image('ground', 'assets/images/platform.png');
-        this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
-        this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
-        this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
-        this.game.load.image('inventory_button', 'assets/images/inventory.png');
-        this.game.load.image('storeButton', 'assets/images/store.png');
-        this.game.load.image('popUpBg',
-            'assets/images/popUpBg.png');
-        this.game.load.image('close', 'assets/images/close.png');
-        this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
-        this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
-        this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
-        this.game.load.image('successIcon', 'assets/images/successIcon.png');
+/**
+ * Loads game assets.
+ * @method Preloader.loadAssets
+ */
+Preloader.prototype.loadAssets = function() {
+    //Menu assets
+    //Level assets
+    this.game.load.image('ground', 'assets/images/platform.png');
+    this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
+    this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
+    this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
+    this.game.load.image('inventory_button', 'assets/images/inventory.png');
+    this.game.load.image('storeButton', 'assets/images/store.png');
+    this.game.load.image('popUpBg',
+        'assets/images/popUpBg.png');
+    this.game.load.image('close', 'assets/images/close.png');
+    this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
+    this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
+    this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
+    this.game.load.image('successIcon', 'assets/images/successIcon.png');
 
-        this.game.load.spritesheet('character', 'assets/sprites/character.png',
-            64, 96);
-        this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
-            64, 96);
-        this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
-            64, 96);
-        this.game.load.spritesheet('simple_enemy',
-            'assets/sprites/simple_enemy.png', 64, 64);
-        this.game.load.spritesheet('strong_enemy',
-            'assets/sprites/strong_enemy.png', 64, 64);
-        this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
-            150);
-        this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
-            30, 16);
-        this.game.load.spritesheet('machineGun',
-            'assets/sprites/machineGun.png', 60, 42);
+    this.game.load.spritesheet('character', 'assets/sprites/character.png',
+        64, 96);
+    this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
+        64, 96);
+    this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
+        64, 96);
+    this.game.load.spritesheet('simple_enemy',
+        'assets/sprites/simple_enemy.png', 64, 64);
+    this.game.load.spritesheet('strong_enemy',
+        'assets/sprites/strong_enemy.png', 64, 64);
+    this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
+        150);
+    this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
+        30, 16);
+    this.game.load.spritesheet('machineGun',
+        'assets/sprites/machineGun.png', 60, 42);
 
-        for (var i = 1; i <= 2; i++) {
-            this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
-                '.png');
-        }
-        this.game.load.image('simpleWeapon',
-            'assets/images/revolver.png');
-        this.game.load.image('strongWeapon',
-            'assets/images/machineGun.png');
-        this.game.load.image('comic1', 'assets/images/comic1.png');
-        this.game.load.image('comic2', 'assets/images/comic2.png');
-        this.game.load.image('introLevelOne',
-            'assets/images/introLevelOne.png');
-        this.game.load.image('house', 'assets/images/house.png');
-        this.game.load.image('openDoor', 'assets/images/openDoor.png');
-        this.game.load.image('working', 'assets/images/working.png');
-        this.game.load.image('addCashButton', 'assets/images/addCash.png');
-        this.game.load.image('button', 'assets/images/button.png');
-        this.game.load.image('mother', 'assets/images/mother.png');
-        this.game.load.image('father', 'assets/images/father.png');
-        this.game.load.image('daughter', 'assets/images/daughter.png');
-        this.game.load.image('son', 'assets/images/son.png');
-
-        this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
-        this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
-        this.game.load.image('wordBg', 'assets/images/wordBg.png');
-        this.game.load.image('letterBg', 'assets/images/letterBg.png');
-        this.game.load.image('transparent', 'assets/images/transparent.png');
-        this.game.load.image('healthBarBackground',
-            'assets/images/healthBarBackground.png');
-        this.game.load.image('healthBar', 'assets/images/healthBar.png');
-
-        this.game.load.image('healthPack5Icon',
-            'assets/icons/healthPack5Icon.png');
-        this.game.load.image('healthPack20Icon',
-            'assets/icons/healthPack20Icon.png');
-        this.game.load.image('revolverIcon', 'assets/icons/revolverIcon.png');
-        this.game.load.image('unscramble', 'assets/icons/unscramble.png');
-        this.game.load.image('contexts', 'assets/icons/contexts.png');
-        this.game.load.image('imageWord', 'assets/icons/imageWord.png');
-        this.game.load.image('popUpPanelBg',
-            'assets/images/popUpPanelBg.png');
-        this.game.load.image('tabBg', 'assets/images/tabBg.png');
-        this.game.load.image('contextBg', 'assets/images/contextBg.png');
-
-        this.game.load.image('englishChallengePanelBg',
-            'assets/images/englishChallengePanelBg.png');
-        this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
-
-        this.game.load.script('webfont',
-            '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
-    },
-
-    update: function() {
-        if (!!this.ready) {
-            //this.game.state.start('menu');
-            this.game.state.start('levelOne');
-            level = this.game.state.states.levelOne;
-        }
-    },
-
-    onLoadComplete: function() {
-        this.ready = true;
+    for (var i = 1; i <= 2; i++) {
+        this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
+            '.png');
     }
+    this.game.load.image('simpleWeapon',
+        'assets/images/revolver.png');
+    this.game.load.image('strongWeapon',
+        'assets/images/machineGun.png');
+    this.game.load.image('comic1', 'assets/images/comic1.png');
+    this.game.load.image('comic2', 'assets/images/comic2.png');
+    this.game.load.image('introLevelOne',
+        'assets/images/introLevelOne.png');
+    this.game.load.image('house', 'assets/images/house.png');
+    this.game.load.image('openDoor', 'assets/images/openDoor.png');
+    this.game.load.image('working', 'assets/images/working.png');
+    this.game.load.image('addCashButton', 'assets/images/addCash.png');
+    this.game.load.image('button', 'assets/images/button.png');
+    this.game.load.image('mother', 'assets/images/mother.png');
+    this.game.load.image('father', 'assets/images/father.png');
+    this.game.load.image('daughter', 'assets/images/daughter.png');
+    this.game.load.image('son', 'assets/images/son.png');
+
+    this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
+    this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
+    this.game.load.image('wordBg', 'assets/images/wordBg.png');
+    this.game.load.image('letterBg', 'assets/images/letterBg.png');
+    this.game.load.image('transparent', 'assets/images/transparent.png');
+    this.game.load.image('healthBarBackground',
+        'assets/images/healthBarBackground.png');
+    this.game.load.image('healthBar', 'assets/images/healthBar.png');
+
+    this.game.load.image('healthPack5Icon',
+        'assets/icons/healthPack5Icon.png');
+    this.game.load.image('healthPack20Icon',
+        'assets/icons/healthPack20Icon.png');
+    this.game.load.image('revolverIcon', 'assets/icons/revolverIcon.png');
+    this.game.load.image('unscramble', 'assets/icons/unscramble.png');
+    this.game.load.image('contexts', 'assets/icons/contexts.png');
+    this.game.load.image('imageWord', 'assets/icons/imageWord.png');
+    this.game.load.image('popUpPanelBg',
+        'assets/images/popUpPanelBg.png');
+    this.game.load.image('tabBg', 'assets/images/tabBg.png');
+    this.game.load.image('contextBg', 'assets/images/contextBg.png');
+
+    this.game.load.image('englishChallengePanelBg',
+        'assets/images/englishChallengePanelBg.png');
+    this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
+
+    this.game.load.script('webfont',
+        '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
+};
+
+/**
+ * Starts menu state.
+ * @method Preloader.update
+ */
+Preloader.prototype.update = function() {
+    if (!!this.ready) {
+        //this.game.state.start('menu');
+        this.game.state.start('levelOne');
+        level = this.game.state.states.levelOne;
+    }
+};
+
+/**
+ * Indicates that assets are already load.
+ * @method Preloader.onLoadComplete
+ */
+Preloader.prototype.onLoadComplete = function() {
+    this.ready = true;
 };
 
 module.exports = Preloader;
@@ -1847,12 +2561,22 @@ var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
 
+/**
+ * Represents a game level.
+ * @class Level
+ * @constructor
+ * @param {Phaser.Game} game - Phaser game object.
+ */
 var Level = function(game) {
     this.game = game;
 };
 
 Level.prototype.constructor = Level;
 
+/**
+ * Sets world background and size.
+ * @method Level.preload
+ */
 Level.prototype.preload = function() {
     this.game.stage.backgroundColor = '#82CAFA';
 
@@ -1861,6 +2585,11 @@ Level.prototype.preload = function() {
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
 };
 
+/**
+ * Create all basic game elements, i.e. Palyer, ground, inventory, store, items,
+ * characters, etc.
+ * @method Level.create
+ */
 Level.prototype.create = function() {
     this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -1884,6 +2613,10 @@ Level.prototype.create = function() {
     this.createStore();
 };
 
+/**
+ * Updates the enemies, the they behave and display.
+ * @method Level.updateEnemies
+ */
 Level.prototype.updateEnemies = function() {
     var i;
     for (i = 0; i < this.enemies.children.length; i++) {
@@ -1911,6 +2644,10 @@ Level.prototype.updateEnemies = function() {
     }
 };
 
+/**
+ * Updates the non player characters, the they behave and display.
+ * @method Level.updateNpcs
+ */
 Level.prototype.updateNpcs = function() {
     for (var i = 0; i < this.npcs.children.length; i++) {
         var npc = this.npcs.children[i];
@@ -1931,6 +2668,11 @@ Level.prototype.updateNpcs = function() {
     }
 };
 
+/**
+ * Deals with characters updating, collisions and overlaps. Moreover it deals
+ * with game input.
+ * @method Level.update
+ */
 Level.prototype.update = function() {
     //Collisions
     this.updateEnemies();
@@ -1988,6 +2730,10 @@ Level.prototype.update = function() {
     }
 };
 
+/**
+ * Adds palyer health bar to the game scene.
+ * @method Level.addHealthBar
+ */
 Level.prototype.addHealthBar = function() {
     var x = this.healthLevelText.x + this.healthLevelText.width;
     var y = this.healthLevelText.y;
@@ -1996,37 +2742,81 @@ Level.prototype.addHealthBar = function() {
     this.healthBar.fixedToCamera = true;
 };
 
+/**
+ * Creates a Phaser group to manage enemies.
+ * @method Level.createEnemiesGroup
+ */
 Level.prototype.createEnemiesGroup = function() {
     this.enemies = this.game.add.group();
     this.gameObjects.push(this.enemies);
 };
 
+/**
+ * Creates a Phaser group to manage non player characters.
+ * @method Level.createNpcsGroup
+ */
 Level.prototype.createNpcsGroup = function() {
     this.npcs = this.game.add.group();
     this.gameObjects.push(this.npcs);
 };
 
+/**
+ * Creates a Phaser group to manage interactive cars.
+ * @method Level.createCarsGroup
+ */
 Level.prototype.createCarsGroup = function() {
     this.cars = this.game.add.group();
     this.gameObjects.push(this.cars);
 };
 
+/**
+ * Adds a new SimpleEnemy to enemies group.
+ * @method Level.addSimpleEnemy
+ * @param {number} x - X coordinate within the world where the enemy should
+ * appear.
+ */
 Level.prototype.addSimpleEnemy = function(x) {
     this.enemies.add(new SimpleEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
+/**
+ * Adds a new StrongEnemy to enemies group.
+ * @method Level.addStrongEnemy
+ * @param {number} x - X coordinate within the world where the enemy should
+ * appear.
+ */
 Level.prototype.addStrongEnemy = function(x) {
     this.enemies.add(new StrongEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
+/**
+ * Adds a new non player character to npcs group.
+ * @method Level.addNPC
+ * @param {number} x - X coordinate within the world where the character should
+ * appear.
+ * @param {string} key - NPC texture key.
+ * @param {string} comicKey - Texture key of the comic that represents the
+ * interaction between this NPC and the player.
+ */
 Level.prototype.addNPC = function(x, key, comicKey) {
     this.npcs.add(new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey));
 };
 
+/**
+ * Adds a new InteractiveCar to enemies group.
+ * @method Level.addCar
+ * @param {number} x - X coordinate within the world where the car should
+ * appear.
+ * @param {string} key - Car texture key.
+ */
 Level.prototype.addCar = function(x, key) {
     this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, key));
 };
 
+/**
+ * Adds the ground to the game world.
+ * @method Level.addPlatforms
+ */
 Level.prototype.addPlatforms = function() {
     this.platforms = this.game.add.group();
     this.platforms.enableBody = true;
@@ -2044,12 +2834,19 @@ Level.prototype.addPlatforms = function() {
     */
 };
 
+/**
+ * Adds a new object (Sprite) to the world.
+ * @method Level.addObject
+ * @param {Phaser.Sprite} object - Object to be added.
+ */
 Level.prototype.addObject = function(object) {
-    //var object = this.game.add.sprite(x, y, key);
-    //object.anchor.setTo(0, 0);
     this.game.add.existing(object);
 };
 
+/**
+ * Adds the player to the game world.
+ * @method Level.addPlayer
+ */
 Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.game.add.existing(this.player);
@@ -2057,6 +2854,10 @@ Level.prototype.addPlayer = function() {
     this.player.useWeapon(new Revolver(700, 100, false));
 };
 
+/**
+ * Adds score, ammo and health level text to the game scene.
+ * @method Level.addTexts
+ */
 Level.prototype.addTexts = function() {
     //The score
     this.scoreText = this.game.add.text(this.game.camera.width - 300, 16,
@@ -2079,28 +2880,48 @@ Level.prototype.addTexts = function() {
     this.healthLevelText.fixedToCamera = true;
 };
 
+/**
+ * Add input to the game.
+ * @method Level.addControls
+ */
 Level.prototype.addControls = function() {
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.changeKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
     this.changeKey.onDown.add(this.player.nextWeapon, this.player);
 };
 
+/**
+ * Adds a camera to the game, it will follow player.
+ * @method Level.addCamera
+ */
 Level.prototype.addCamera = function() {
     this.game.renderer.renderSession.roundPixels = true;
     this.game.camera.follow(this.player);
 };
 
+/**
+ * Creates a Phaser group to manage health packs.
+ * @method Level.createHealthPacksGroup
+ */
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
     this.addHealthPack(new HealthPack(500, 10, 5, this));
 };
 
+/**
+ * Creates a Phaser group to manage health packs.
+ * @method Level.createHealthPacksGroup
+ */
 Level.prototype.createWeaponsGroup = function() {
     this.weapons = this.game.add.group();
     this.gameObjects.push(this.weapons);
 };
 
+/**
+ * Creates the game inventory and a button to access it.
+ * @method Level.createInventory
+ */
 Level.prototype.createInventory = function() {
     this.inventory = new Inventory(this);
     this.game.add.existing(this.inventory);
@@ -2113,6 +2934,10 @@ Level.prototype.createInventory = function() {
     this.inventoryButton.input.priorityID = 1;
 };
 
+/**
+ * Creates the English challenges menu and a button to access it.
+ * @method Level.createEnglishChallengesMenu
+ */
 Level.prototype.createEnglishChallengesMenu = function() {
     this.englishChallengeMenu = new EnglishChallengesMenu();
     this.game.add.existing(this.englishChallengeMenu);
@@ -2125,6 +2950,10 @@ Level.prototype.createEnglishChallengesMenu = function() {
     this.addCashButton.input.priorityID = 1;
 };
 
+/**
+ * Creates the game Store and a button to access it.
+ * @method Level.createStore
+ */
 Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
@@ -2137,24 +2966,48 @@ Level.prototype.createStore = function() {
     this.storeButton.input.priorityID = 1;
 };
 
+/**
+ * Decrease the health level of character that was impacted with a bullet.
+ * @method Level.bulletHitCharacter
+ * @param {Character} character - Character that was impacted.
+ * @param {Bullet} bullet - Bullet that impacts the character.
+ */
 Level.prototype.bulletHitCharacter = function(character, bullet) {
     character.decreaseHealthLevel(bullet.power);
     character.updateHealthLevel();
     bullet.kill();
 };
 
+/**
+ * Allows the player to pick uo a weapon and use it.
+ * @method Level.collectWeapon
+ * @param {Player} player - Game main player.
+ * @param {Weapon} weapon - Weapon to be picked up.
+ */
 Level.prototype.collectWeapon = function(player, weapon) {
     this.weapons.remove(weapon);
     this.player.useWeapon(weapon);
     this.updateAmmoText();
 };
 
+/**
+ * Controls when a car crash an Enemy.
+ * @method Level.crashEnemy
+ * @param {InteractiveCar} car - Car that crashes the enemy.
+ * @param {Enemy} enemy - Enemy who is crashed.
+ */
 Level.prototype.crashEnemy = function(car, enemy) {
     if (!car.isStopped()) {
         enemy.killCharacter();
     }
 };
 
+/**
+ * Allows the player to pick up a HealthPack.
+ * @method Level.collectHealthPack
+ * @param {Player} player - Game main player.
+ * @param {HealthPack} healthPack - HealthPack to be picked up.
+ */
 Level.prototype.collectHealthPack = function(player, healthPack) {
     if (!this.player.fullHealthLevel()) {
         this.increaseHealthLevel(healthPack.maxIncreasing);
@@ -2164,15 +3017,27 @@ Level.prototype.collectHealthPack = function(player, healthPack) {
     healthPack.pickUp();
 };
 
+/**
+ * Updates current player's avialbele ammo text.
+ * @method Level.updateAmmoText
+ */
 Level.prototype.updateAmmoText = function() {
     this.ammoText.text = 'Ammo: ' +
         this.player.currentWeapon.numberOfBullets;
 };
 
+/**
+ * Updates current player's score.
+ * @method Level.updateScoreText
+ */
 Level.prototype.updateScoreText = function() {
     this.scoreText.text = 'Score: ' + this.player.score;
 };
 
+/**
+ * Updates current player's health leel bar and text.
+ * @method Level.updateHealthLevel
+ */
 Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
         this.game.state.start('menu');
@@ -2182,42 +3047,97 @@ Level.prototype.updateHealthLevel = function() {
         this.player.maxHealthLevel);
 };
 
+/**
+ * Increases player's health level.
+ * @method Level.increaseHealthLevel
+ * @param {number} increase - The amount to be increased.
+ */
 Level.prototype.increaseHealthLevel = function(increase) {
     this.player.increaseHealthLevel(increase);
     this.updateHealthLevel();
 };
 
+/**
+ * Increases player's score.
+ * @method Level.increaseScore
+ * @param {number} increase - The amount to be increased.
+ */
 Level.prototype.increaseScore = function(increase) {
     this.player.increaseScore(increase);
     this.updateScoreText();
 };
 
+/**
+ * Adds a HealthPack to healthPacks group.
+ * @method Level.addHealthPack
+ * @param {HealthPack} healthPack - HealthPack to be added.
+ */
 Level.prototype.addHealthPack = function(healthPack) {
     this.healthPacks.add(healthPack);
 };
 
+/**
+ * Adds a new Revolver to weapons group.
+ * @method Level.addRevolver
+ * @param {number} x - X coordinate within the world where the Revolver should
+ * appear.
+ * @param {number} y - Y coordinate within the world where the Revolver should
+ * appear.
+ * @param {boolean} infiniteAmmo - Indicates whether the revolver has or no
+ * infinite ammo.
+ */
 Level.prototype.addRevolver = function(x, y, infiniteAmmo) {
     this.weapons.add(new Revolver(x, y, infiniteAmmo));
 };
 
+/**
+ * Adds a new MachineGun to weapons group.
+ * @method Level.addMachineGun
+ * @param {number} x - X coordinate within the world where the MachineGun should
+ * appear.
+ * @param {number} y - Y coordinate within the world where the MachineGun should
+ * appear.
+ * @param {boolean} infiniteAmmo - Indicates whether the MachineGun has or no
+ * infinite ammo.
+ */
 Level.prototype.addMachineGun = function(x, y, infiniteAmmo) {
     this.weapons.add(new MachineGun(x, y, infiniteAmmo));
 };
 
+/**
+ * Pauses the current game.
+ * @method Level.pause
+ */
 Level.prototype.pause = function() {
     this.game.physics.arcade.isPaused = true;
 };
 
+/**
+ * Resumes the game wehn it has been paused.
+ * @method Level.resume
+ */
 Level.prototype.resume = function() {
     this.game.physics.arcade.isPaused = false;
 };
 
+/**
+ * Shows a Dialog with an error message.
+ * @method Level.showErrorMessage
+ * @param {string} errorMessage - Message to be showed.
+ * @param {PopUp} [parent] - PopUp that shows the message.
+ */
 Level.prototype.showErrorMessage = function(errorMessage, parent) {
     var errorDialog = new Dialog('errorIcon', errorMessage, parent);
     this.game.add.existing(errorDialog);
     errorDialog.open();
 };
 
+/**
+ * Shows a Dialog with a success message.
+ * @method Level.showSuccessMessage
+ * @param {string} successMessage - Message to be showed.
+ * @param {PopUp} [parent] - PopUp that shows the message.
+ */
 Level.prototype.showSuccessMessage = function(successMessage, parent) {
     var successDialog = new Dialog('successIcon', successMessage, parent);
     this.game.add.existing(successDialog);
@@ -2233,6 +3153,19 @@ module.exports = Level;
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 
+/**
+ * Number of fights that player will have during this level.
+ * @type {number}
+ */
+var NUMBER_OF_FIGHTING_POINTS = 5;
+
+/**
+ * Manages LevelOne.
+ * @class LevelOne
+ * @constructor
+ * @extends Level
+ * @param {Phaser.Game} game - Pahser Game object.
+ */
 var LevelOne = function(game) {
     Level.call(this, game);
 };
@@ -2240,6 +3173,10 @@ var LevelOne = function(game) {
 LevelOne.prototype = Object.create(Level.prototype);
 LevelOne.prototype.constructor = LevelOne;
 
+/**
+ * Creates level one specific objects and elements.
+ * @method LevelOne.create
+ */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
     this.firstCheckPointX = this.game.camera.width * 1.3;
@@ -2249,9 +3186,12 @@ LevelOne.prototype.create = function() {
     this.addObjects();
     this.addRevolver(2000, 400, false);
     this.addRevolver(2000, 400, false);
-    //this.player.bringToTop();
 };
 
+/**
+ * Add InteractiveCar and InteractiveHouses for this level.
+ * @method LevelOne.addObjects
+ */
 LevelOne.prototype.addObjects = function() {
     var gunsStore = new InteractiveHouse(
         this.firstCheckPointX + 1.5 * this.checkPointsDistance,
@@ -2273,17 +3213,25 @@ LevelOne.prototype.addObjects = function() {
     //this.addCar(40, 'jeep');
 };
 
+/**
+ * Adds level one non player characters.
+ * @method LevelOne.addNPCs
+ */
 LevelOne.prototype.addNPCs = function() {
     this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
     this.addNPC(this.firstCheckPointX + this.checkPointsDistance, 'friend',
         'comic2');
 };
 
+/**
+ * Adds this level enemies.
+ * @method LevelOne.addEnemies
+ */
 LevelOne.prototype.addEnemies = function() {
     var x = this.firstCheckPointX;
-    var y = 350;
+    var y = level.WORLD_HEIGHT / (NUMBER_OF_FIGHTING_POINTS + 1);
     var numberOfEnemies = 3;
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
         for (var j = 0; j < numberOfEnemies; j++) {
             x += 30;
             this.addSimpleEnemy(x, y);
@@ -2299,11 +3247,19 @@ module.exports = LevelOne;
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
+
 /**
- * Created by Edwin Gamboa on 22/07/2015.
+ * Manages Game Intro, in which is presented background game story.
+ * @class LevelOneIntro
+ * @constructor
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelOneIntro = function(game) {};
 
+/**
+ * Creates the comic for the intro and a button to continue.
+ * @method LevelOneIntro.create
+ */
 LevelOneIntro.prototype.create = function() {
     var centerX = this.game.camera.width / 2;
     var centerY = this.game.camera.height / 2;
@@ -2326,6 +3282,10 @@ LevelOneIntro.prototype.create = function() {
     continueButton.events.onInputDown.add(this.continue, this);
 };
 
+/**
+ * Allows the player to start level one.
+ * @method LevelOneIntro.continue
+ */
 LevelOneIntro.prototype.continue = function() {
     this.game.state.start('levelOne');
 };
@@ -2337,6 +3297,16 @@ module.exports = LevelOneIntro;
  * Created by Edwin Gamboa on 10/10/2015.
  */
 
+/**
+ * Represents a Button for the views.
+ * @class Button
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} text - Buttons label.
+ * @param {function} action - Action to be carried out when button is clicked.
+ * @param {Phaser.Sprite} parent - View that contains this button.
+ * @param {string} iconKey - Button's texture key.
+ */
 var Button = function(text, action, parent, iconKey) {
     var key = iconKey || 'button';
     Phaser.Sprite.call(this, level.game, 0, 0, key);
@@ -2367,6 +3337,15 @@ module.exports = Button;
  */
 var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
+/**
+ * View for a Dialog.
+ * @class Dialog
+ * @extends PopUp
+ * @constructor
+ * @param {string} iconKey - Background texture key.
+ * @param {string} text - Text to be through the dialog.
+ * @param {PopUp} [parent = null] - View that generates the Dialog.
+ */
 var Dialog = function(iconKey, text, parent) {
     HorizontalLayoutPopUp.call(this, 'dialogBg', parent);
 
@@ -2384,6 +3363,11 @@ var Dialog = function(iconKey, text, parent) {
 Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
 Dialog.prototype.constructor = Dialog;
 
+/**
+ * Sets the text to be diaplayed through this dialog.
+ * @method Dialog.setText
+ * @param text
+ */
 Dialog.prototype.setText = function(text) {
     this.message.text = text;
 };
@@ -2405,6 +3389,7 @@ var MARGIN = 10;
 /**
  * Represents a grid with a fixed number of rows and columns. All the cells have
  * the same height and width.
+ * @class GridLayout
  * @constructor
  * @param {number} numberOfColumns - Number of columns for the grid.
  * @param {number} numberOfRows - Number of rows for the grid.
@@ -2439,6 +3424,7 @@ GridLayout.prototype.constructor = GridLayout;
 
 /**
  * Adds an element to the container on the next possible cell of the grid.
+ * @method GridLayout.addElement
  * @param element {Sprite} Element to be added to the container
  */
 GridLayout.prototype.addElement = function(element) {
@@ -2461,7 +3447,8 @@ GridLayout.prototype.addElement = function(element) {
 };
 
 /**
- * Restarts the indexes, currentRow and currentColumn
+ * Restarts the indexes, currentRow and currentColumn.
+ * @method GridLayout.restartIndexes
  */
 GridLayout.prototype.restartIndexes = function() {
     this.currentColumn = 0;
@@ -2476,9 +3463,35 @@ module.exports = GridLayout;
  */
 var GridLayout = require('./GridLayout');
 
+/**
+ * Lowest number of columns for this Panel
+ * @constant
+ * @default
+ * @type {number}
+ */
 var NUMBER_OF_COLUMNS = 1;
+/**
+ * Lowest number of rows for this Panel
+ * @constant
+ * @default
+ * @type {number}
+ */
 var NUMBER_OF_ROWS = 1;
 
+/**
+ * Represents a Panel that uses a GridLayout to arrange its elements.
+ * @class GridLayoutPanel
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} backgroundKey - Background texture key.
+ * @param {Object} [optionals.x] - X coordinate for the Panel within its parent
+ * view.
+ * @param {Object} [optionals.y] - Y coordinate for the Panel within its parent
+ * view.
+ * @param {Object} [optionals.numberOfColumns] - Number of columns for the
+ * panel.
+ * @param {Object} [optionals.numberOfRows] - Number of rows for the panel.
+ */
 var GridLayoutPanel = function(backgroundKey, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
@@ -2494,12 +3507,18 @@ var GridLayoutPanel = function(backgroundKey, optionals) {
 GridLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
 GridLayoutPanel.prototype.constructor = GridLayoutPanel;
 
+/**
+ * Add an element to the panel.
+ * @method GridLayoutPanel.addElement
+ * @param {Phaser.Sprite} element - Element ot be added to the panel.
+ */
 GridLayoutPanel.prototype.addElement = function(element) {
     this.grid.addElement(element);
 };
 
 /**
  * Remove all the elements that contains the panel
+ * @method GridLayoutPanel.removeAllElements
  */
 GridLayoutPanel.prototype.removeAllElements = function() {
     this.removeChildren();
@@ -2530,11 +3549,15 @@ var MIN_NUMBER_OF_ROWS = 1;
 
 /**
  * Represents a PopUpLayout that contains a grid layout to arrange its elements.
- * @param backgroundKey {string} Texture's key of the background
- * @param title {string} Name or title of the PopUp
- * @param dimensions {Array} Array containing the number of rows and columns
- * @param parent {Sprite} View or Sprite that opened this PopUp
+ * @class GridLayoutPopUp
+ * @extends PopUp
  * @constructor
+ * @param {string} backgroundKey - Texture's key of the background
+ * @param {string} title - Name or title of the PopUp.
+ * @param {Object} [dimensions.numberOfColumns] - Number of columns for the
+ * PopUp.
+ * @param {Object} [dimensions.numberOfRows] - Number of rows for the PopUp.
+ * @param {Phaser.Sprite} parent - View or Sprite that opened this PopUp.
  */
 var GridLayoutPopUp = function(backgroundKey, title, dimensions, parent) {
     PopUp.call(this, backgroundKey, parent, title);
@@ -2554,7 +3577,8 @@ GridLayoutPopUp.prototype.constructor = GridLayoutPopUp;
 
 /**
  * Add an element to the container in the next possible cell of the grid.
- * @param element
+ * @method GridLayoutPopUp.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the view.
  */
 GridLayoutPopUp.prototype.addElement = function(element) {
     this.grid.addElement(element);
@@ -2563,6 +3587,7 @@ GridLayoutPopUp.prototype.addElement = function(element) {
 /**
  * Restarts the positions x and y to the origin, so that next elements will be
  * added in the first position.
+ * @method GridLayoutPopUp.restartPositions
  */
 GridLayoutPopUp.prototype.restartPositions = function() {
     this.grid.restartsIndexes();
@@ -2574,8 +3599,24 @@ module.exports = GridLayoutPopUp;
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
+
+/**
+ * Default value for the margin between elements.
+ * @constant
+ * @default
+ * @type {number}
+ */
 var MARGIN = 10;
 
+/**
+ * Controls an HorizontalLayout for a view, so that it arranged elements
+ * horizontally, one after another, centered on y axis.
+ * @class HorizontalLayout
+ * @constructor
+ * @param {Phaser.Sprite} parent - View on which elements are added and
+ * arranged.
+ * @param {number} [margin = MARGIN] - Margin between elements.
+ */
 var HorizontalLayout = function(parent, margin) {
     this.margin = margin || MARGIN;
     this.currentX = this.margin;
@@ -2584,6 +3625,11 @@ var HorizontalLayout = function(parent, margin) {
 
 HorizontalLayout.prototype.constructor = HorizontalLayout;
 
+/**
+ * Add an element horizontally, after the last one (if any), centered on y axis.
+ * @method HorizontalLayout.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the view.
+ */
 HorizontalLayout.prototype.addElement = function(element) {
     element.x = this.currentX;
     this.currentX += element.width + this.margin ;
@@ -2592,6 +3638,11 @@ HorizontalLayout.prototype.addElement = function(element) {
     this.parent.addChild(element);
 };
 
+/**
+ * Restarts the position of x to the first one, so that new element will be
+ * added in first position.
+ * @method HorizontalLayout.restartPosition
+ */
 HorizontalLayout.prototype.restartPosition = function() {
     this.currentX = this.margin;
 };
@@ -2606,9 +3657,13 @@ module.exports = HorizontalLayout;
 var HorizontalLayout = require('./HorizontalLayout');
 /**
  * Represents a panel that has a HorizontalLayout to arrange its elements.
- * @param backgroundKey {string} Texture's key for panel's background
- * @param optionals {Array} array containing optional parameters x and/or y
- * coordinates for the panel, it can be undefined (optional)
+ * @class HorizontalLayoutPanel
+ * @extends Phaser.Sprite
+ * @param {string} backgroundKey - Texture's key for panel's background
+ * @param {Object} [optionals.x = 0] - X coordinate for the panel within its
+ * parent view.
+ * @param {Object} [optionals.y = 0] - Y coordinate for the panel within its
+ * parent view.
  * @constructor
  */
 var HorizontalLayoutPanel = function(backgroundKey, optionals) {
@@ -2624,7 +3679,8 @@ HorizontalLayoutPanel.prototype.constructor = HorizontalLayoutPanel;
 
 /**
  * Adds an element to the Panel horizontally.
- * @param element
+ * @method HorizontalLayoutPanel.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the panel.
  */
 HorizontalLayoutPanel.prototype.addElement = function(element) {
     this.layout.addElement(element);
@@ -2639,6 +3695,15 @@ module.exports = HorizontalLayoutPanel;
 var PopUp = require('./PopUp');
 var Horizontalayout = require('./HorizontalLayout');
 
+/**
+ * Represents a PopUp that arranges its elements using an HorizontalLayout.
+ * @class HorizontalLayoutPopUP
+ * @extends PopUp
+ * @constructor
+ * @param {string} backgroundKey - Background texture's key.
+ * @param {PopUp} parent - View that creates this PopUp.
+ * @param {string} title - PopUp title.
+ */
 var HorizontalLayoutPopUP = function(backgroundKey, parent, title) {
     PopUp.call(this, backgroundKey, parent, title);
     this.layout = new Horizontalayout(this);
@@ -2647,6 +3712,11 @@ var HorizontalLayoutPopUP = function(backgroundKey, parent, title) {
 HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);
 HorizontalLayoutPopUP.prototype.constructor = HorizontalLayoutPopUP;
 
+/**
+ * Adds an element to the PopUp.
+ * @method HorizontalLayoutPopUP.addElement
+ * @param {Phaser.Sprite} element - Element to be added.
+ */
 HorizontalLayoutPopUP.prototype.addElement = function(element) {
     this.layout.addElement(element);
 };
@@ -2654,6 +3724,7 @@ HorizontalLayoutPopUP.prototype.addElement = function(element) {
 /**
  * Restarts the positions x and y to the origin, so that next elements will be
  * added in the first position.
+ * @method HorizontalLayoutPopUP.restartPositions
  */
 HorizontalLayoutPopUP.prototype.restartPositions = function() {
     this.layout.restartPosition();
@@ -2666,7 +3737,15 @@ module.exports = HorizontalLayoutPopUP;
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
-var MARGIN = 10;
+/**
+ * Represents a pop up window.
+ * @class PopUp
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} backgroundKey - Background texture key.
+ * @param {PopUP} [parent] - View that creates this PopUP.
+ * @param {string} [title] - PopUp title.
+ */
 var PopUp = function(backgroundKey, parent, title) {
     Phaser.Sprite.call(this, level.game, 0, 0, backgroundKey);
 
@@ -2706,6 +3785,10 @@ var PopUp = function(backgroundKey, parent, title) {
 PopUp.prototype = Object.create(Phaser.Sprite.prototype);
 PopUp.prototype.constructor = PopUp;
 
+/**
+ * Closes or disposes this PopUp window.
+ * @method PopUp.close
+ */
 PopUp.prototype.close = function() {
     this.visible = false;
     level.activePopUps --;
@@ -2715,6 +3798,10 @@ PopUp.prototype.close = function() {
     this.kill();
 };
 
+/**
+ * Opens or displays this PopUp window.
+ * @method PopUp.open
+ */
 PopUp.prototype.open = function() {
     if (!this.alive) {
         this.revive();
@@ -2728,6 +3815,7 @@ PopUp.prototype.open = function() {
 
 /**
  * Remove all the elements that contains the PopUp
+ * @method PopUp.removeAllElements
  */
 PopUp.prototype.removeAllElements = function() {
     var index = 1;
@@ -2746,12 +3834,14 @@ module.exports = PopUp;
  */
 
 /**
- * Bar that shows the remaining part of a resource, for example a Health Bar
- * @param x {number} X coordinate of the bar.
- * @param y {number} Y coordinate of the bar.
- * @param size {Array} Array containing width and height of the bar,
- * it is optional
+ * Bar that shows the remaining part of a resource, for example a HealthBar.
+ * @class ResourceBar
+ * @extends Phaser.Sprite
  * @constructor
+ * @param {number} x - X coordinate of the bar.
+ * @param {number} y - Y coordinate of the bar.
+ * @param {Object} [size.width] - Bar width.
+ * @param {Object} [size.height] - Bar height.
  */
 var ResourceBar = function(x, y, size) {
     Phaser.Sprite.call(this, level.game, x, y, 'healthBarBackground');
@@ -2769,7 +3859,9 @@ ResourceBar.prototype.constructor = ResourceBar;
 
 /**
  * Updates the current level of the bar.
- * @param barLevel
+ * @method ResourceBar.updateResourceBarLevel
+ * @param {number} barLevel - Number between 0 (0%) and 1 (100%), that
+ * represents the bar current level.
  */
 ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
     this.bar.scale.x = barLevel;
@@ -2785,14 +3877,16 @@ module.exports = ResourceBar;
 /**
  * Tha class Utilities contains different functions or utilities that are useful
  * within other classes.
+ * @class Utilities
  * @constructor
  */
 var Utilities = function() {};
 
 /**
- * Returns a list with random indexes for an array of length = size
- * @param {number} size array's length
- * @returns {Array} array containing the random indexes
+ * Returns a list with random indexes for an array of length = size.
+ * @method Utilities.randomIndexesArray
+ * @param {number} size - Array's length.
+ * @returns {number[]} Array containing the random indexes.
  */
 Utilities.prototype.randomIndexesArray = function(size) {
     var randomIndex;
@@ -2825,11 +3919,11 @@ var MARGIN = 10;
 
 /**
  * Allow control for a Vertical Layout Sprite.
+ * @class VerticalLayout
  * @constructor
  * @param {Phaser.Sprite} parent - Sprite that contains the layout.
  * @param {number} margin - Margin or space between elements, optional.
- * @param {number} yOrigin - Where layout should start adding elements,
- * optional.
+ * @param {number} [yOrigin] - Where layout should start adding elements.
  */
 var VerticalLayout = function(parent, margin, yOrigin) {
     var y = yOrigin || 0;
@@ -2843,6 +3937,7 @@ VerticalLayout.prototype.constructor = VerticalLayout;
 /**
  * Adds a element as a child to the parent Sprite, is add the elment vercially
  * bellow the last element and centered on x axis.
+ * @method VerticalLayout.addElement
  * @param {Phaser.Sprite} element Element to be added to the Sprite
  */
 VerticalLayout.prototype.addElement = function(element) {
@@ -2853,6 +3948,11 @@ VerticalLayout.prototype.addElement = function(element) {
     this.parent.addChild(element);
 };
 
+/**
+ * Restart the position of y, so that the next element is added at the first
+ * position.
+ * @method VerticalLayout.restartPosition
+ */
 VerticalLayout.prototype.restartPosition = function() {
     this.currentY = this.margin;
 };
@@ -2868,6 +3968,8 @@ var VerticalLayout = require('./VerticalLayout');
 
 /**
  * Represents a panel that has a VerticalLayout to arrange its elements.
+ * @class VerticalLayoutPanel
+ * @extends Phaser.Sprite
  * @constructor
  * @param {string} backgroundKey - Texture's key for panel's background
  * @param {number} margin - Margin or space between elements, optional
@@ -2884,7 +3986,8 @@ VerticalLayoutPanel.prototype.constructor = VerticalLayoutPanel;
 
 /**
  * Adds an element to the Panel vertically.
- * @param element
+ * @method VerticalLayoutPanel.addElement
+ * @param {Phaser.Sprite} element - Element to be added.
  */
 VerticalLayoutPanel.prototype.addElement = function(element) {
     this.layout.addElement(element);
@@ -2892,6 +3995,7 @@ VerticalLayoutPanel.prototype.addElement = function(element) {
 
 /**
  * Remove all the elements that contains the panel
+ * @method VerticalLayoutPanel.removeAllElements
  */
 VerticalLayoutPanel.prototype.removeAllElements = function() {
     this.removeChildren();
@@ -2899,7 +4003,8 @@ VerticalLayoutPanel.prototype.removeAllElements = function() {
 };
 
 /**
- * Restatrs the positions of x and y to the origin.
+ * Restarts the positions of x and y to the origin.
+ * @method VerticalLayoutPanel.restartPosition
  */
 VerticalLayoutPanel.prototype.restartPosition = function() {
     this.layout.restartPosition();
@@ -2915,6 +4020,15 @@ module.exports = VerticalLayoutPanel;
 var PopUp = require('./PopUp');
 var VerticalLayout = require('./VerticalLayout');
 
+/**
+ * PopUp view that uses a VerticalLayout to arrange its elements.
+ * @class VerticalLayoutPopUP
+ * @extends PopUp
+ * @constructor
+ * @param {string} backgroundKey - Background texture's key.
+ * @param {PopUp} [parent] - View that creates this PopUp.
+ * @param {string} title - Title for this PopUp.
+ */
 var VerticalLayoutPopUP = function(backgroundKey, parent, title) {
     PopUp.call(this, backgroundKey, parent, title);
     var yOrigin = this.title.y + this.title.height || 0;
@@ -2924,6 +4038,11 @@ var VerticalLayoutPopUP = function(backgroundKey, parent, title) {
 VerticalLayoutPopUP.prototype = Object.create(PopUp.prototype);
 VerticalLayoutPopUP.prototype.constructor = VerticalLayoutPopUP;
 
+/**
+ * Adds an element to the PopUp.
+ * @method VerticalLayoutPopUP.addElement
+ * @param {Phaser.Sprite} element - Element to be added to the PopUp.
+ */
 VerticalLayoutPopUP.prototype.addElement = function(element) {
     this.layout.addElement(element);
 };
@@ -2931,6 +4050,7 @@ VerticalLayoutPopUP.prototype.addElement = function(element) {
 /**
  * Restarts the positions x and y to the origin, so that next elements will be
  * added in the first position.
+ * @method VerticalLayoutPopUP.restartPositions
  */
 VerticalLayoutPopUP.prototype.restartPositions = function() {
     this.layout.restartPosition();
@@ -2945,11 +4065,40 @@ module.exports = VerticalLayoutPopUP;
 var PopUp = require('../util/PopUp');
 var ResourceBar = require('../util/ResourceBar');
 
+/**
+ * Default car speed.
+ * @constant
+ * @type {number}
+ */
 var DEFAULT_CAR_SPEED = 400;
+/**
+ * Default greatest car speed.
+ * @constant
+ * @type {number}
+ */
 var DEFAULT_CAR_MAX_SPEED = 500;
+/**
+ * Car gravity.
+ * @constant
+ * @type {number}
+ */
 var CAR_GRAVITY = 30000;
+/**
+ * Longest distance that car can go.
+ * @constant
+ * @type {number}
+ */
 var MAX_DISTANCE = 400;
 
+/**
+ * Represents a car, which player can interact with.
+ * @class InteractiveCar
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - Car x coordinate within the world.
+ * @param {number} y - Car y coordinate within the world.
+ * @param {string} backgroundKey - Car texture key.
+ */
 var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -2983,6 +4132,10 @@ var InteractiveCar = function(x, y, backgroundKey) {
 InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
+/**
+ * Allows the player to get on the car.
+ * @method InteractiveCar.getOn
+ */
 InteractiveCar.prototype.getOn = function() {
     level.player.onVehicle = true;
     level.player.relocate(this.x, this.y - 100);
@@ -2991,6 +4144,10 @@ InteractiveCar.prototype.getOn = function() {
     this.occupied = true;
 };
 
+/**
+ * Allows the player to get off the car.
+ * @method InteractiveCar.getOff
+ */
 InteractiveCar.prototype.getOff = function() {
     this.stop();
     level.player.onVehicle = false;
@@ -3000,6 +4157,11 @@ InteractiveCar.prototype.getOff = function() {
     this.occupied = false;
 };
 
+/**
+ * Updates car current state, animations and traveled distance, to stop it when
+ * it has traveled the longest possible distance.
+ * @method InteractiveCar.update
+ */
 InteractiveCar.prototype.update = function() {
     if (this.occupied) {
         this.body.velocity.x = level.player.body.velocity.x;
@@ -3022,10 +4184,19 @@ InteractiveCar.prototype.update = function() {
     }
 };
 
+/**
+ * Determines whether the car is stopped or not.
+ * @method InteractiveCar.isStopped
+ * @returns {boolean} - True if car speed = 0, otherwise false.
+ */
 InteractiveCar.prototype.isStopped = function() {
     return this.body.velocity.x === 0;
 };
 
+/**
+ * Stops the car, making speed = 0.
+ * @method InteractiveCar.stop
+ */
 InteractiveCar.prototype.stop = function() {
     this.body.velocity.x = 0;
 };
@@ -3038,6 +4209,15 @@ module.exports = InteractiveCar;
  */
 var Store = require('../items/store/Store');
 
+/**
+ * Represents a House, which player can interact with.
+ * @class InteractiveHouse
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - House x coordinate within the world.
+ * @param {number} y - House y coordinate within the world.
+ * @param {string} backgroundKey - House texture key.
+ */
 var InteractiveHouse = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
@@ -3056,10 +4236,11 @@ var InteractiveHouse = function(x, y, backgroundKey) {
 InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
+/**
+ *
+ */
 InteractiveHouse.prototype.openActivity = function() {
-    var popUp = new Store(level);
-    level.game.add.existing(popUp);
-    popUp.open();
+    //TODO
 };
 
 module.exports = InteractiveHouse;
