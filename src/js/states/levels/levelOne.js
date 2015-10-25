@@ -3,6 +3,7 @@
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var NameBoard = require('../../worldElements/NameBoard');
 
 /**
  * Number of fights that player will have during this level.
@@ -61,6 +62,7 @@ LevelOne.prototype.addObjects = function() {
     playerHouse.anchor.set(0, 1);
     this.addObject(playerHouse);
 
+
     var gunsStore = new InteractiveHouse(
         this.firstCheckPointX * 1.4,
         this.GROUND_HEIGHT,
@@ -68,6 +70,9 @@ LevelOne.prototype.addObjects = function() {
     );
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
+
+    this.addObject(new NameBoard(this.firstCheckPointX * 1.35,
+        this.GROUND_HEIGHT, 'First Street'));
 
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,

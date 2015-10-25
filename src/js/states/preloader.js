@@ -145,6 +145,8 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/blueHouse.png');
     this.game.load.image('gasStation',
         'assets/images/vocabulary/gasStation.png');
+    this.game.load.image('nameBoard',
+        'assets/images/vocabulary/nameBoard.png');
 
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

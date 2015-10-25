@@ -2528,6 +2528,8 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/blueHouse.png');
     this.game.load.image('gasStation',
         'assets/images/vocabulary/gasStation.png');
+    this.game.load.image('nameBoard',
+        'assets/images/vocabulary/nameBoard.png');
 
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -3178,6 +3180,7 @@ module.exports = Level;
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var NameBoard = require('../../worldElements/NameBoard');
 
 /**
  * Number of fights that player will have during this level.
@@ -3236,6 +3239,7 @@ LevelOne.prototype.addObjects = function() {
     playerHouse.anchor.set(0, 1);
     this.addObject(playerHouse);
 
+
     var gunsStore = new InteractiveHouse(
         this.firstCheckPointX * 1.4,
         this.GROUND_HEIGHT,
@@ -3243,6 +3247,9 @@ LevelOne.prototype.addObjects = function() {
     );
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
+
+    this.addObject(new NameBoard(this.firstCheckPointX * 1.35,
+        this.GROUND_HEIGHT, 'First Street'));
 
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,
@@ -3302,7 +3309,7 @@ LevelOne.prototype.addPlaces = function() {
 
 module.exports = LevelOne;
 
-},{"../../worldElements/InteractiveHouse":49,"../levels/Level":31}],33:[function(require,module,exports){
+},{"../../worldElements/InteractiveHouse":49,"../../worldElements/NameBoard":50,"../levels/Level":31}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -4304,4 +4311,36 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":22}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49]);
+},{"../items/store/Store":22}],50:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 25/10/2015.
+ */
+
+/**
+ * Represents a board for streets and city places names.
+ * @class NameBoard
+ * @extends Phaser.Sprite
+ * @param {number} x - Board x coordinate within the world.
+ * @param {number} y - Board y coordinate within the world.
+ * @param {string} name - Text to be showed on the Board.
+ * @constructor
+ */
+var NameBoard = function(x, y, name) {
+    Phaser.Sprite.call(this, level.game, x, y, 'nameBoard');
+    this.anchor.set(0.5, 1);
+
+    this.message = level.game.make.text(0, -this.height + 10, name);
+    this.message.font = 'Arial';
+    this.message.fontSize = 16;
+    this.message.fill = '#FFFFFF';
+    this.message.anchor.set(0.5, 0);
+
+    this.addChild(this.message);
+};
+
+NameBoard.prototype = Object.create(Phaser.Sprite.prototype);
+NameBoard.prototype.constructor = NameBoard;
+
+module.exports = NameBoard;
+
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]);
