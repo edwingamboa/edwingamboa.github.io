@@ -9,6 +9,16 @@ var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
  * @type {number}
  */
 var NUMBER_OF_FIGHTING_POINTS = 5;
+/**
+ * Number of places form vocabulary for this level.
+ * @type {number}
+ */
+var NUMBER_OF_PLACES = 4;
+/**
+ * Number of houses player should visit during this level.
+ * @type {number}
+ */
+var NUMBER_OF_HOUSES = 2;
 
 /**
  * Manages LevelOne.
@@ -30,13 +40,15 @@ LevelOne.prototype.constructor = LevelOne;
  */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
-    this.firstCheckPointX = this.game.camera.width * 1.3;
-    this.checkPointsDistance = this.game.camera.width + 140;
+    this.firstCheckPointX = this.game.camera.width * 1.5;
+    this.checkPointsDistance = this.WORLD_WIDTH /
+        (NUMBER_OF_FIGHTING_POINTS + 1);
     this.addNPCs();
     this.addEnemies();
     this.addObjects();
+    this.addPlaces();
     this.addRevolver(2000, 400, false);
-    this.addRevolver(2000, 400, false);
+    this.addRevolver(3000, 400, false);
 };
 
 /**
@@ -44,23 +56,27 @@ LevelOne.prototype.create = function() {
  * @method LevelOne.addObjects
  */
 LevelOne.prototype.addObjects = function() {
+    var playerHouse = level.game.make.sprite(5, this.GROUND_HEIGHT,
+        'orangeHouse');
+    playerHouse.anchor.set(0, 1);
+    this.addObject(playerHouse);
+
     var gunsStore = new InteractiveHouse(
-        this.firstCheckPointX + 1.5 * this.checkPointsDistance,
+        this.firstCheckPointX * 1.4,
         this.GROUND_HEIGHT,
-        'house'
+        'redHouse'
     );
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
 
-    var friendsHouse = new InteractiveHouse(
-        this.firstCheckPointX + 5 * this.checkPointsDistance,
+    var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,
-        'house'
+        'blueHouse'
     );
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
 
-    this.addCar(this.firstCheckPointX + 3 * this.checkPointsDistance, 'jeep');
+    this.addCar(3 * this.checkPointsDistance, 'jeep');
     //this.addCar(40, 'jeep');
 };
 
@@ -70,7 +86,7 @@ LevelOne.prototype.addObjects = function() {
  */
 LevelOne.prototype.addNPCs = function() {
     this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
-    this.addNPC(this.firstCheckPointX + this.checkPointsDistance, 'friend',
+    this.addNPC(this.firstCheckPointX * 1.2, 'friend',
         'comic2');
 };
 
@@ -79,16 +95,33 @@ LevelOne.prototype.addNPCs = function() {
  * @method LevelOne.addEnemies
  */
 LevelOne.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX;
-    var y = level.WORLD_HEIGHT / (NUMBER_OF_FIGHTING_POINTS + 1);
+    var x = this.firstCheckPointX * 0.75;
+    var y = level.WORLD_HEIGHT - 200;
     var numberOfEnemies = 3;
     for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
         for (var j = 0; j < numberOfEnemies; j++) {
-            x += 30;
+            x += 50;
             this.addSimpleEnemy(x, y);
         }
         numberOfEnemies ++;
-        x += 2 * this.checkPointsDistance;
+        x += this.checkPointsDistance;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelOne.addPlaces
+ */
+LevelOne.prototype.addPlaces = function() {
+    var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
+    var place;
+    var i;
+    for (i = 0; i < placesKeys.length; i++) {
+        place = level.game.make.sprite(x * (i + 1), this.GROUND_HEIGHT,
+            placesKeys[i]);
+        place.anchor.set(0, 1);
+        this.addObject(place);
     }
 };
 

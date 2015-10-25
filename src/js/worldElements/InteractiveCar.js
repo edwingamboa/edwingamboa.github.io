@@ -112,7 +112,7 @@ InteractiveCar.prototype.update = function() {
             this.remainingGas --;
         }else if (level.direction > 0) {
             this.frame = this.stopRightFrameIndex;
-        }else {
+        }else if (level.direction < 0) {
             this.frame = this.stopLeftFrameIndex;
         }
         if (this.remainingGas <= 0) {

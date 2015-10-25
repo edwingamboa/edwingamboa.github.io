@@ -34,11 +34,11 @@ Level.prototype.constructor = Level;
  * @method Level.preload
  */
 Level.prototype.preload = function() {
-    this.game.stage.backgroundColor = '#82CAFA';
+    this.game.stage.backgroundColor = '#C7D2FC';
 
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
-    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
+    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
 };
 
 /**
@@ -48,15 +48,18 @@ Level.prototype.preload = function() {
  */
 Level.prototype.create = function() {
     this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
+    this.backgroundImage = this.game.add.tileSprite(0, 0, this.WORLD_WIDTH,
+        400, 'worldBg');
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
 
+    this.createBackObjectsGroup();
     this.createHealthPacksGroup();
-    this.createEnemiesGroup();
-    this.createNpcsGroup();
     this.createCarsGroup();
+    this.createNpcsGroup();
+    this.createEnemiesGroup();
     this.addPlayer();
     this.createWeaponsGroup();
     this.addPlatforms();
@@ -200,6 +203,14 @@ Level.prototype.addHealthBar = function() {
 
 /**
  * Creates a Phaser group to manage enemies.
+ * @method Level.createBackObjectsGroup
+ */
+Level.prototype.createBackObjectsGroup = function() {
+    this.backObjects = this.game.add.group();
+};
+
+/**
+ * Creates a Phaser group to manage enemies.
  * @method Level.createEnemiesGroup
  */
 Level.prototype.createEnemiesGroup = function() {
@@ -277,9 +288,10 @@ Level.prototype.addPlatforms = function() {
     this.platforms = this.game.add.group();
     this.platforms.enableBody = true;
 
-    this.ground = this.platforms.create(0, this.game.world.height - 64,
-        'ground');
-    this.ground.scale.setTo(40, 2);
+    this.ground = this.platforms.create(0, this.GROUND_HEIGHT, 'ground');
+    var yScale = 100 / this.ground.height;
+    var xScale = this.WORLD_WIDTH / this.ground.width;
+    this.ground.scale.setTo(xScale, yScale);
     this.ground.body.immovable = true;
 
     /*
@@ -296,7 +308,7 @@ Level.prototype.addPlatforms = function() {
  * @param {Phaser.Sprite} object - Object to be added.
  */
 Level.prototype.addObject = function(object) {
-    this.game.add.existing(object);
+    this.backObjects.add(object);
 };
 
 /**

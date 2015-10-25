@@ -53,6 +53,7 @@ Preloader.prototype.displayLoadScreen = function() {
 Preloader.prototype.loadAssets = function() {
     //Menu assets
     //Level assets
+    this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
     this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
     this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
@@ -131,6 +132,19 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('englishChallengePanelBg',
         'assets/images/englishChallengePanelBg.png');
     this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
+
+    this.game.load.image('bookStore', 'assets/images/vocabulary/bookStore.png');
+    this.game.load.image('playground',
+        'assets/images/vocabulary/playground.png');
+    this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
+    this.game.load.image('orangeHouse',
+        'assets/images/vocabulary/orangeHouse.png');
+    this.game.load.image('redHouse',
+        'assets/images/vocabulary/redHouse.png');
+    this.game.load.image('blueHouse',
+        'assets/images/vocabulary/blueHouse.png');
+    this.game.load.image('gasStation',
+        'assets/images/vocabulary/gasStation.png');
 
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

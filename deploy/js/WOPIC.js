@@ -2436,6 +2436,7 @@ Preloader.prototype.displayLoadScreen = function() {
 Preloader.prototype.loadAssets = function() {
     //Menu assets
     //Level assets
+    this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
     this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
     this.game.load.image('healthPack20', 'assets/images/healthPack20.png');
@@ -2515,6 +2516,19 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/englishChallengePanelBg.png');
     this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
 
+    this.game.load.image('bookStore', 'assets/images/vocabulary/bookStore.png');
+    this.game.load.image('playground',
+        'assets/images/vocabulary/playground.png');
+    this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
+    this.game.load.image('orangeHouse',
+        'assets/images/vocabulary/orangeHouse.png');
+    this.game.load.image('redHouse',
+        'assets/images/vocabulary/redHouse.png');
+    this.game.load.image('blueHouse',
+        'assets/images/vocabulary/blueHouse.png');
+    this.game.load.image('gasStation',
+        'assets/images/vocabulary/gasStation.png');
+
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 };
@@ -2578,11 +2592,11 @@ Level.prototype.constructor = Level;
  * @method Level.preload
  */
 Level.prototype.preload = function() {
-    this.game.stage.backgroundColor = '#82CAFA';
+    this.game.stage.backgroundColor = '#C7D2FC';
 
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
-    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 60;
+    this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
 };
 
 /**
@@ -2592,15 +2606,18 @@ Level.prototype.preload = function() {
  */
 Level.prototype.create = function() {
     this.game.world.setBounds(0, 0, this.WORLD_WIDTH, this.WORLD_HEIGHT);
+    this.backgroundImage = this.game.add.tileSprite(0, 0, this.WORLD_WIDTH,
+        400, 'worldBg');
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
 
+    this.createBackObjectsGroup();
     this.createHealthPacksGroup();
-    this.createEnemiesGroup();
-    this.createNpcsGroup();
     this.createCarsGroup();
+    this.createNpcsGroup();
+    this.createEnemiesGroup();
     this.addPlayer();
     this.createWeaponsGroup();
     this.addPlatforms();
@@ -2744,6 +2761,14 @@ Level.prototype.addHealthBar = function() {
 
 /**
  * Creates a Phaser group to manage enemies.
+ * @method Level.createBackObjectsGroup
+ */
+Level.prototype.createBackObjectsGroup = function() {
+    this.backObjects = this.game.add.group();
+};
+
+/**
+ * Creates a Phaser group to manage enemies.
  * @method Level.createEnemiesGroup
  */
 Level.prototype.createEnemiesGroup = function() {
@@ -2821,9 +2846,10 @@ Level.prototype.addPlatforms = function() {
     this.platforms = this.game.add.group();
     this.platforms.enableBody = true;
 
-    this.ground = this.platforms.create(0, this.game.world.height - 64,
-        'ground');
-    this.ground.scale.setTo(40, 2);
+    this.ground = this.platforms.create(0, this.GROUND_HEIGHT, 'ground');
+    var yScale = 100 / this.ground.height;
+    var xScale = this.WORLD_WIDTH / this.ground.width;
+    this.ground.scale.setTo(xScale, yScale);
     this.ground.body.immovable = true;
 
     /*
@@ -2840,7 +2866,7 @@ Level.prototype.addPlatforms = function() {
  * @param {Phaser.Sprite} object - Object to be added.
  */
 Level.prototype.addObject = function(object) {
-    this.game.add.existing(object);
+    this.backObjects.add(object);
 };
 
 /**
@@ -3158,6 +3184,16 @@ var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
  * @type {number}
  */
 var NUMBER_OF_FIGHTING_POINTS = 5;
+/**
+ * Number of places form vocabulary for this level.
+ * @type {number}
+ */
+var NUMBER_OF_PLACES = 4;
+/**
+ * Number of houses player should visit during this level.
+ * @type {number}
+ */
+var NUMBER_OF_HOUSES = 2;
 
 /**
  * Manages LevelOne.
@@ -3179,13 +3215,15 @@ LevelOne.prototype.constructor = LevelOne;
  */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
-    this.firstCheckPointX = this.game.camera.width * 1.3;
-    this.checkPointsDistance = this.game.camera.width + 140;
+    this.firstCheckPointX = this.game.camera.width * 1.5;
+    this.checkPointsDistance = this.WORLD_WIDTH /
+        (NUMBER_OF_FIGHTING_POINTS + 1);
     this.addNPCs();
     this.addEnemies();
     this.addObjects();
+    this.addPlaces();
     this.addRevolver(2000, 400, false);
-    this.addRevolver(2000, 400, false);
+    this.addRevolver(3000, 400, false);
 };
 
 /**
@@ -3193,23 +3231,27 @@ LevelOne.prototype.create = function() {
  * @method LevelOne.addObjects
  */
 LevelOne.prototype.addObjects = function() {
+    var playerHouse = level.game.make.sprite(5, this.GROUND_HEIGHT,
+        'orangeHouse');
+    playerHouse.anchor.set(0, 1);
+    this.addObject(playerHouse);
+
     var gunsStore = new InteractiveHouse(
-        this.firstCheckPointX + 1.5 * this.checkPointsDistance,
+        this.firstCheckPointX * 1.4,
         this.GROUND_HEIGHT,
-        'house'
+        'redHouse'
     );
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
 
-    var friendsHouse = new InteractiveHouse(
-        this.firstCheckPointX + 5 * this.checkPointsDistance,
+    var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
         this.GROUND_HEIGHT,
-        'house'
+        'blueHouse'
     );
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
 
-    this.addCar(this.firstCheckPointX + 3 * this.checkPointsDistance, 'jeep');
+    this.addCar(3 * this.checkPointsDistance, 'jeep');
     //this.addCar(40, 'jeep');
 };
 
@@ -3219,7 +3261,7 @@ LevelOne.prototype.addObjects = function() {
  */
 LevelOne.prototype.addNPCs = function() {
     this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
-    this.addNPC(this.firstCheckPointX + this.checkPointsDistance, 'friend',
+    this.addNPC(this.firstCheckPointX * 1.2, 'friend',
         'comic2');
 };
 
@@ -3228,16 +3270,33 @@ LevelOne.prototype.addNPCs = function() {
  * @method LevelOne.addEnemies
  */
 LevelOne.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX;
-    var y = level.WORLD_HEIGHT / (NUMBER_OF_FIGHTING_POINTS + 1);
+    var x = this.firstCheckPointX * 0.75;
+    var y = level.WORLD_HEIGHT - 200;
     var numberOfEnemies = 3;
     for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
         for (var j = 0; j < numberOfEnemies; j++) {
-            x += 30;
+            x += 50;
             this.addSimpleEnemy(x, y);
         }
         numberOfEnemies ++;
-        x += 2 * this.checkPointsDistance;
+        x += this.checkPointsDistance;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelOne.addPlaces
+ */
+LevelOne.prototype.addPlaces = function() {
+    var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
+    var place;
+    var i;
+    for (i = 0; i < placesKeys.length; i++) {
+        place = level.game.make.sprite(x * (i + 1), this.GROUND_HEIGHT,
+            placesKeys[i]);
+        place.anchor.set(0, 1);
+        this.addObject(place);
     }
 };
 
@@ -4173,7 +4232,7 @@ InteractiveCar.prototype.update = function() {
             this.remainingGas --;
         }else if (level.direction > 0) {
             this.frame = this.stopRightFrameIndex;
-        }else {
+        }else if (level.direction < 0) {
             this.frame = this.stopLeftFrameIndex;
         }
         if (this.remainingGas <= 0) {
