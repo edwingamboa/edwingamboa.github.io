@@ -16,6 +16,7 @@ var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
+var NameBoard = require('../../worldElements/NameBoard');
 
 /**
  * Represents a game level.
@@ -114,9 +115,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            var comic = new PopUp(npc.comicKey);
-            this.game.add.existing(comic);
-            comic.open();
+            npc.showMessage();
             if (this.player.x < npc.x) {
                 this.player.x += 2 * npc.width;
             } else {
@@ -580,7 +579,7 @@ Level.prototype.pause = function() {
 };
 
 /**
- * Resumes the game wehn it has been paused.
+ * Resumes the game when it has been paused.
  * @method Level.resume
  */
 Level.prototype.resume = function() {
@@ -609,6 +608,50 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
     var successDialog = new Dialog('successIcon', successMessage, parent);
     this.game.add.existing(successDialog);
     successDialog.open();
+};
+
+/**
+ * Adds a new static building (player can not interact with it) to the game
+ * scene.
+ * @method Level.prototype.addStaticBuilding
+ * @param {number} x - X coordinate within the world where the building should
+ * appear.
+ * @param {string} key - Bulding texture key.
+ * @returns {Phaser.Sprite} - Added building
+ */
+Level.prototype.addStaticBuilding = function(x, key) {
+    var building = level.game.make.sprite(x, this.GROUND_HEIGHT, key);
+    building.anchor.set(0, 1);
+    this.addObject(building);
+    return building;
+};
+
+/**
+ * Adds two neighbors to a certain building, one on its left and the other one
+ * on its right.
+ * @method Level.addNeighbors
+ * @param {Phaser.Sprite} building - Building, which will have the neighbors.
+ * @param {string} leftKey - Left neighbor texture key.
+ * @param {string} rightKey - Right neighbor texture key.
+ */
+Level.prototype.addNeighbors = function(building, leftKey, rightKey) {
+    var leftHouse = this.addStaticBuilding(0, leftKey);
+    leftHouse.x = building.x - leftHouse.width;
+    this.addStaticBuilding(building.x + building.width, rightKey);
+};
+
+/**
+ * Adds a new NameBoard, typically for a certain place or street.
+ * @method Level.addNameBoard
+ * @param {number} x - X coordinate within the world, where the board should
+ * appear.
+ * @param {string} text - Text to be showed on the board.
+ */
+Level.prototype.addNameBoard = function(x, text) {
+    var board;
+    board = new NameBoard(x, this.GROUND_HEIGHT, text);
+    this.addObject(board);
+
 };
 
 module.exports = Level;

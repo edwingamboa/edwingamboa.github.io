@@ -3,8 +3,8 @@
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
-var NameBoard = require('../../worldElements/NameBoard');
 var HealthPack = require('../../items/HealthPack');
+var Dialog = require('../../util/Dialog');
 
 /**
  * Number of fights that player will have during this level.
@@ -52,7 +52,6 @@ LevelOne.prototype.create = function() {
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, 350, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(300, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
@@ -63,32 +62,25 @@ LevelOne.prototype.create = function() {
  * @method LevelOne.addObjects
  */
 LevelOne.prototype.addObjects = function() {
-    var playerHouse = level.game.make.sprite(5, this.GROUND_HEIGHT,
-        'orangeHouse');
-    playerHouse.anchor.set(0, 1);
-    this.addObject(playerHouse);
+    var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
 
-    var gunsStore = new InteractiveHouse(
-        this.firstCheckPointX * 1.4,
-        this.GROUND_HEIGHT,
-        'redHouse'
-    );
+    var house = this.addStaticBuilding(500, 'whiteHouse');
+    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
+
+    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
+        this.GROUND_HEIGHT, 'redHouse', dialog);
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
 
-    this.addObject(new NameBoard(this.firstCheckPointX * 1.35,
-
-        this.GROUND_HEIGHT, 'First Street'));
-
+    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT,
-        'blueHouse'
-    );
+        this.GROUND_HEIGHT, 'blueHouse', dialog);
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
+    this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
 
-    this.addCar(3 * this.checkPointsDistance, 'jeep');
-    //this.addCar(40, 'jeep');
+    this.addCar(3.7 * this.checkPointsDistance, 'jeep');
 };
 
 /**
@@ -96,9 +88,15 @@ LevelOne.prototype.addObjects = function() {
  * @method LevelOne.addNPCs
  */
 LevelOne.prototype.addNPCs = function() {
-    this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
-    this.addNPC(this.firstCheckPointX * 1.2, 'friend',
-        'comic2');
+    var message = 'I know that you are looking for \nyour family.' +
+        '\nI can help you.' +
+        '\n\nGo to the blue house after the Zoo,' +
+        '\nmaybe your family is there.';
+    this.addNPC(this.game.camera.width / 2, 'npc', message);
+    message = 'Hi my friend!.' +
+        '\n\nGo to the red House before the' +
+        '\nPlayground, \nthere you can buy a new weapon.';
+    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
 };
 
 /**
@@ -124,15 +122,24 @@ LevelOne.prototype.addEnemies = function() {
  * @method LevelOne.addPlaces
  */
 LevelOne.prototype.addPlaces = function() {
+    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
     var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
     var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
-    var place;
     var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
     for (i = 0; i < placesKeys.length; i++) {
-        place = level.game.make.sprite(x * (i + 1), this.GROUND_HEIGHT,
-            placesKeys[i]);
-        place.anchor.set(0, 1);
-        this.addObject(place);
+        if (houseIndex >= housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
+        this.addNeighbors(place, housesKeys[houseIndex],
+            housesKeys[houseIndex + 1]);
+
+        houseIndex += 2;
+        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
     }
 };
 

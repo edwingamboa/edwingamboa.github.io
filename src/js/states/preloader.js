@@ -136,6 +136,12 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
+    this.game.load.image('greenHouse',
+        'assets/images/vocabulary/greenHouse.png');
+    this.game.load.image('whiteHouse',
+        'assets/images/vocabulary/whiteHouse.png');
+    this.game.load.image('yellowHouse',
+        'assets/images/vocabulary/yellowHouse.png');
     this.game.load.image('redHouse',
         'assets/images/vocabulary/redHouse.png');
     this.game.load.image('blueHouse',

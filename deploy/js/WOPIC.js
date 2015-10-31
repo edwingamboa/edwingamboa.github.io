@@ -463,7 +463,7 @@ Enemy.prototype.updateHealthLevel = function() {
  */
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
-    level.player.increaseScore(this.maxHealthLevel * 0.1);
+    level.player.increaseScore(this.maxHealthLevel * 0.5);
     Character.prototype.killCharacter.call(this);
 };
 
@@ -502,6 +502,7 @@ module.exports = Enemy;
  * Created by Edwin Gamboa on 16/07/2015.
  */
 var Character = require('./Character');
+var Dialog = require('../util/Dialog');
 
 /**
  * Represents a non player character within the game, whom player will interact
@@ -512,12 +513,11 @@ var Character = require('./Character');
  * @param {number} x - NPC's x coordinate within game world.
  * @param {number} y - NPC's y coordinate within game world.
  * @param {string} key - NPC's texture key.
- * @param {string} comicKey - Texture key of the comic that represents the
- * interaction between this NPC and the player.
+ * @param {string} message - Message that the NPC will tell to the player.
  */
-var NPC = function(x, y, key, comicKey) {
+var NPC = function(x, y, key, message) {
     Character.call(this, x, y, key);
-    this.comicKey = comicKey;
+    this.message = message;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
 };
@@ -525,9 +525,15 @@ var NPC = function(x, y, key, comicKey) {
 NPC.prototype = Object.create(Character.prototype);
 NPC.prototype.constructor = NPC;
 
+NPC.prototype.showMessage = function() {
+    var dialog = new Dialog(this.key, this.message);
+    level.game.add.existing(dialog);
+    dialog.open();
+};
+
 module.exports = NPC;
 
-},{"./Character":2}],5:[function(require,module,exports){
+},{"../util/Dialog":35,"./Character":2}],5:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -557,7 +563,7 @@ var GRAVITY = 300;
  * @constant
  * @type {number}
  */
-var MINIMUM_SCORE = 10;
+var MINIMUM_SCORE = 20;
 
 /**
  * Represents player's character within the game.
@@ -699,7 +705,7 @@ var SPRITE_KEY = 'simple_enemy';
  * @constant
  * @type {number}
  */
-var MAX_HEALTH_LEVEL = 5;
+var MAX_HEALTH_LEVEL = 4;
 /**
  * Lowest distance in which a simple enemy can detect the player.
  * @constant
@@ -1773,8 +1779,8 @@ var InventoryItem = require ('./InventoryItem');
  * @constructor
  */
 var Inventory = function() {
-    var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
-    var categories = ['healthPacks', 'weapons', 'objects'];
+    var tabsLabels = ['Weapons', 'Health Packs', 'Objects'];
+    var categories = ['weapons', 'healthPacks', 'objects'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
 };
 
@@ -1863,8 +1869,8 @@ var StoreItem = require ('./StoreItem');
  * @constructor
  */
 var Store = function() {
-    var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
-    var categories = ['healthPacks', 'weapons', 'objects'];
+    var tabsLabels = ['Weapons', 'Health Packs', 'Objects'];
+    var categories = ['weapons', 'healthPacks', 'objects'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Store');
 
     this.cash = level.game.make.text(this.width - 20, 58,
@@ -2519,6 +2525,12 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
+    this.game.load.image('greenHouse',
+        'assets/images/vocabulary/greenHouse.png');
+    this.game.load.image('whiteHouse',
+        'assets/images/vocabulary/whiteHouse.png');
+    this.game.load.image('yellowHouse',
+        'assets/images/vocabulary/yellowHouse.png');
     this.game.load.image('redHouse',
         'assets/images/vocabulary/redHouse.png');
     this.game.load.image('blueHouse',
@@ -2715,6 +2727,7 @@ var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
+var NameBoard = require('../../worldElements/NameBoard');
 
 /**
  * Represents a game level.
@@ -2813,9 +2826,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            var comic = new PopUp(npc.comicKey);
-            this.game.add.existing(comic);
-            comic.open();
+            npc.showMessage();
             if (this.player.x < npc.x) {
                 this.player.x += 2 * npc.width;
             } else {
@@ -3279,7 +3290,7 @@ Level.prototype.pause = function() {
 };
 
 /**
- * Resumes the game wehn it has been paused.
+ * Resumes the game when it has been paused.
  * @method Level.resume
  */
 Level.prototype.resume = function() {
@@ -3310,16 +3321,60 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
     successDialog.open();
 };
 
+/**
+ * Adds a new static building (player can not interact with it) to the game
+ * scene.
+ * @method Level.prototype.addStaticBuilding
+ * @param {number} x - X coordinate within the world where the building should
+ * appear.
+ * @param {string} key - Bulding texture key.
+ * @returns {Phaser.Sprite} - Added building
+ */
+Level.prototype.addStaticBuilding = function(x, key) {
+    var building = level.game.make.sprite(x, this.GROUND_HEIGHT, key);
+    building.anchor.set(0, 1);
+    this.addObject(building);
+    return building;
+};
+
+/**
+ * Adds two neighbors to a certain building, one on its left and the other one
+ * on its right.
+ * @method Level.addNeighbors
+ * @param {Phaser.Sprite} building - Building, which will have the neighbors.
+ * @param {string} leftKey - Left neighbor texture key.
+ * @param {string} rightKey - Right neighbor texture key.
+ */
+Level.prototype.addNeighbors = function(building, leftKey, rightKey) {
+    var leftHouse = this.addStaticBuilding(0, leftKey);
+    leftHouse.x = building.x - leftHouse.width;
+    this.addStaticBuilding(building.x + building.width, rightKey);
+};
+
+/**
+ * Adds a new NameBoard, typically for a certain place or street.
+ * @method Level.addNameBoard
+ * @param {number} x - X coordinate within the world, where the board should
+ * appear.
+ * @param {string} text - Text to be showed on the board.
+ */
+Level.prototype.addNameBoard = function(x, text) {
+    var board;
+    board = new NameBoard(x, this.GROUND_HEIGHT, text);
+    this.addObject(board);
+
+};
+
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48}],33:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48,"../../worldElements/NameBoard":50}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
-var NameBoard = require('../../worldElements/NameBoard');
 var HealthPack = require('../../items/HealthPack');
+var Dialog = require('../../util/Dialog');
 
 /**
  * Number of fights that player will have during this level.
@@ -3367,7 +3422,6 @@ LevelOne.prototype.create = function() {
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, 350, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(300, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
@@ -3378,32 +3432,25 @@ LevelOne.prototype.create = function() {
  * @method LevelOne.addObjects
  */
 LevelOne.prototype.addObjects = function() {
-    var playerHouse = level.game.make.sprite(5, this.GROUND_HEIGHT,
-        'orangeHouse');
-    playerHouse.anchor.set(0, 1);
-    this.addObject(playerHouse);
+    var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
 
-    var gunsStore = new InteractiveHouse(
-        this.firstCheckPointX * 1.4,
-        this.GROUND_HEIGHT,
-        'redHouse'
-    );
+    var house = this.addStaticBuilding(500, 'whiteHouse');
+    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
+
+    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
+        this.GROUND_HEIGHT, 'redHouse', dialog);
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
 
-    this.addObject(new NameBoard(this.firstCheckPointX * 1.35,
-
-        this.GROUND_HEIGHT, 'First Street'));
-
+    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT,
-        'blueHouse'
-    );
+        this.GROUND_HEIGHT, 'blueHouse', dialog);
     friendsHouse.anchor.set(0, 1);
     this.addObject(friendsHouse);
+    this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
 
-    this.addCar(3 * this.checkPointsDistance, 'jeep');
-    //this.addCar(40, 'jeep');
+    this.addCar(3.7 * this.checkPointsDistance, 'jeep');
 };
 
 /**
@@ -3411,9 +3458,15 @@ LevelOne.prototype.addObjects = function() {
  * @method LevelOne.addNPCs
  */
 LevelOne.prototype.addNPCs = function() {
-    this.addNPC(this.game.camera.width / 2, 'npc', 'comic1');
-    this.addNPC(this.firstCheckPointX * 1.2, 'friend',
-        'comic2');
+    var message = 'I know that you are looking for \nyour family.' +
+        '\nI can help you.' +
+        '\n\nGo to the blue house after the Zoo,' +
+        '\nmaybe your family is there.';
+    this.addNPC(this.game.camera.width / 2, 'npc', message);
+    message = 'Hi my friend!.' +
+        '\n\nGo to the red House before the' +
+        '\nPlayground, \nthere you can buy a new weapon.';
+    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
 };
 
 /**
@@ -3439,21 +3492,30 @@ LevelOne.prototype.addEnemies = function() {
  * @method LevelOne.addPlaces
  */
 LevelOne.prototype.addPlaces = function() {
+    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
     var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
     var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
-    var place;
     var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
     for (i = 0; i < placesKeys.length; i++) {
-        place = level.game.make.sprite(x * (i + 1), this.GROUND_HEIGHT,
-            placesKeys[i]);
-        place.anchor.set(0, 1);
-        this.addObject(place);
+        if (houseIndex >= housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
+        this.addNeighbors(place, housesKeys[houseIndex],
+            housesKeys[houseIndex + 1]);
+
+        houseIndex += 2;
+        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
     }
 };
 
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":16,"../../worldElements/InteractiveHouse":49,"../../worldElements/NameBoard":50,"../levels/Level":32}],34:[function(require,module,exports){
+},{"../../items/HealthPack":16,"../../util/Dialog":35,"../../worldElements/InteractiveHouse":49,"../levels/Level":32}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -3508,9 +3570,17 @@ var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
  * @param {PopUp} [parent = null] - View that generates the Dialog.
  */
 var Dialog = function(iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, 'dialogBg', parent);
+    HorizontalLayoutPopUp.call(this, 'dialogBg', parent, null, 20);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
+    var scale;
+    if (this.icon.width > 100) {
+        scale = this.icon.width / 100;
+    }else {
+        scale = 100 / this.icon.width;
+    }
+    this.icon.scale.setTo(scale, scale);
+
     this.message = level.game.make.text(0, 0, '');
     this.message.font = 'Arial';
     this.message.fontSize = 20;
@@ -3864,10 +3934,11 @@ var Horizontalayout = require('./HorizontalLayout');
  * @param {string} backgroundKey - Background texture's key.
  * @param {PopUp} parent - View that creates this PopUp.
  * @param {string} title - PopUp title.
+ * @param {number} margin - Margin between elements.
  */
-var HorizontalLayoutPopUP = function(backgroundKey, parent, title) {
+var HorizontalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
-    this.layout = new Horizontalayout(this);
+    this.layout = new Horizontalayout(this, margin);
 };
 
 HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);
@@ -4369,6 +4440,7 @@ module.exports = InteractiveCar;
  * Created by Edwin Gamboa on 29/08/2015.
  */
 var Store = require('../items/store/Store');
+var Button = require('../util/Button');
 
 /**
  * Represents a House, which player can interact with.
@@ -4378,18 +4450,17 @@ var Store = require('../items/store/Store');
  * @param {number} x - House x coordinate within the world.
  * @param {number} y - House y coordinate within the world.
  * @param {string} backgroundKey - House texture key.
+ * @param {PopUp} dialog - Dialog to be displayed when player interact with
+ * the house.
  */
-var InteractiveHouse = function(x, y, backgroundKey) {
+var InteractiveHouse = function(x, y, backgroundKey, dialog) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.openDoorButton = new Button ('Get in', this.openActivity, this);
+    this.openDoorButton.x = (this.width - this.openDoorButton.width) / 2;
+    this.openDoorButton.y = -this.height + 50;
 
-    this.anchor.set(0, 0);
-
-    this.openDoorButton = level.game.make.sprite(this.width / 2,
-        -this.height / 2, 'openDoor');
-    this.openDoorButton.anchor.set(0.5);
-    this.openDoorButton.inputEnabled = true;
-    this.openDoorButton.input.priorityID = 2;
-    this.openDoorButton.events.onInputDown.add(this.openActivity, this);
+    this.dialog = dialog;
+    level.game.add.existing(this.dialog);
 
     this.addChild(this.openDoorButton);
 };
@@ -4398,15 +4469,16 @@ InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
- *
+ * Displays this house dialog
+ * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
-    //TODO
+    this.dialog.open();
 };
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":22}],50:[function(require,module,exports){
+},{"../items/store/Store":22,"../util/Button":34}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */

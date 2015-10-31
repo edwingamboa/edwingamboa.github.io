@@ -97,7 +97,7 @@ Enemy.prototype.updateHealthLevel = function() {
  */
 Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
-    level.player.increaseScore(this.maxHealthLevel * 0.1);
+    level.player.increaseScore(this.maxHealthLevel * 0.5);
     Character.prototype.killCharacter.call(this);
 };
 

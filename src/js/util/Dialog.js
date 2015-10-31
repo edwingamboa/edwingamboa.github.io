@@ -13,9 +13,17 @@ var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
  * @param {PopUp} [parent = null] - View that generates the Dialog.
  */
 var Dialog = function(iconKey, text, parent) {
-    HorizontalLayoutPopUp.call(this, 'dialogBg', parent);
+    HorizontalLayoutPopUp.call(this, 'dialogBg', parent, null, 20);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
+    var scale;
+    if (this.icon.width > 100) {
+        scale = this.icon.width / 100;
+    }else {
+        scale = 100 / this.icon.width;
+    }
+    this.icon.scale.setTo(scale, scale);
+
     this.message = level.game.make.text(0, 0, '');
     this.message.font = 'Arial';
     this.message.fontSize = 20;

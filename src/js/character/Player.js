@@ -27,7 +27,7 @@ var GRAVITY = 300;
  * @constant
  * @type {number}
  */
-var MINIMUM_SCORE = 10;
+var MINIMUM_SCORE = 20;
 
 /**
  * Represents player's character within the game.

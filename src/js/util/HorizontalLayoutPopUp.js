@@ -12,10 +12,11 @@ var Horizontalayout = require('./HorizontalLayout');
  * @param {string} backgroundKey - Background texture's key.
  * @param {PopUp} parent - View that creates this PopUp.
  * @param {string} title - PopUp title.
+ * @param {number} margin - Margin between elements.
  */
-var HorizontalLayoutPopUP = function(backgroundKey, parent, title) {
+var HorizontalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
-    this.layout = new Horizontalayout(this);
+    this.layout = new Horizontalayout(this, margin);
 };
 
 HorizontalLayoutPopUP.prototype = Object.create(PopUp.prototype);

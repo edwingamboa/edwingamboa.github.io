@@ -15,7 +15,7 @@ var SPRITE_KEY = 'simple_enemy';
  * @constant
  * @type {number}
  */
-var MAX_HEALTH_LEVEL = 5;
+var MAX_HEALTH_LEVEL = 4;
 /**
  * Lowest distance in which a simple enemy can detect the player.
  * @constant

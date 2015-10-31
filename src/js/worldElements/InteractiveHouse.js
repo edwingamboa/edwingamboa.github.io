@@ -2,6 +2,7 @@
  * Created by Edwin Gamboa on 29/08/2015.
  */
 var Store = require('../items/store/Store');
+var Button = require('../util/Button');
 
 /**
  * Represents a House, which player can interact with.
@@ -11,18 +12,17 @@ var Store = require('../items/store/Store');
  * @param {number} x - House x coordinate within the world.
  * @param {number} y - House y coordinate within the world.
  * @param {string} backgroundKey - House texture key.
+ * @param {PopUp} dialog - Dialog to be displayed when player interact with
+ * the house.
  */
-var InteractiveHouse = function(x, y, backgroundKey) {
+var InteractiveHouse = function(x, y, backgroundKey, dialog) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.openDoorButton = new Button ('Get in', this.openActivity, this);
+    this.openDoorButton.x = (this.width - this.openDoorButton.width) / 2;
+    this.openDoorButton.y = -this.height + 50;
 
-    this.anchor.set(0, 0);
-
-    this.openDoorButton = level.game.make.sprite(this.width / 2,
-        -this.height / 2, 'openDoor');
-    this.openDoorButton.anchor.set(0.5);
-    this.openDoorButton.inputEnabled = true;
-    this.openDoorButton.input.priorityID = 2;
-    this.openDoorButton.events.onInputDown.add(this.openActivity, this);
+    this.dialog = dialog;
+    level.game.add.existing(this.dialog);
 
     this.addChild(this.openDoorButton);
 };
@@ -31,10 +31,11 @@ InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
- *
+ * Displays this house dialog
+ * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
-    //TODO
+    this.dialog.open();
 };
 
 module.exports = InteractiveHouse;

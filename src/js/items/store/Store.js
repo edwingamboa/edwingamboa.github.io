@@ -11,8 +11,8 @@ var StoreItem = require ('./StoreItem');
  * @constructor
  */
 var Store = function() {
-    var tabsLabels = ['Health Packs', 'Weapons', 'Objects'];
-    var categories = ['healthPacks', 'weapons', 'objects'];
+    var tabsLabels = ['Weapons', 'Health Packs', 'Objects'];
+    var categories = ['weapons', 'healthPacks', 'objects'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Store');
 
     this.cash = level.game.make.text(this.width - 20, 58,
