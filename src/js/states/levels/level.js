@@ -374,12 +374,11 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack(500, 10, 5, this));
 };
 
 /**
  * Creates a Phaser group to manage health packs.
- * @method Level.createHealthPacksGroup
+ * @method Level.createWeaponsGroup
  */
 Level.prototype.createWeaponsGroup = function() {
     this.weapons = this.game.add.group();

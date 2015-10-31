@@ -85,7 +85,8 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('machineGun',
         'assets/sprites/machineGun.png', 60, 42);
 
-    for (var i = 1; i <= 2; i++) {
+    var i;
+    for (i = 1; i <= 2; i++) {
         this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
             '.png');
     }
@@ -93,10 +94,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/revolver.png');
     this.game.load.image('strongWeapon',
         'assets/images/machineGun.png');
-    this.game.load.image('comic1', 'assets/images/comic1.png');
-    this.game.load.image('comic2', 'assets/images/comic2.png');
-    this.game.load.image('introLevelOne',
-        'assets/images/introLevelOne.png');
     this.game.load.image('house', 'assets/images/house.png');
     this.game.load.image('openDoor', 'assets/images/openDoor.png');
     this.game.load.image('working', 'assets/images/working.png');
@@ -148,6 +145,13 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
 
+    this.game.load.image('comicBg', 'assets/images/comics/comicBg.png');
+    var key;
+    for (i = 1; i <= 7; i++) {
+        key = 'intro' + i;
+        this.game.load.image(key, 'assets/images/comics/' + key + '.png');
+    }
+
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 };
@@ -159,7 +163,7 @@ Preloader.prototype.loadAssets = function() {
 Preloader.prototype.update = function() {
     if (!!this.ready) {
         //this.game.state.start('menu');
-        this.game.state.start('levelOne');
+        this.game.state.start('intro');
         level = this.game.state.states.levelOne;
     }
 };

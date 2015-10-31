@@ -27,9 +27,9 @@ var Preloader = require('./states/Preloader');
 var Menu = require('./states/Menu');
 /**
  * Game Intro, introduces the game backgroudn story to the player.
- * @type {LevelOneIntro}
+ * @type {Intro}
  */
-var LevelOneIntro = require('./states/levels/LevelOneIntro');
+var Intro = require('./states/levels/Intro');
 /**
  * Level one state.
  * @type {LevelOne|exports|module.exports}
@@ -40,10 +40,10 @@ game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOne);
-game.state.add('levelOneIntro', LevelOneIntro);
+game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/LevelOne":32,"./states/levels/LevelOneIntro":33}],2:[function(require,module,exports){
+},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/Intro":31,"./states/levels/LevelOne":33}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -567,7 +567,7 @@ var MINIMUM_SCORE = 10;
  */
 var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, 32, level.game.world.height - 150,
+    Character.call(this, 200, level.game.world.height - 150,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -2468,7 +2468,8 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('machineGun',
         'assets/sprites/machineGun.png', 60, 42);
 
-    for (var i = 1; i <= 2; i++) {
+    var i;
+    for (i = 1; i <= 2; i++) {
         this.game.load.image('bullet' + i, 'assets/images/bullet' + i +
             '.png');
     }
@@ -2476,10 +2477,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/revolver.png');
     this.game.load.image('strongWeapon',
         'assets/images/machineGun.png');
-    this.game.load.image('comic1', 'assets/images/comic1.png');
-    this.game.load.image('comic2', 'assets/images/comic2.png');
-    this.game.load.image('introLevelOne',
-        'assets/images/introLevelOne.png');
     this.game.load.image('house', 'assets/images/house.png');
     this.game.load.image('openDoor', 'assets/images/openDoor.png');
     this.game.load.image('working', 'assets/images/working.png');
@@ -2531,6 +2528,13 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
 
+    this.game.load.image('comicBg', 'assets/images/comics/comicBg.png');
+    var key;
+    for (i = 1; i <= 7; i++) {
+        key = 'intro' + i;
+        this.game.load.image(key, 'assets/images/comics/' + key + '.png');
+    }
+
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 };
@@ -2542,7 +2546,7 @@ Preloader.prototype.loadAssets = function() {
 Preloader.prototype.update = function() {
     if (!!this.ready) {
         //this.game.state.start('menu');
-        this.game.state.start('levelOne');
+        this.game.state.start('intro');
         level = this.game.state.states.levelOne;
     }
 };
@@ -2558,6 +2562,141 @@ Preloader.prototype.onLoadComplete = function() {
 module.exports = Preloader;
 
 },{}],31:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+
+var Button = require('../../util/Button');
+
+/**
+ * Number seconds to wait before changing the comic image or frame.
+ * @constant
+ * @type {number}
+ */
+var SECONDS_BETWEEN_FRAMES = 8;
+/**
+ * Number of images that contains this comic.
+ * @constant
+ * @type {number}
+ */
+var NUMBER_OF_COMIC_IMAGES = 7;
+/**
+ * Time in seconds to wait before showing a new word.
+ * @type {number}
+ */
+var WORD_DELAY = 300;
+
+/**
+ * Manages Game Intro, in which is presented background game story.
+ * @class Intro
+ * @constructor
+ * @param {Phaser.Game} game - Phaser Game object.
+ */
+var Intro = function(game) {};
+
+/**
+ * Creates the comic for the intro and a button to continue.
+ * @method Intro.create
+ */
+Intro.prototype.create = function() {
+    var centerX = this.game.camera.width / 2;
+    var centerY = this.game.camera.height / 2;
+
+    this.background = this.game.add.sprite(centerX, centerY,
+        'comicBg');
+    this.background.anchor.set(0.5, 0.7);
+
+    this.changeComicImage('intro1');
+    this.currentImage = 1;
+
+    var continueButton = new Button('Continue', this.continue, this);
+    continueButton.x = this.game.camera.width - 250;
+    continueButton.y = this.game.camera.height - 60;
+    this.game.add.existing(continueButton);
+
+    this.game.time.events.repeat(Phaser.Timer.SECOND * SECONDS_BETWEEN_FRAMES,
+        NUMBER_OF_COMIC_IMAGES, this.updateComic, this);
+
+    this.scripts = [
+        'Edwar gets home',
+        'He parks his car and gets into his house',
+        'Now he wants to eat something',
+        'Edwar finds a piece of paper',
+        'Someone kidnapped his family und he is now angry',
+        'He needs a weapon to defend himself',
+        'He will rescue his family, but that can be dangerous'
+    ];
+    this.comicText = this.game.add.text(100, 450, '',
+        {font: '20px Arial', fill: '#FFFFFF'});
+    this.game.add.existing(this.comicText);
+    this.showScript(0);
+};
+
+/**
+ * Allows the player to start level one.
+ * @method Intro.continue
+ */
+Intro.prototype.continue = function() {
+    this.game.state.start('levelOne');
+};
+
+/**
+ * Updates the image to be showed, in order to show the whole intro story. This
+ * method is called every SECONDS_BETWEEN_FRAMES.
+ * @method Intro.updateComic
+ */
+Intro.prototype.updateComic = function() {
+    if (this.currentImage < NUMBER_OF_COMIC_IMAGES) {
+        this.currentImage ++;
+        this.changeComicImage('intro' + this.currentImage);
+        this.showScript(this.currentImage - 1);
+    }else {
+        this.continue();
+    }
+};
+
+/**
+ * Changes the current image of the comic.
+ * @method Intro.changeComicImage
+ * @param {string} imageKey - New images' texture key.
+ */
+Intro.prototype.changeComicImage = function(imageKey) {
+    var image = this.game.make.sprite(0, 0, imageKey);
+    image.anchor.set(0.5, 0.5);
+    if (this.background.children.length > 0) {
+        this.background.removeChildren();
+    }
+    this.background.addChild(image);
+
+};
+
+/**
+ * Shows the script that corresponds to an index in this.scripts array.
+ * @method Intro.showScript
+ * @param {number} index - Index of the script to be showed.
+ */
+Intro.prototype.showScript = function(index) {
+    this.wordIndex = 0;
+    this.comicText.text = '';
+    this.line = this.scripts[index].split(' ');
+    this.game.time.events.repeat(WORD_DELAY, this.line.length, this.nextWord,
+        this);
+
+};
+
+/**
+ * Adds a new word to the script showed on screen.
+ * @method Intro.nextWord
+ */
+Intro.prototype.nextWord = function() {
+    this.comicText.text = this.comicText.text.concat(this.line[this.wordIndex] +
+        ' ');
+    this.wordIndex++;
+};
+
+module.exports = Intro;
+
+},{"../../util/Button":34}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2934,12 +3073,11 @@ Level.prototype.addCamera = function() {
 Level.prototype.createHealthPacksGroup = function() {
     this.healthPacks = this.game.add.group();
     this.gameObjects.push(this.healthPacks);
-    this.addHealthPack(new HealthPack(500, 10, 5, this));
 };
 
 /**
  * Creates a Phaser group to manage health packs.
- * @method Level.createHealthPacksGroup
+ * @method Level.createWeaponsGroup
  */
 Level.prototype.createWeaponsGroup = function() {
     this.weapons = this.game.add.group();
@@ -3174,13 +3312,14 @@ Level.prototype.showSuccessMessage = function(successMessage, parent) {
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48}],32:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var NameBoard = require('../../worldElements/NameBoard');
+var HealthPack = require('../../items/HealthPack');
 
 /**
  * Number of fights that player will have during this level.
@@ -3225,8 +3364,13 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.addObjects();
     this.addPlaces();
-    this.addRevolver(2000, 400, false);
-    this.addRevolver(3000, 400, false);
+    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(6000, 350, false);
+    var heathPacksDistance = this.WORLD_WIDTH / 4;
+    this.addHealthPack(new HealthPack(300, 10, 5, this));
+    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
+    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
+    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
 };
 
 /**
@@ -3239,7 +3383,6 @@ LevelOne.prototype.addObjects = function() {
     playerHouse.anchor.set(0, 1);
     this.addObject(playerHouse);
 
-
     var gunsStore = new InteractiveHouse(
         this.firstCheckPointX * 1.4,
         this.GROUND_HEIGHT,
@@ -3249,6 +3392,7 @@ LevelOne.prototype.addObjects = function() {
     this.addObject(gunsStore);
 
     this.addObject(new NameBoard(this.firstCheckPointX * 1.35,
+
         this.GROUND_HEIGHT, 'First Street'));
 
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
@@ -3309,56 +3453,7 @@ LevelOne.prototype.addPlaces = function() {
 
 module.exports = LevelOne;
 
-},{"../../worldElements/InteractiveHouse":49,"../../worldElements/NameBoard":50,"../levels/Level":31}],33:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 29/08/2015.
- */
-
-/**
- * Manages Game Intro, in which is presented background game story.
- * @class LevelOneIntro
- * @constructor
- * @param {Phaser.Game} game - Phaser Game object.
- */
-var LevelOneIntro = function(game) {};
-
-/**
- * Creates the comic for the intro and a button to continue.
- * @method LevelOneIntro.create
- */
-LevelOneIntro.prototype.create = function() {
-    var centerX = this.game.camera.width / 2;
-    var centerY = this.game.camera.height / 2;
-
-    this.background = this.game.add.sprite(centerX, centerY,
-        'introLevelOne');
-    this.background.anchor.setTo(0.5, 0.5);
-
-    var continueButton = this.game.add.text(
-        this.game.camera.width - 80,
-        this.game.camera.height - 30,
-        'Continue');
-    //Font style
-    continueButton.font = 'Arial';
-    continueButton.fontSize = 30;
-    continueButton.fontWeight = 'bold';
-    continueButton.fill = '#0040FF';
-    continueButton.anchor.set(0.5);
-    continueButton.inputEnabled = true;
-    continueButton.events.onInputDown.add(this.continue, this);
-};
-
-/**
- * Allows the player to start level one.
- * @method LevelOneIntro.continue
- */
-LevelOneIntro.prototype.continue = function() {
-    this.game.state.start('levelOne');
-};
-
-module.exports = LevelOneIntro;
-
-},{}],34:[function(require,module,exports){
+},{"../../items/HealthPack":16,"../../worldElements/InteractiveHouse":49,"../../worldElements/NameBoard":50,"../levels/Level":32}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -3371,10 +3466,10 @@ module.exports = LevelOneIntro;
  * @param {string} text - Buttons label.
  * @param {function} action - Action to be carried out when button is clicked.
  * @param {Phaser.Sprite} parent - View that contains this button.
- * @param {string} iconKey - Button's texture key.
+ * @param {string} buttonKey - Button's texture key.
  */
-var Button = function(text, action, parent, iconKey) {
-    var key = iconKey || 'button';
+var Button = function(text, action, parent, buttonKey) {
+    var key = buttonKey || 'button';
     Phaser.Sprite.call(this, level.game, 0, 0, key);
 
     this.text = level.game.make.text(this.width / 2, this.height / 2, text);

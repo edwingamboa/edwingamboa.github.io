@@ -26,9 +26,9 @@ var Preloader = require('./states/Preloader');
 var Menu = require('./states/Menu');
 /**
  * Game Intro, introduces the game backgroudn story to the player.
- * @type {LevelOneIntro}
+ * @type {Intro}
  */
-var LevelOneIntro = require('./states/levels/LevelOneIntro');
+var Intro = require('./states/levels/Intro');
 /**
  * Level one state.
  * @type {LevelOne|exports|module.exports}
@@ -39,5 +39,5 @@ game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOne);
-game.state.add('levelOneIntro', LevelOneIntro);
+game.state.add('intro', Intro);
 game.state.start('boot');

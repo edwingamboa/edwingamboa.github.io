@@ -10,10 +10,10 @@
  * @param {string} text - Buttons label.
  * @param {function} action - Action to be carried out when button is clicked.
  * @param {Phaser.Sprite} parent - View that contains this button.
- * @param {string} iconKey - Button's texture key.
+ * @param {string} buttonKey - Button's texture key.
  */
-var Button = function(text, action, parent, iconKey) {
-    var key = iconKey || 'button';
+var Button = function(text, action, parent, buttonKey) {
+    var key = buttonKey || 'button';
     Phaser.Sprite.call(this, level.game, 0, 0, key);
 
     this.text = level.game.make.text(this.width / 2, this.height / 2, text);
