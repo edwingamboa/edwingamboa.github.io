@@ -121,6 +121,10 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('unscramble', 'assets/icons/unscramble.png');
     this.game.load.image('contexts', 'assets/icons/contexts.png');
     this.game.load.image('imageWord', 'assets/icons/imageWord.png');
+    this.game.load.image('health', 'assets/icons/health.png');
+    this.game.load.image('ammo', 'assets/icons/ammo.png');
+    this.game.load.image('money', 'assets/icons/money.png');
+
     this.game.load.image('popUpPanelBg',
         'assets/images/popUpPanelBg.png');
     this.game.load.image('tabBg', 'assets/images/tabBg.png');

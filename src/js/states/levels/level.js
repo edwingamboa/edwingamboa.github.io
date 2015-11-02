@@ -71,6 +71,7 @@ Level.prototype.create = function() {
     this.createInventory();
     this.createEnglishChallengesMenu();
     this.createStore();
+    this.updateHealthLevel();
 };
 
 /**
@@ -193,9 +194,9 @@ Level.prototype.update = function() {
  * @method Level.addHealthBar
  */
 Level.prototype.addHealthBar = function() {
-    var x = this.healthLevelText.x + this.healthLevelText.width;
-    var y = this.healthLevelText.y;
-    this.healthBar = new ResourceBar(x, y);
+    this.healthBar = new ResourceBar(this.healthIcon.x +
+        this.healthIcon.width / 2 + 10,
+        this.healthLevelText.y + 2);
     this.addObject(this.healthBar);
     this.healthBar.fixedToCamera = true;
 };
@@ -327,24 +328,55 @@ Level.prototype.addPlayer = function() {
  */
 Level.prototype.addTexts = function() {
     //The score
-    this.scoreText = this.game.add.text(this.game.camera.width - 300, 16,
-        'Score: ' + this.player.score, {fontSize: '32px', fill: '#000'});
+    this.scoreIcon = this.game.add.sprite(this.game.camera.width - 150, 10,
+        'money');
+    this.scoreIcon.fixedToCamera = true;
+    this.scoreIcon.anchor.set(0.5, 0);
+    this.scoreLabel = this.game.add.text(this.scoreIcon.x,
+        this.scoreIcon.y + this.scoreIcon.height,
+        'Money', {fontSize: '16px', fill: '#000'});
+    this.scoreLabel.fixedToCamera = true;
+    this.scoreLabel.anchor.set(0.5, 0);
+    this.scoreText = this.game.add.text(this.scoreIcon.x + 60, 10,
+        '' + this.player.score, {fontSize: '32px', fill: '#000'});
     this.scoreText.fixedToCamera = true;
+    this.scoreText.anchor.set(0.5, 0);
 
     //The ammo
-    this.ammoText = this.game.add.text(this.game.camera.width - 300,
-        this.game.camera.height - 50,
-        'Ammo: ' + this.player.currentWeapon.numberOfBullets,
+    this.ammoIcon = this.game.add.sprite(this.game.camera.width - 150,
+        this.game.camera.height - 70,
+        'ammo');
+    this.ammoIcon.fixedToCamera = true;
+    this.ammoIcon.anchor.set(0.5, 0);
+    this.ammoLabel = this.game.add.text(this.ammoIcon.x,
+        this.ammoIcon.y + this.ammoIcon.height,
+        'Ammo', {fontSize: '16px', fill: '#000'});
+    this.ammoLabel.fixedToCamera = true;
+    this.ammoLabel.anchor.set(0.5, 0);
+    this.ammoText = this.game.add.text(this.ammoIcon.x + 60,
+        this.game.camera.height - 60,
+        '' + this.player.currentWeapon.numberOfBullets,
         {
             fontSize: '32px',
             fill: '#000'
         });
     this.ammoText.fixedToCamera = true;
+    this.ammoText.anchor.set(0.5, 0);
 
     //The health level
-    this.healthLevelText = this.game.add.text(16, 16, 'Health: ',
-        {fontSize: '32px', fill: '#000'});
+    this.healthIcon = this.game.add.sprite(40, 10,
+        'health');
+    this.healthIcon.fixedToCamera = true;
+    this.healthIcon.anchor.set(0.5, 0);
+    this.healthLabel = this.game.add.text(this.healthIcon.x,
+        this.healthIcon.y + this.healthIcon.height,
+        'Health', {fontSize: '16px', fill: '#000'});
+    this.healthLabel.fixedToCamera = true;
+    this.healthLabel.anchor.set(0.5, 0);
+    this.healthLevelText = this.game.add.text(this.healthIcon.x + 60, 16,
+        ' ', {fontSize: '32px', fill: '#000'});
     this.healthLevelText.fixedToCamera = true;
+    this.healthLevelText.anchor.set(0.5, 0);
 };
 
 /**
@@ -393,27 +425,16 @@ Level.prototype.createInventory = function() {
     this.game.add.existing(this.inventory);
 
     this.inventoryButton = this.game.add.button(50,
-        this.game.camera.height - 30, 'inventory_button',
+        this.game.camera.height - 70, 'inventory_button',
         this.inventory.open, this.inventory);
-    this.inventoryButton.anchor.setTo(0.5, 0.5);
+    this.inventoryButton.anchor.setTo(0.5, 0);
     this.inventoryButton.fixedToCamera = true;
     this.inventoryButton.input.priorityID = 1;
-};
-
-/**
- * Creates the English challenges menu and a button to access it.
- * @method Level.createEnglishChallengesMenu
- */
-Level.prototype.createEnglishChallengesMenu = function() {
-    this.englishChallengeMenu = new EnglishChallengesMenu();
-    this.game.add.existing(this.englishChallengeMenu);
-
-    this.addCashButton = this.game.add.button(170,
-        this.game.camera.height - 30, 'addCashButton',
-        this.englishChallengeMenu.open, this.englishChallengeMenu);
-    this.addCashButton.anchor.setTo(0.5, 0.5);
-    this.addCashButton.fixedToCamera = true;
-    this.addCashButton.input.priorityID = 1;
+    this.inventoryButtonLabel = this.game.add.text(this.inventoryButton.x,
+        this.inventoryButton.y + this.inventoryButton.height,
+        'Inventory', {fontSize: '16px', fill: '#000'});
+    this.inventoryButtonLabel.fixedToCamera = true;
+    this.inventoryButtonLabel.anchor.set(0.5, 0);
 };
 
 /**
@@ -424,12 +445,39 @@ Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
 
-    this.storeButton = this.game.add.button(110,
-        this.game.camera.height - 30, 'storeButton',
+    this.storeButton = this.game.add.button(130,
+        this.game.camera.height - 70, 'storeButton',
         this.store.open, this.store);
-    this.storeButton.anchor.setTo(0.5, 0.5);
+    this.storeButton.anchor.setTo(0.5, 0);
     this.storeButton.fixedToCamera = true;
     this.storeButton.input.priorityID = 1;
+    this.storeButtonLabel = this.game.add.text(this.storeButton.x,
+        this.storeButton.y + this.storeButton.height,
+        'Store', {fontSize: '16px', fill: '#000'});
+    this.storeButtonLabel.fixedToCamera = true;
+    this.storeButtonLabel.anchor.set(0.5, 0);
+};
+
+/**
+ * Creates the English challenges menu and a button to access it.
+ * @method Level.createEnglishChallengesMenu
+ */
+Level.prototype.createEnglishChallengesMenu = function() {
+    this.englishChallengeMenu = new EnglishChallengesMenu();
+    this.game.add.existing(this.englishChallengeMenu);
+
+    this.addCashButton = this.game.add.button(210,
+        this.game.camera.height - 70, 'addCashButton',
+        this.englishChallengeMenu.open, this.englishChallengeMenu);
+    this.addCashButton.anchor.setTo(0.5, 0);
+    this.addCashButton.fixedToCamera = true;
+    this.addCashButton.input.priorityID = 1;
+    this.addCashButtonLabel = this.game.add.text(this.addCashButton.x,
+        this.addCashButton.y + this.addCashButton.height,
+        'Add Money', {fontSize: '16px', fill: '#000'});
+    this.addCashButtonLabel.fixedToCamera = true;
+    this.addCashButtonLabel.anchor.set(0.5, 0);
+
 };
 
 /**
@@ -488,8 +536,7 @@ Level.prototype.collectHealthPack = function(player, healthPack) {
  * @method Level.updateAmmoText
  */
 Level.prototype.updateAmmoText = function() {
-    this.ammoText.text = 'Ammo: ' +
-        this.player.currentWeapon.numberOfBullets;
+    this.ammoText.text = '' + this.player.currentWeapon.numberOfBullets;
 };
 
 /**
@@ -497,7 +544,7 @@ Level.prototype.updateAmmoText = function() {
  * @method Level.updateScoreText
  */
 Level.prototype.updateScoreText = function() {
-    this.scoreText.text = 'Score: ' + this.player.score;
+    this.scoreText.text = '' + this.player.score;
 };
 
 /**
@@ -508,7 +555,7 @@ Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
         this.game.state.start('menu');
     }
-    this.healthLevelText.text = 'Health: ' + this.player.healthLevel;
+    this.healthLevelText.text = '' + this.player.healthLevel;
     this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
 };
