@@ -22,7 +22,7 @@ var Boot = require('./states/Boot');
 var Preloader = require('./states/Preloader');
 /**
  * Main menu state, allows the player start a game.
- * @type {Menu|exports|module.exports}
+ * @type {Menu}
  */
 var Menu = require('./states/Menu');
 /**
@@ -32,18 +32,24 @@ var Menu = require('./states/Menu');
 var Intro = require('./states/levels/Intro');
 /**
  * Level one state.
- * @type {LevelOne|exports|module.exports}
+ * @type {LevelOne}
  */
 var LevelOne = require('./states/levels/LevelOne');
+/**
+ * Level two state.
+ * @type {LevelTwo}
+ */
+var LevelTwo = require('./states/levels/LevelTwo');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOne);
+game.state.add('levelTwo', LevelTwo);
 game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/Intro":31,"./states/levels/LevelOne":33}],2:[function(require,module,exports){
+},{"./states/Boot":28,"./states/Menu":29,"./states/Preloader":30,"./states/levels/Intro":31,"./states/levels/LevelOne":33,"./states/levels/LevelTwo":34}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -497,7 +503,7 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":43,"./Character":2}],4:[function(require,module,exports){
+},{"./../util/ResourceBar":44,"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -533,7 +539,7 @@ NPC.prototype.showMessage = function() {
 
 module.exports = NPC;
 
-},{"../util/Dialog":35,"./Character":2}],5:[function(require,module,exports){
+},{"../util/Dialog":36,"./Character":2}],5:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -942,7 +948,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],9:[function(require,module,exports){
+},{"../util/GridLayoutPanel":38,"../util/VerticalLayoutPanel":47,"./dragAndDrop/DragAndDropChallenge":12}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1090,7 +1096,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],11:[function(require,module,exports){
+},{"../util/GridLayoutPanel":38,"../util/VerticalLayoutPanel":47,"./dragAndDrop/DragAndDropChallenge":12}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1173,7 +1179,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":37,"../util/VerticalLayoutPanel":46,"./dragAndDrop/DragAndDropChallenge":12}],12:[function(require,module,exports){
+},{"../util/GridLayoutPanel":38,"../util/VerticalLayoutPanel":47,"./dragAndDrop/DragAndDropChallenge":12}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1250,7 +1256,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":9,"../../util/Button":34,"../../util/VerticalLayoutPanel":46,"../../util/VerticalLayoutPopUp":47,"./DragAndDropController":13}],13:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":9,"../../util/Button":35,"../../util/VerticalLayoutPanel":47,"../../util/VerticalLayoutPopUp":48,"./DragAndDropController":13}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1361,7 +1367,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":44}],14:[function(require,module,exports){
+},{"../../util/Utilities":45}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1410,7 +1416,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":37,"../../util/PopUp":42,"../ContextGroups":8,"../ImageWordMatch":10,"../WordUnscramble":11,"./MenuItem":15}],15:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":38,"../../util/PopUp":43,"../ContextGroups":8,"../ImageWordMatch":10,"../WordUnscramble":11,"./MenuItem":15}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1672,7 +1678,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":34,"../util/VerticalLayoutPanel":46}],19:[function(require,module,exports){
+},{"../util/Button":35,"../util/VerticalLayoutPanel":47}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/10/2015.
  */
@@ -1765,7 +1771,7 @@ ItemsPopUp.prototype.createItemGroups = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":34,"../util/GridLayoutPanel":37,"../util/PopUp":42,"./HealthPack":16,"./weapons/Revolver":26}],20:[function(require,module,exports){
+},{"../util/Button":35,"../util/GridLayoutPanel":38,"../util/PopUp":43,"./HealthPack":16,"./weapons/Revolver":26}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2527,6 +2533,15 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('playground',
         'assets/images/vocabulary/playground.png');
     this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
+    this.game.load.image('gasStation',
+        'assets/images/vocabulary/gasStation.png');
+
+    this.game.load.image('bank', 'assets/images/vocabulary/bank.png');
+    this.game.load.image('coffeeShop',
+        'assets/images/vocabulary/coffeeShop.png');
+    this.game.load.image('hospital', 'assets/images/vocabulary/hospital.png');
+    this.game.load.image('school', 'assets/images/vocabulary/school.png');
+
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
     this.game.load.image('greenHouse',
@@ -2539,8 +2554,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/redHouse.png');
     this.game.load.image('blueHouse',
         'assets/images/vocabulary/blueHouse.png');
-    this.game.load.image('gasStation',
-        'assets/images/vocabulary/gasStation.png');
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
 
@@ -2550,6 +2563,9 @@ Preloader.prototype.loadAssets = function() {
         key = 'intro' + i;
         this.game.load.image(key, 'assets/images/comics/' + key + '.png');
     }
+
+    this.game.load.image('mediumPopUpBg', 'assets/images/mediumPopUpBg.png');
+    this.game.load.image('emptyRoom', 'assets/images/emptyRoom.png');
 
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -2712,7 +2728,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":34}],32:[function(require,module,exports){
+},{"../../util/Button":35}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2848,7 +2864,9 @@ Level.prototype.updateNpcs = function() {
  * @method Level.update
  */
 Level.prototype.update = function() {
-    //Collisions
+    if (this.playerWins()) {
+        this.nextLevel();
+    }
     this.updateEnemies();
     this.updateNpcs();
 
@@ -3416,9 +3434,17 @@ Level.prototype.addNameBoard = function(x, text) {
 
 };
 
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+Level.prototype.playerWins = function() {
+    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
+};
+
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":35,"../../util/PopUp":42,"../../util/ResourceBar":43,"../../worldElements/InteractiveCar":48,"../../worldElements/NameBoard":50}],33:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../englishChallenges/menu/EnglishChallengesMenu":14,"../../items/HealthPack":16,"../../items/inventory/Inventory":20,"../../items/store/Store":22,"../../items/weapons/MachineGun":25,"../../items/weapons/Revolver":26,"../../util/Dialog":36,"../../util/PopUp":43,"../../util/ResourceBar":44,"../../worldElements/InteractiveCar":49,"../../worldElements/NameBoard":51}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -3426,6 +3452,7 @@ var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
+var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 
 /**
  * Number of fights that player will have during this level.
@@ -3494,7 +3521,18 @@ LevelOne.prototype.addObjects = function() {
     gunsStore.anchor.set(0, 1);
     this.addObject(gunsStore);
 
-    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'So late!');
+    var emptyRoom = level.game.make.sprite(0, 0, 'emptyRoom');
+    var finishMessage = 'Your family is now somewhere else.' +
+        '\nContinue trying, because this game is just starting!';
+    var dialogText = level.game.make.text(0, 0, finishMessage);
+    dialogText.font = 'Arial';
+    dialogText.fontSize = 20;
+    dialogText.fill = '#000000';
+    dialogText.align = 'center';
+    dialog.addElement(emptyRoom);
+    dialog.addElement(dialogText);
+
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
         this.GROUND_HEIGHT, 'blueHouse', dialog);
     friendsHouse.anchor.set(0, 1);
@@ -3564,9 +3602,189 @@ LevelOne.prototype.addPlaces = function() {
     }
 };
 
+/**
+ * Lets the player to play second level.
+ * @method LevelOne.nextLevel
+ */
+LevelOne.prototype.nextLevel = function() {
+    this.game.state.start('levelTwo');
+    level = this.game.state.states.levelTwo;
+};
+
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":16,"../../util/Dialog":35,"../../worldElements/InteractiveHouse":49,"../levels/Level":32}],34:[function(require,module,exports){
+},{"../../items/HealthPack":16,"../../util/Dialog":36,"../../util/VerticalLayoutPopUp":48,"../../worldElements/InteractiveHouse":50,"../levels/Level":32}],34:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 05/11/2015.
+ */
+var Level = require ('../levels/Level');
+var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var HealthPack = require('../../items/HealthPack');
+var Dialog = require('../../util/Dialog');
+var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+
+/**
+ * Number of fights that player will have during this level.
+ * @type {number}
+ */
+var NUMBER_OF_FIGHTING_POINTS = 5;
+/**
+ * Number of places form vocabulary for this level.
+ * @type {number}
+ */
+var NUMBER_OF_PLACES = 4;
+/**
+ * Number of houses player should visit during this level.
+ * @type {number}
+ */
+var NUMBER_OF_HOUSES = 2;
+
+/**
+ * Manages LevelOne.
+ * @class LevelOne
+ * @constructor
+ * @extends Level
+ * @param {Phaser.Game} game - Pahser Game object.
+ */
+var LevelOne = function(game) {
+    Level.call(this, game);
+};
+
+LevelOne.prototype = Object.create(Level.prototype);
+LevelOne.prototype.constructor = LevelOne;
+
+/**
+ * Creates level one specific objects and elements.
+ * @method LevelOne.create
+ */
+LevelOne.prototype.create = function() {
+    Level.prototype.create.call(this);
+    this.game.stage.backgroundColor = '#C2501B';
+    this.firstCheckPointX = this.game.camera.width * 1.5;
+    this.checkPointsDistance = this.WORLD_WIDTH /
+        (NUMBER_OF_FIGHTING_POINTS + 1);
+    this.addNPCs();
+    this.addEnemies();
+    this.addObjects();
+    this.addPlaces();
+    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(6000, 350, false);
+    var heathPacksDistance = this.WORLD_WIDTH / 4;
+    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
+    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
+    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
+};
+
+/**
+ * Add InteractiveCar and InteractiveHouses for this level.
+ * @method LevelOne.addObjects
+ */
+LevelOne.prototype.addObjects = function() {
+    var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
+
+    var house = this.addStaticBuilding(500, 'whiteHouse');
+    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
+
+    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
+        this.GROUND_HEIGHT, 'redHouse', dialog);
+    gunsStore.anchor.set(0, 1);
+    this.addObject(gunsStore);
+
+    dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'So late!');
+    var emptyRoom = level.game.make.sprite(0, 0, 'emptyRoom');
+    var finishMessage = 'Your family is now somewhere else.' +
+        '\nContinue trying, because this game is just starting!';
+    var dialogText = level.game.make.text(0, 0, finishMessage);
+    dialogText.font = 'Arial';
+    dialogText.fontSize = 20;
+    dialogText.fill = '#000000';
+    dialogText.align = 'center';
+    dialog.addElement(emptyRoom);
+    dialog.addElement(dialogText);
+
+    var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
+        this.GROUND_HEIGHT, 'blueHouse', dialog);
+    friendsHouse.anchor.set(0, 1);
+    this.addObject(friendsHouse);
+    this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'jeep');
+    this.addCar(200, 'jeep');
+};
+
+/**
+ * Adds level one non player characters.
+ * @method LevelOne.addNPCs
+ */
+LevelOne.prototype.addNPCs = function() {
+    var message = 'I know that you are looking for \nyour family.' +
+        '\nI can help you.' +
+        '\n\nGo to the blue house after the Zoo,' +
+        '\nmaybe your family is there.';
+    this.addNPC(this.game.camera.width / 2, 'npc', message);
+    message = 'Hi my friend!.' +
+        '\n\nGo to the red House before the' +
+        '\nPlayground, \nthere you can buy a new weapon.';
+    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
+};
+
+/**
+ * Adds this level enemies.
+ * @method LevelOne.addEnemies
+ */
+LevelOne.prototype.addEnemies = function() {
+    var x = this.firstCheckPointX * 0.75;
+    var y = level.WORLD_HEIGHT - 200;
+    var numberOfEnemies = 3;
+    for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
+        for (var j = 0; j < numberOfEnemies; j++) {
+            x += 50;
+            this.addSimpleEnemy(x, y);
+        }
+        numberOfEnemies ++;
+        x += this.checkPointsDistance;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelOne.addPlaces
+ */
+LevelOne.prototype.addPlaces = function() {
+    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
+    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school'];
+    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School'];
+    var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
+    var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
+    for (i = 0; i < placesKeys.length; i++) {
+        if (houseIndex >= housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
+        this.addNeighbors(place, housesKeys[houseIndex],
+            housesKeys[houseIndex + 1]);
+
+        houseIndex += 2;
+        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
+    }
+};
+
+/**
+ * Lets the player to play second level.
+ * @method LevelOne.nextLevel
+ */
+LevelOne.prototype.nextLevel = function() {
+    this.game.state.start('intro');
+    //level = this.game.state.states.levelOne;
+};
+
+module.exports = LevelOne;
+
+},{"../../items/HealthPack":16,"../../util/Dialog":36,"../../util/VerticalLayoutPopUp":48,"../../worldElements/InteractiveHouse":50,"../levels/Level":32}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -3605,7 +3823,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -3656,7 +3874,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":41}],36:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":42}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -3739,7 +3957,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -3809,7 +4027,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":36}],38:[function(require,module,exports){
+},{"./GridLayout":37}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -3877,7 +4095,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":36,"./PopUp":42}],39:[function(require,module,exports){
+},{"./GridLayout":37,"./PopUp":43}],40:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -3931,7 +4149,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -3970,7 +4188,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":39}],41:[function(require,module,exports){
+},{"./HorizontalLayout":40}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4016,7 +4234,7 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":39,"./PopUp":42}],42:[function(require,module,exports){
+},{"./HorizontalLayout":40,"./PopUp":43}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4111,7 +4329,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -4152,7 +4370,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4189,7 +4407,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4242,7 +4460,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4296,7 +4514,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":45}],47:[function(require,module,exports){
+},{"./VerticalLayout":46}],48:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 21/10/2015.
  */
@@ -4341,12 +4559,13 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":42,"./VerticalLayout":45}],48:[function(require,module,exports){
+},{"./PopUp":43,"./VerticalLayout":46}],49:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
 var PopUp = require('../util/PopUp');
 var ResourceBar = require('../util/ResourceBar');
+var Button = require('../util/Button');
 
 /**
  * Default car speed.
@@ -4372,6 +4591,18 @@ var CAR_GRAVITY = 30000;
  * @type {number}
  */
 var MAX_DISTANCE = 400;
+/**
+ * Fuel bar width.
+ * @constant
+ * @type {number}
+ */
+var BAR_WIDTH = 100;
+/**
+ * Fuel bar height.
+ * @constant
+ * @type {number}
+ */
+var BAR_HEIGHT = 10;
 
 /**
  * Represents a car, which player can interact with.
@@ -4385,17 +4616,6 @@ var MAX_DISTANCE = 400;
 var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
-    this.anchor.set(0, 0);
-
-    this.getOnButton = level.game.make.sprite(this.width / 2,
-        -this.height, 'openDoor');
-    this.getOnButton.anchor.set(0.5);
-    this.getOnButton.inputEnabled = true;
-    this.getOnButton.input.priorityID = 2;
-    this.getOnButton.events.onInputDown.add(this.getOn, this);
-
-    this.addChild(this.getOnButton);
-
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.anchor.set(0.5, 1);
@@ -4407,9 +4627,15 @@ var InteractiveCar = function(x, y, backgroundKey) {
     this.remainingGas = MAX_DISTANCE;
     this.maxDistance = MAX_DISTANCE;
 
-    this.gasBar = new ResourceBar(-this.width / 2, -this.height - 10,
-        {width: 80, height: 8});
+    this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
+        -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
+    this.gasBar.visible = false;
     this.addChild(this.gasBar);
+
+    this.getOnButton = new Button ('Get on', this.getOn, this);
+    this.getOnButton.x = -(this.width - this.getOnButton.width) / 2;
+    this.getOnButton.y = -this.height;
+    this.addChild(this.getOnButton);
 };
 
 InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
@@ -4420,6 +4646,8 @@ InteractiveCar.prototype.constructor = InteractiveCar;
  * @method InteractiveCar.getOn
  */
 InteractiveCar.prototype.getOn = function() {
+    this.gasBar.visible = true;
+    this.getOnButton.visible = false;
     level.player.onVehicle = true;
     level.player.relocate(this.x, this.y - 100);
     level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
@@ -4486,7 +4714,7 @@ InteractiveCar.prototype.stop = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/PopUp":42,"../util/ResourceBar":43}],49:[function(require,module,exports){
+},{"../util/Button":35,"../util/PopUp":43,"../util/ResourceBar":44}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -4506,14 +4734,14 @@ var Button = require('../util/Button');
  */
 var InteractiveHouse = function(x, y, backgroundKey, dialog) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.openDoorButton = new Button ('Get in', this.openActivity, this);
-    this.openDoorButton.x = (this.width - this.openDoorButton.width) / 2;
-    this.openDoorButton.y = -this.height + 50;
+    this.getOnButton = new Button ('Get in', this.openActivity, this);
+    this.getOnButton.x = (this.width - this.getOnButton.width) / 2;
+    this.getOnButton.y = -this.height + 50;
 
     this.dialog = dialog;
     level.game.add.existing(this.dialog);
 
-    this.addChild(this.openDoorButton);
+    this.addChild(this.getOnButton);
 };
 
 InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
@@ -4529,7 +4757,7 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":22,"../util/Button":34}],50:[function(require,module,exports){
+},{"../items/store/Store":22,"../util/Button":35}],51:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */
@@ -4561,4 +4789,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51]);

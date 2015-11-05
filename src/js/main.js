@@ -21,7 +21,7 @@ var Boot = require('./states/Boot');
 var Preloader = require('./states/Preloader');
 /**
  * Main menu state, allows the player start a game.
- * @type {Menu|exports|module.exports}
+ * @type {Menu}
  */
 var Menu = require('./states/Menu');
 /**
@@ -31,13 +31,19 @@ var Menu = require('./states/Menu');
 var Intro = require('./states/levels/Intro');
 /**
  * Level one state.
- * @type {LevelOne|exports|module.exports}
+ * @type {LevelOne}
  */
 var LevelOne = require('./states/levels/LevelOne');
+/**
+ * Level two state.
+ * @type {LevelTwo}
+ */
+var LevelTwo = require('./states/levels/LevelTwo');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOne);
+game.state.add('levelTwo', LevelTwo);
 game.state.add('intro', Intro);
 game.state.start('boot');

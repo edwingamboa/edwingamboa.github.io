@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 22/07/2015.
+ * Created by Edwin Gamboa on 05/11/2015.
  */
 var Level = require ('../levels/Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
@@ -43,6 +43,7 @@ LevelOne.prototype.constructor = LevelOne;
  */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
+    this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
@@ -92,7 +93,8 @@ LevelOne.prototype.addObjects = function() {
     this.addObject(friendsHouse);
     this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
 
-    this.addCar(3.7 * this.checkPointsDistance, 'jeep');
+    //this.addCar(3.7 * this.checkPointsDistance, 'jeep');
+    this.addCar(200, 'jeep');
 };
 
 /**
@@ -135,8 +137,8 @@ LevelOne.prototype.addEnemies = function() {
  */
 LevelOne.prototype.addPlaces = function() {
     var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
-    var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
+    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school'];
+    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School'];
     var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
     var i;
     var houseIndex = 0;
@@ -160,8 +162,8 @@ LevelOne.prototype.addPlaces = function() {
  * @method LevelOne.nextLevel
  */
 LevelOne.prototype.nextLevel = function() {
-    this.game.state.start('levelTwo');
-    level = this.game.state.states.levelTwo;
+    this.game.state.start('intro');
+    //level = this.game.state.states.levelOne;
 };
 
 module.exports = LevelOne;

@@ -3,6 +3,7 @@
  */
 var PopUp = require('../util/PopUp');
 var ResourceBar = require('../util/ResourceBar');
+var Button = require('../util/Button');
 
 /**
  * Default car speed.
@@ -28,6 +29,18 @@ var CAR_GRAVITY = 30000;
  * @type {number}
  */
 var MAX_DISTANCE = 400;
+/**
+ * Fuel bar width.
+ * @constant
+ * @type {number}
+ */
+var BAR_WIDTH = 100;
+/**
+ * Fuel bar height.
+ * @constant
+ * @type {number}
+ */
+var BAR_HEIGHT = 10;
 
 /**
  * Represents a car, which player can interact with.
@@ -41,17 +54,6 @@ var MAX_DISTANCE = 400;
 var InteractiveCar = function(x, y, backgroundKey) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
 
-    this.anchor.set(0, 0);
-
-    this.getOnButton = level.game.make.sprite(this.width / 2,
-        -this.height, 'openDoor');
-    this.getOnButton.anchor.set(0.5);
-    this.getOnButton.inputEnabled = true;
-    this.getOnButton.input.priorityID = 2;
-    this.getOnButton.events.onInputDown.add(this.getOn, this);
-
-    this.addChild(this.getOnButton);
-
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.anchor.set(0.5, 1);
@@ -63,9 +65,15 @@ var InteractiveCar = function(x, y, backgroundKey) {
     this.remainingGas = MAX_DISTANCE;
     this.maxDistance = MAX_DISTANCE;
 
-    this.gasBar = new ResourceBar(-this.width / 2, -this.height - 10,
-        {width: 80, height: 8});
+    this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
+        -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
+    this.gasBar.visible = false;
     this.addChild(this.gasBar);
+
+    this.getOnButton = new Button ('Get on', this.getOn, this);
+    this.getOnButton.x = -(this.width - this.getOnButton.width) / 2;
+    this.getOnButton.y = -this.height;
+    this.addChild(this.getOnButton);
 };
 
 InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
@@ -76,6 +84,8 @@ InteractiveCar.prototype.constructor = InteractiveCar;
  * @method InteractiveCar.getOn
  */
 InteractiveCar.prototype.getOn = function() {
+    this.gasBar.visible = true;
+    this.getOnButton.visible = false;
     level.player.onVehicle = true;
     level.player.relocate(this.x, this.y - 100);
     level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);

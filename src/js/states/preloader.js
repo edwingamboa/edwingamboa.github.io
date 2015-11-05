@@ -138,6 +138,15 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('playground',
         'assets/images/vocabulary/playground.png');
     this.game.load.image('zoo', 'assets/images/vocabulary/zoo.png');
+    this.game.load.image('gasStation',
+        'assets/images/vocabulary/gasStation.png');
+
+    this.game.load.image('bank', 'assets/images/vocabulary/bank.png');
+    this.game.load.image('coffeeShop',
+        'assets/images/vocabulary/coffeeShop.png');
+    this.game.load.image('hospital', 'assets/images/vocabulary/hospital.png');
+    this.game.load.image('school', 'assets/images/vocabulary/school.png');
+
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
     this.game.load.image('greenHouse',
@@ -150,8 +159,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/redHouse.png');
     this.game.load.image('blueHouse',
         'assets/images/vocabulary/blueHouse.png');
-    this.game.load.image('gasStation',
-        'assets/images/vocabulary/gasStation.png');
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
 
@@ -161,6 +168,9 @@ Preloader.prototype.loadAssets = function() {
         key = 'intro' + i;
         this.game.load.image(key, 'assets/images/comics/' + key + '.png');
     }
+
+    this.game.load.image('mediumPopUpBg', 'assets/images/mediumPopUpBg.png');
+    this.game.load.image('emptyRoom', 'assets/images/emptyRoom.png');
 
     this.game.load.script('webfont',
         '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');

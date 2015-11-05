@@ -17,14 +17,14 @@ var Button = require('../util/Button');
  */
 var InteractiveHouse = function(x, y, backgroundKey, dialog) {
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.openDoorButton = new Button ('Get in', this.openActivity, this);
-    this.openDoorButton.x = (this.width - this.openDoorButton.width) / 2;
-    this.openDoorButton.y = -this.height + 50;
+    this.getOnButton = new Button ('Get in', this.openActivity, this);
+    this.getOnButton.x = (this.width - this.getOnButton.width) / 2;
+    this.getOnButton.y = -this.height + 50;
 
     this.dialog = dialog;
     level.game.add.existing(this.dialog);
 
-    this.addChild(this.openDoorButton);
+    this.addChild(this.getOnButton);
 };
 
 InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);

@@ -133,7 +133,9 @@ Level.prototype.updateNpcs = function() {
  * @method Level.update
  */
 Level.prototype.update = function() {
-    //Collisions
+    if (this.playerWins()) {
+        this.nextLevel();
+    }
     this.updateEnemies();
     this.updateNpcs();
 
@@ -699,6 +701,14 @@ Level.prototype.addNameBoard = function(x, text) {
     board = new NameBoard(x, this.GROUND_HEIGHT, text);
     this.addObject(board);
 
+};
+
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+Level.prototype.playerWins = function() {
+    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
 };
 
 module.exports = Level;
