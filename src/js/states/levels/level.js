@@ -8,6 +8,7 @@ var Player = require('../../character/Player');
 var Revolver = require('../../items/weapons/Revolver');
 var MachineGun = require('../../items/weapons/MachineGun');
 var SimpleEnemy = require('../../character/SimpleEnemy');
+var StrongestEnemy = require('../../character/StrongestEnemy');
 var StrongEnemy = require('../../character/StrongEnemy');
 var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
@@ -58,6 +59,7 @@ Level.prototype.create = function() {
 
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
+    this.createOtherItemsGroup();
     this.createCarsGroup();
     this.createNpcsGroup();
     this.createEnemiesGroup();
@@ -147,7 +149,8 @@ Level.prototype.update = function() {
         this.collectWeapon, null, this);
     this.game.physics.arcade.overlap(this.cars, this.enemies,
         this.crashEnemy, null, this);
-
+    this.game.physics.arcade.overlap(this.player, this.otherItems,
+        this.collectItem, null, this);
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
             this.enemies,
@@ -246,6 +249,16 @@ Level.prototype.createCarsGroup = function() {
  */
 Level.prototype.addSimpleEnemy = function(x) {
     this.enemies.add(new SimpleEnemy(x, this.GROUND_HEIGHT - 100));
+};
+
+/**
+ * Adds a new StrongestEnemy to enemies group.
+ * @method Level.addStrongestEnemy
+ * @param {number} x - X coordinate within the world where the enemy should
+ * appear.
+ */
+Level.prototype.addStrongestEnemy = function(x) {
+    this.enemies.add(new StrongestEnemy(x, this.GROUND_HEIGHT - 100));
 };
 
 /**
@@ -410,6 +423,15 @@ Level.prototype.createHealthPacksGroup = function() {
 };
 
 /**
+ * Creates a Phaser group to manage other items.
+ * @method Level.createOtherItemsGroup
+ */
+Level.prototype.createOtherItemsGroup = function() {
+    this.otherItems = this.game.add.group();
+    this.gameObjects.push(this.otherItems);
+};
+
+/**
  * Creates a Phaser group to manage health packs.
  * @method Level.createWeaponsGroup
  */
@@ -534,6 +556,17 @@ Level.prototype.collectHealthPack = function(player, healthPack) {
 };
 
 /**
+ * Allows the player to pick up an Item.
+ * @method Level.collectItem
+ * @param {Player} player - Game main player.
+ * @param {Item} item - Item to be picked up.
+ */
+Level.prototype.collectItem = function(player, item) {
+    this.inventory.addItem(item);
+    item.pickUp();
+};
+
+/**
  * Updates current player's avialbele ammo text.
  * @method Level.updateAmmoText
  */
@@ -589,6 +622,15 @@ Level.prototype.increaseScore = function(increase) {
  */
 Level.prototype.addHealthPack = function(healthPack) {
     this.healthPacks.add(healthPack);
+};
+
+/**
+ * Adds a Item to healthPacks group.
+ * @method Level.otherItems
+ * @param {Item} healthPack - Item to be added.
+ */
+Level.prototype.addOtherItem = function(healthPack) {
+    this.otherItems.add(healthPack);
 };
 
 /**

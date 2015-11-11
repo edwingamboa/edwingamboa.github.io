@@ -78,8 +78,12 @@ Preloader.prototype.loadAssets = function() {
         'assets/sprites/simple_enemy.png', 64, 64);
     this.game.load.spritesheet('strong_enemy',
         'assets/sprites/strong_enemy.png', 64, 64);
+    this.game.load.spritesheet('strongestEnemy',
+        'assets/sprites/strongestEnemy.png', 80, 80);
     this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
         150);
+    this.game.load.spritesheet('bus', 'assets/sprites/bus.png', 400,
+        180);
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
         30, 16);
     this.game.load.spritesheet('machineGun',
@@ -103,6 +107,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('father', 'assets/images/father.png');
     this.game.load.image('daughter', 'assets/images/daughter.png');
     this.game.load.image('son', 'assets/images/son.png');
+    this.game.load.image('son', 'assets/images/friend.png');
 
     this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
     this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
@@ -118,6 +123,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('healthPack20Icon',
         'assets/icons/healthPack20Icon.png');
     this.game.load.image('revolverIcon', 'assets/icons/revolverIcon.png');
+    this.game.load.image('machineGunIcon', 'assets/icons/machineGunIcon.png');
     this.game.load.image('unscramble', 'assets/icons/unscramble.png');
     this.game.load.image('contexts', 'assets/icons/contexts.png');
     this.game.load.image('imageWord', 'assets/icons/imageWord.png');
@@ -134,6 +140,7 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/englishChallengePanelBg.png');
     this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
 
+    this.game.load.image('forgive', 'assets/images/vocabulary/forgive.png');
     this.game.load.image('bookStore', 'assets/images/vocabulary/bookStore.png');
     this.game.load.image('playground',
         'assets/images/vocabulary/playground.png');
@@ -161,6 +168,11 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/blueHouse.png');
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
+    this.game.load.image('necklace',
+        'assets/images/vocabulary/necklace.png');
+    this.game.load.image('necklaceBig',
+        'assets/images/vocabulary/necklaceBig.png');
+    this.game.load.image('necklaceIcon', 'assets/icons/necklaceIcon.png');
 
     this.game.load.image('comicBg', 'assets/images/comics/comicBg.png');
     var key;
@@ -184,6 +196,8 @@ Preloader.prototype.update = function() {
     if (!!this.ready) {
         //this.game.state.start('menu');
         this.game.state.start('intro');
+
+        //level = this.game.state.states.levelTwo;
         level = this.game.state.states.levelOne;
     }
 };

@@ -38,7 +38,7 @@ Dialog.prototype = Object.create(HorizontalLayoutPopUp.prototype);
 Dialog.prototype.constructor = Dialog;
 
 /**
- * Sets the text to be diaplayed through this dialog.
+ * Sets the text to be displayed through this dialog.
  * @method Dialog.setText
  * @param text
  */

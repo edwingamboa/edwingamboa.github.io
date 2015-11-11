@@ -21,7 +21,6 @@ var Item = function(x, y, key, price) {
     level.game.physics.arcade.enable(this);
     this.body.bounce.y = BOUNCE;
     this.body.collideWorldBounds = true;
-    this.level = level;
     this.price = price;
     this.name = '';
     this.description = '';

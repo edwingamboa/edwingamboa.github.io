@@ -32,26 +32,26 @@ var MACHINE_GUN_NEXT_FIRE = 1;
  * @constant
  * @type {number}
  */
-var MACHINE_GUN_BULLET_SPEED = 700;
+var MACHINE_GUN_BULLET_SPEED = 400;
 /**
  * Rate at which this weapon fires, the lower the number, the higher the firing
  * rate.
  * @constant
  * @type {number}
  */
-var MACHINE_GUN_FIRE_RATE = 100;
+var MACHINE_GUN_FIRE_RATE = 200;
 /**
  * Damage that can cause this weapon bullets.
  * @constant
  * @type {number}
  */
-var MACHINE_GUN_BULLET_POWER = 10;
+var MACHINE_GUN_BULLET_POWER = 2;
 /**
  * The price that this weapon costs.
  * @constant
  * @type {number}
  */
-var PRICE = 100;
+var PRICE = 30;
 
 /**
  * Represents a MachineGun, which is a  kind of a Weapon.

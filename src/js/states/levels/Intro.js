@@ -73,6 +73,7 @@ Intro.prototype.create = function() {
  * @method Intro.continue
  */
 Intro.prototype.continue = function() {
+    //this.game.state.start('levelTwo');
     this.game.state.start('levelOne');
 };
 

@@ -6,42 +6,38 @@ var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var ClueItem = require('../../items/ClueItem');
 
 /**
  * Number of fights that player will have during this level.
  * @type {number}
  */
-var NUMBER_OF_FIGHTING_POINTS = 5;
+var NUMBER_OF_FIGHTING_POINTS = 6;
 /**
  * Number of places form vocabulary for this level.
  * @type {number}
  */
 var NUMBER_OF_PLACES = 4;
-/**
- * Number of houses player should visit during this level.
- * @type {number}
- */
-var NUMBER_OF_HOUSES = 2;
 
 /**
- * Manages LevelOne.
- * @class LevelOne
+ * Manages LevelTwo.
+ * @class LevelTwo
  * @constructor
  * @extends Level
  * @param {Phaser.Game} game - Pahser Game object.
  */
-var LevelOne = function(game) {
+var LevelTwo = function(game) {
     Level.call(this, game);
 };
 
-LevelOne.prototype = Object.create(Level.prototype);
-LevelOne.prototype.constructor = LevelOne;
+LevelTwo.prototype = Object.create(Level.prototype);
+LevelTwo.prototype.constructor = LevelTwo;
 
 /**
  * Creates level one specific objects and elements.
- * @method LevelOne.create
+ * @method LevelTwo.create
  */
-LevelOne.prototype.create = function() {
+LevelTwo.prototype.create = function() {
     Level.prototype.create.call(this);
     this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
@@ -51,8 +47,11 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.addObjects();
     this.addPlaces();
-    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
-    this.addRevolver(6000, 350, false);
+    this.addMachineGun(600, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(2000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(4000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
+    this.addMachineGun(7000, this.GROUND_HEIGHT - 40, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
     this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
@@ -60,71 +59,64 @@ LevelOne.prototype.create = function() {
 };
 
 /**
- * Add InteractiveCar and InteractiveHouses for this level.
- * @method LevelOne.addObjects
+ * Add ClueItems, InteractiveCar and InteractiveHouses for this level.
+ * @method LevelTwo.addObjects
  */
-LevelOne.prototype.addObjects = function() {
-    var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
-
-    var house = this.addStaticBuilding(500, 'whiteHouse');
-    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
-
-    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
-    var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
-        this.GROUND_HEIGHT, 'redHouse', dialog);
-    gunsStore.anchor.set(0, 1);
-    this.addObject(gunsStore);
-
-    dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'So late!');
-    var emptyRoom = level.game.make.sprite(0, 0, 'emptyRoom');
-    var finishMessage = 'Your family is now somewhere else.' +
-        '\nContinue trying, because this game is just starting!';
-    var dialogText = level.game.make.text(0, 0, finishMessage);
+LevelTwo.prototype.addObjects = function() {
+    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
+    var necklaceIcon = level.game.make.sprite(0, 0, 'necklaceBig');
+    var message = 'That is my wife\'s necklace!';
+    var dialogText = level.game.make.text(0, 0, message);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
     dialogText.align = 'center';
-    dialog.addElement(emptyRoom);
+    dialog.addElement(necklaceIcon);
     dialog.addElement(dialogText);
+    var necklace = new ClueItem(300, this.GROUND_HEIGHT - 30, 'necklace',
+        dialog, 'Necklace', 'My wife\'s necklace.');
+    this.addOtherItem(necklace);
 
-    var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT, 'blueHouse', dialog);
-    friendsHouse.anchor.set(0, 1);
-    this.addObject(friendsHouse);
-    this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
+    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    var gunsStore = new InteractiveHouse(5 * this.firstCheckPointX,
+        this.GROUND_HEIGHT, 'redHouse', dialog);
+    gunsStore.anchor.set(0, 1);
+    this.addObject(gunsStore);
 
-    //this.addCar(3.7 * this.checkPointsDistance, 'jeep');
-    this.addCar(200, 'jeep');
+    this.addCar(3.7 * this.checkPointsDistance, 'bus');
 };
 
 /**
  * Adds level one non player characters.
- * @method LevelOne.addNPCs
+ * @method LevelTwo.addNPCs
  */
-LevelOne.prototype.addNPCs = function() {
+LevelTwo.prototype.addNPCs = function() {
     var message = 'I know that you are looking for \nyour family.' +
         '\nI can help you.' +
         '\n\nGo to the blue house after the Zoo,' +
         '\nmaybe your family is there.';
     this.addNPC(this.game.camera.width / 2, 'npc', message);
-    message = 'Hi my friend!.' +
-        '\n\nGo to the red House before the' +
-        '\nPlayground, \nthere you can buy a new weapon.';
-    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
 };
 
 /**
  * Adds this level enemies.
- * @method LevelOne.addEnemies
+ * @method LevelTwo.addEnemies
  */
-LevelOne.prototype.addEnemies = function() {
+LevelTwo.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
-    var y = level.WORLD_HEIGHT - 200;
-    var numberOfEnemies = 3;
-    for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (var j = 0; j < numberOfEnemies; j++) {
+    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
+    var numberOfEnemies = 2;
+    var numberOfStrongEnemies = 2;
+    var i;
+    var j;
+    for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
+        for (j = 0; j < numberOfEnemies; j++) {
             x += 50;
-            this.addSimpleEnemy(x, y);
+            this.addSimpleEnemy(x);
+        }
+        for (j = 0; j < numberOfStrongEnemies; j++) {
+            x += 50;
+            this.addStrongEnemy(x);
         }
         numberOfEnemies ++;
         x += this.checkPointsDistance;
@@ -133,9 +125,9 @@ LevelOne.prototype.addEnemies = function() {
 
 /**
  * Adds city places from vocabulary that corresponds to this level.
- * @method LevelOne.addPlaces
+ * @method LevelTwo.addPlaces
  */
-LevelOne.prototype.addPlaces = function() {
+LevelTwo.prototype.addPlaces = function() {
     var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
     var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school'];
     var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School'];
@@ -159,11 +151,11 @@ LevelOne.prototype.addPlaces = function() {
 
 /**
  * Lets the player to play second level.
- * @method LevelOne.nextLevel
+ * @method LevelTwo.nextLevel
  */
-LevelOne.prototype.nextLevel = function() {
+LevelTwo.prototype.nextLevel = function() {
     this.game.state.start('intro');
-    //level = this.game.state.states.levelOne;
+    //level = this.game.state.states.levelThree;
 };
 
-module.exports = LevelOne;
+module.exports = LevelTwo;

@@ -51,7 +51,7 @@ LevelOne.prototype.create = function() {
     this.addObjects();
     this.addPlaces();
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
-    this.addRevolver(6000, 350, false);
+    this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
     this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
     this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
@@ -117,12 +117,11 @@ LevelOne.prototype.addNPCs = function() {
  */
 LevelOne.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
-    var y = level.WORLD_HEIGHT - 200;
     var numberOfEnemies = 3;
     for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
         for (var j = 0; j < numberOfEnemies; j++) {
             x += 50;
-            this.addSimpleEnemy(x, y);
+            this.addSimpleEnemy(x);
         }
         numberOfEnemies ++;
         x += this.checkPointsDistance;

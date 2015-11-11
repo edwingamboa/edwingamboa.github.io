@@ -15,25 +15,25 @@ var SPRITE_KEY = 'strong_enemy';
  * @constant
  * @type {number}
  */
-var MAX_HEALTH_LEVEL = 150;
+var MAX_HEALTH_LEVEL = 8;
 /**
  * Lowest distance in which a strong enemy can detect the player.
  * @constant
  * @type {number}
  */
-var MIN_RANGE_DETECTION = 1000;
-/**
- * Longest distance in which a simple enemy can detect the player.
- * @constant
- * @type {number}
- */
-var MIN_RANGE_ATTACK = 600;
+var MIN_RANGE_DETECTION = 400;
 /**
  * Lowest distance in which a strong enemy can shoot the player.
  * @constant
  * @type {number}
  */
 var MAX_RANGE_DETECTION = 1000;
+/**
+ * Longest distance in which a simple enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
+var MIN_RANGE_ATTACK = 200;
 /**
  * Longest distance in which a simple enemy can shoot the player.
  * @constant

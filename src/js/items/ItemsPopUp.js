@@ -7,6 +7,7 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
 var HealthPack = require('./HealthPack');
 var Revolver = require('./weapons/Revolver');
+var MachineGun = require('./weapons/MachineGun');
 
 /**
  * View that contains a menu of items, grouped by category.
@@ -82,6 +83,8 @@ ItemsPopUp.prototype.fillPanel = function(category) {
 ItemsPopUp.prototype.createItemGroups = function() {
     var revolverItem = new Revolver(0, 0, false);
     this.addItem(revolverItem);
+    var machineGunItem = new MachineGun(0, 0, false);
+    this.addItem(machineGunItem);
     var healthPackItem = new HealthPack(0, 0, 5);
     this.addItem(healthPackItem);
     healthPackItem = new HealthPack(0, 0, 20);
