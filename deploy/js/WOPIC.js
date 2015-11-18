@@ -49,7 +49,7 @@ game.state.add('levelTwo', LevelTwo);
 game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":30,"./states/Menu":31,"./states/Preloader":32,"./states/levels/Intro":33,"./states/levels/LevelOne":35,"./states/levels/LevelTwo":36}],2:[function(require,module,exports){
+},{"./states/Boot":31,"./states/Menu":32,"./states/Preloader":33,"./states/levels/Intro":34,"./states/levels/LevelOne":36,"./states/levels/LevelTwo":37}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -134,6 +134,7 @@ var Character = function(x, y, spriteKey, optionals) {
     this.weapons = [];
     this.weaponsKeys = [];
     this.onVehicle = false;
+    this.canFire = true;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -260,10 +261,18 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
  * @method Character.killCharacter
  */
 Character.prototype.killCharacter = function() {
+    this.killWeapons();
+    this.kill();
+};
+
+/**
+ * Kill the character's weapons.
+ * @method Character.killWeapons
+ */
+Character.prototype.killWeapons = function() {
     for (var weaponKey in this.weapons) {
         this.weapons[weaponKey].killWeapon();
     }
-    this.kill();
 };
 
 /**
@@ -325,7 +334,9 @@ Character.prototype.addWeapon = function(newWeapon) {
  * @param y {number} Y coordinate on the point to fire
  */
 Character.prototype.fireToXY = function(x, y) {
-    this.currentWeapon.fire(x, y);
+    if (this.canFire) {
+        this.currentWeapon.fire(x, y);
+    }
 };
 
 /**
@@ -503,7 +514,7 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":46,"./Character":2}],4:[function(require,module,exports){
+},{"./../util/ResourceBar":47,"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -520,17 +531,26 @@ var Dialog = require('../util/Dialog');
  * @param {number} y - NPC's y coordinate within game world.
  * @param {string} key - NPC's texture key.
  * @param {string} message - Message that the NPC will tell to the player.
+ * @return {NPC}
  */
 var NPC = function(x, y, key, message) {
     Character.call(this, x, y, key);
     this.message = message;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 5;
+    this.frame = this.stopRightFrameIndex;
+    return this;
 };
 
 NPC.prototype = Object.create(Character.prototype);
 NPC.prototype.constructor = NPC;
 
+/**
+ * Shows the message that thhis NPC has for the Character
+ * @method NPC.showMessage
+ */
 NPC.prototype.showMessage = function() {
     var dialog = new Dialog(this.key, this.message);
     level.game.add.existing(dialog);
@@ -539,7 +559,7 @@ NPC.prototype.showMessage = function() {
 
 module.exports = NPC;
 
-},{"../util/Dialog":38,"./Character":2}],5:[function(require,module,exports){
+},{"../util/Dialog":39,"./Character":2}],5:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -764,7 +784,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":28,"./Enemy":3}],7:[function(require,module,exports){
+},{"../items/weapons/Revolver":29,"./Enemy":3}],7:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -837,7 +857,7 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":27,"./Enemy":3}],8:[function(require,module,exports){
+},{"../items/weapons/MachineGun":28,"./Enemy":3}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/11/2015.
  */
@@ -922,9 +942,12 @@ StrongestEnemy.prototype.constructor = StrongestEnemy;
  */
 StrongestEnemy.prototype.decreaseHealthLevel = function(decrease) {
     this.healthLevel -= decrease;
-    if (this.healthLevel <= 10) {
+    if (this.healthLevel <= 10 && !level.lastGoalAimed) {
+        this.killWeapons();
+        this.canFire = false;
         this.dialogFriend.open();
         this.dialogForgive.open();
+        level.lastGoalAimed = true;
     }
 };
 
@@ -959,7 +982,56 @@ StrongestEnemy.prototype.makeDialogs = function() {
 module.exports = StrongestEnemy;
 
 
-},{"../items/weapons/MachineGun":27,"../util/VerticalLayoutPopUp":50,"./Enemy":3}],9:[function(require,module,exports){
+},{"../items/weapons/MachineGun":28,"../util/VerticalLayoutPopUp":51,"./Enemy":3}],9:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 13/11/2015.
+ */
+var NPC = require('./NPC');
+
+/**
+ * Represents a non player character within the game, whom player will interact
+ * with.
+ * @class NPC
+ * @extends Character
+ * @constructor
+ * @param {number} x - WifeNPC's x coordinate within game world.
+ * @param {number} y - WifeNPC's y coordinate within game world.
+ * @param {string} key - WifeNPC's texture key.
+ * @param {string} message - Message that the NPC will tell to the player.
+ * @return {WifeNPC}
+ */
+var WifeNPC = function(x, y, key, message) {
+    return NPC.call(this, x, y, key, message);
+};
+
+WifeNPC.prototype = Object.create(NPC.prototype);
+WifeNPC.prototype.constructor = WifeNPC;
+
+/**
+ * Shows the message that thhis NPC has for the Character
+ * @method NPC.showMessage
+ */
+WifeNPC.prototype.showMessage = function() {
+    NPC.prototype.showMessage.call(this);
+    this.stop();
+    level.metWife = true;
+};
+
+/**
+ * Update animations of the wife.
+ * @method WifeNPC.update
+ */
+WifeNPC.prototype.update = function() {
+    if (this.body.velocity.x > 0) {
+        this.animations.play('right');
+    }else if (this.body.velocity.x < 0) {
+        this.animations.play('left');
+    }
+};
+
+module.exports = WifeNPC;
+
+},{"./NPC":4}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1070,7 +1142,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":40,"../util/VerticalLayoutPanel":49,"./dragAndDrop/DragAndDropChallenge":13}],10:[function(require,module,exports){
+},{"../util/GridLayoutPanel":41,"../util/VerticalLayoutPanel":50,"./dragAndDrop/DragAndDropChallenge":14}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1126,7 +1198,7 @@ EnglishChallenge.prototype.incomplete = function(parent) {
 
 module.exports = EnglishChallenge;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1218,7 +1290,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":40,"../util/VerticalLayoutPanel":49,"./dragAndDrop/DragAndDropChallenge":13}],12:[function(require,module,exports){
+},{"../util/GridLayoutPanel":41,"../util/VerticalLayoutPanel":50,"./dragAndDrop/DragAndDropChallenge":14}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1301,7 +1373,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":40,"../util/VerticalLayoutPanel":49,"./dragAndDrop/DragAndDropChallenge":13}],13:[function(require,module,exports){
+},{"../util/GridLayoutPanel":41,"../util/VerticalLayoutPanel":50,"./dragAndDrop/DragAndDropChallenge":14}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1378,7 +1450,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":10,"../../util/Button":37,"../../util/VerticalLayoutPanel":49,"../../util/VerticalLayoutPopUp":50,"./DragAndDropController":14}],14:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":11,"../../util/Button":38,"../../util/VerticalLayoutPanel":50,"../../util/VerticalLayoutPopUp":51,"./DragAndDropController":15}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1489,7 +1561,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":47}],15:[function(require,module,exports){
+},{"../../util/Utilities":48}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1538,7 +1610,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":40,"../../util/PopUp":45,"../ContextGroups":9,"../ImageWordMatch":11,"../WordUnscramble":12,"./MenuItem":16}],16:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":41,"../../util/PopUp":46,"../ContextGroups":10,"../ImageWordMatch":12,"../WordUnscramble":13,"./MenuItem":17}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1590,7 +1662,7 @@ MenuItem.prototype.updateScoreText = function() {
 module.exports = MenuItem;
 
 
-},{"../../items/ItemGroupView":20}],17:[function(require,module,exports){
+},{"../../items/ItemGroupView":21}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 06/11/2015.
  */
@@ -1641,7 +1713,7 @@ ClueItem.prototype.use = function() {
 module.exports = ClueItem;
 
 
-},{"./Item":19}],18:[function(require,module,exports){
+},{"./Item":20}],19:[function(require,module,exports){
 var Item = require('./Item');
 
 /**
@@ -1704,7 +1776,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"./Item":19}],19:[function(require,module,exports){
+},{"./Item":20}],20:[function(require,module,exports){
 /**
  * Bounce value for an Item
  * @constant
@@ -1756,7 +1828,7 @@ Item.prototype.setName = function(name) {
 
 module.exports = Item;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1850,7 +1922,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":37,"../util/VerticalLayoutPanel":49}],21:[function(require,module,exports){
+},{"../util/Button":38,"../util/VerticalLayoutPanel":50}],22:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/10/2015.
  */
@@ -1946,7 +2018,7 @@ ItemsPopUp.prototype.createItemGroups = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":37,"../util/GridLayoutPanel":40,"../util/PopUp":45,"./HealthPack":18,"./weapons/MachineGun":27,"./weapons/Revolver":28}],22:[function(require,module,exports){
+},{"../util/Button":38,"../util/GridLayoutPanel":41,"../util/PopUp":46,"./HealthPack":19,"./weapons/MachineGun":28,"./weapons/Revolver":29}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -1983,7 +2055,7 @@ Inventory.prototype.addItem = function(item) {
 
 module.exports = Inventory;
 
-},{"../ItemsPopUp":21,"./InventoryItem":23}],23:[function(require,module,exports){
+},{"../ItemsPopUp":22,"./InventoryItem":24}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2036,7 +2108,7 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../ItemGroupView":20}],24:[function(require,module,exports){
+},{"../ItemGroupView":21}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2079,7 +2151,7 @@ Store.prototype.addItem = function(item) {
 
 module.exports = Store;
 
-},{"../ItemsPopUp":21,"./StoreItem":25}],25:[function(require,module,exports){
+},{"../ItemsPopUp":22,"./StoreItem":26}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2129,7 +2201,7 @@ StoreItem.prototype.buttonAction = function() {
 
 module.exports = StoreItem;
 
-},{"../ItemGroupView":20}],26:[function(require,module,exports){
+},{"../ItemGroupView":21}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -2158,7 +2230,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2247,7 +2319,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":29}],28:[function(require,module,exports){
+},{"./Weapon":30}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2336,7 +2408,7 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":29}],29:[function(require,module,exports){
+},{"./Weapon":30}],30:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
@@ -2492,7 +2564,7 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":19,"./Bullet":26}],30:[function(require,module,exports){
+},{"../Item":20,"./Bullet":27}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -2528,7 +2600,7 @@ Boot.prototype.create = function() {
 
 module.exports = Boot;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -2567,7 +2639,7 @@ Menu.prototype.newGame = function() {
 
 module.exports = Menu;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -2639,6 +2711,8 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('successIcon', 'assets/images/successIcon.png');
 
     this.game.load.spritesheet('character', 'assets/sprites/character.png',
+        64, 96);
+    this.game.load.spritesheet('wife', 'assets/sprites/wife.png',
         64, 96);
     this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
         64, 96);
@@ -2723,6 +2797,7 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/coffeeShop.png');
     this.game.load.image('hospital', 'assets/images/vocabulary/hospital.png');
     this.game.load.image('school', 'assets/images/vocabulary/school.png');
+    this.game.load.image('factory', 'assets/images/vocabulary/factory.png');
 
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
@@ -2782,7 +2857,7 @@ Preloader.prototype.onLoadComplete = function() {
 
 module.exports = Preloader;
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -2918,7 +2993,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":37}],34:[function(require,module,exports){
+},{"../../util/Button":38}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2977,7 +3052,6 @@ Level.prototype.create = function() {
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
-
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
     this.createOtherItemsGroup();
@@ -3200,9 +3274,12 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {string} key - NPC texture key.
  * @param {string} comicKey - Texture key of the comic that represents the
  * interaction between this NPC and the player.
+ * @return {NPC} - Added NPC;
  */
 Level.prototype.addNPC = function(x, key, comicKey) {
-    this.npcs.add(new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey));
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey);
+    this.npcs.add(npc);
+    return npc;
 };
 
 /**
@@ -3670,13 +3747,11 @@ Level.prototype.addNameBoard = function(x, text) {
  * Determines whether the player has won
  * @returns {boolean}
  */
-Level.prototype.playerWins = function() {
-    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
-};
+Level.prototype.playerWins = function() {};
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../character/StrongestEnemy":8,"../../englishChallenges/menu/EnglishChallengesMenu":15,"../../items/HealthPack":18,"../../items/inventory/Inventory":22,"../../items/store/Store":24,"../../items/weapons/MachineGun":27,"../../items/weapons/Revolver":28,"../../util/Dialog":38,"../../util/PopUp":45,"../../util/ResourceBar":46,"../../worldElements/InteractiveCar":51,"../../worldElements/NameBoard":53}],35:[function(require,module,exports){
+},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../character/StrongestEnemy":8,"../../englishChallenges/menu/EnglishChallengesMenu":16,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/weapons/MachineGun":28,"../../items/weapons/Revolver":29,"../../util/Dialog":39,"../../util/PopUp":46,"../../util/ResourceBar":47,"../../worldElements/InteractiveCar":52,"../../worldElements/NameBoard":54}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -3842,9 +3917,17 @@ LevelOne.prototype.nextLevel = function() {
     level = this.game.state.states.levelTwo;
 };
 
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+LevelOne.prototype.playerWins = function() {
+    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
+};
+
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":18,"../../util/Dialog":38,"../../util/VerticalLayoutPopUp":50,"../../worldElements/InteractiveHouse":52,"../levels/Level":34}],36:[function(require,module,exports){
+},{"../../items/HealthPack":19,"../../util/Dialog":39,"../../util/VerticalLayoutPopUp":51,"../../worldElements/InteractiveHouse":53,"../levels/Level":35}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 05/11/2015.
  */
@@ -3854,6 +3937,7 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var WifeNPC = require('../../character/WifeNPC');
 
 /**
  * Number of fights that player will have during this level.
@@ -3890,7 +3974,8 @@ LevelTwo.prototype.create = function() {
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
-    this.addNPCs();
+    this.lastGoalAimed = false;
+    this.metWife = false;
     this.addEnemies();
     this.addObjects();
     this.addPlaces();
@@ -3924,25 +4009,20 @@ LevelTwo.prototype.addObjects = function() {
         dialog, 'Necklace', 'My wife\'s necklace.');
     this.addOtherItem(necklace);
 
-    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
-    var gunsStore = new InteractiveHouse(5 * this.firstCheckPointX,
-        this.GROUND_HEIGHT, 'redHouse', dialog);
-    gunsStore.anchor.set(0, 1);
-    this.addObject(gunsStore);
-
     this.addCar(3.7 * this.checkPointsDistance, 'bus');
 };
 
 /**
- * Adds level one non player characters.
- * @method LevelTwo.addNPCs
+ * Adds character's wife to the level scene.
+ * @method LevelTwo.addWife
  */
-LevelTwo.prototype.addNPCs = function() {
-    var message = 'I know that you are looking for \nyour family.' +
-        '\nI can help you.' +
-        '\n\nGo to the blue house after the Zoo,' +
-        '\nmaybe your family is there.';
-    this.addNPC(this.game.camera.width / 2, 'npc', message);
+LevelTwo.prototype.addWife = function() {
+    var message = 'Hello. I am so happy to see you again.' +
+        '\nBut our children are not here.' +
+        '\nYor friend has our daughter and \nour son.';
+    this.wife = new WifeNPC(this.checkPointsDistance *
+        (NUMBER_OF_FIGHTING_POINTS), this.GROUND_HEIGHT - 100, 'wife', message);
+    this.npcs.add(this.wife);
 };
 
 /**
@@ -3976,8 +4056,9 @@ LevelTwo.prototype.addEnemies = function() {
  */
 LevelTwo.prototype.addPlaces = function() {
     var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school'];
-    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School'];
+    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
+    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
+        'Old Factory'];
     var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
     var i;
     var houseIndex = 0;
@@ -4001,13 +4082,31 @@ LevelTwo.prototype.addPlaces = function() {
  * @method LevelTwo.nextLevel
  */
 LevelTwo.prototype.nextLevel = function() {
-    this.game.state.start('intro');
-    //level = this.game.state.states.levelThree;
+    if (this.wife === undefined) {
+        this.addWife();
+        this.wife.moveRight();
+    /*}else if (!this.metWife) {
+        this.game.physics.arcade.moveToXY(
+            this.wife,
+            this.player.x,
+            this.player.y); */
+    }else if (this.metWife && this.activePopUps === 0) {
+        this.game.state.start('intro');
+        //level = this.game.state.states.levelThree;
+    }
+};
+
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+LevelTwo.prototype.playerWins = function() {
+    return this.lastGoalAimed;
 };
 
 module.exports = LevelTwo;
 
-},{"../../items/ClueItem":17,"../../items/HealthPack":18,"../../util/Dialog":38,"../../util/VerticalLayoutPopUp":50,"../../worldElements/InteractiveHouse":52,"../levels/Level":34}],37:[function(require,module,exports){
+},{"../../character/WifeNPC":9,"../../items/ClueItem":18,"../../items/HealthPack":19,"../../util/Dialog":39,"../../util/VerticalLayoutPopUp":51,"../../worldElements/InteractiveHouse":53,"../levels/Level":35}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -4046,7 +4145,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4097,7 +4196,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":44}],39:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":45}],40:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4180,7 +4279,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4250,7 +4349,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":39}],41:[function(require,module,exports){
+},{"./GridLayout":40}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4318,7 +4417,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":39,"./PopUp":45}],42:[function(require,module,exports){
+},{"./GridLayout":40,"./PopUp":46}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4372,7 +4471,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -4411,7 +4510,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":42}],44:[function(require,module,exports){
+},{"./HorizontalLayout":43}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4457,7 +4556,7 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":42,"./PopUp":45}],45:[function(require,module,exports){
+},{"./HorizontalLayout":43,"./PopUp":46}],46:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4552,7 +4651,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -4593,7 +4692,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4630,7 +4729,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4683,7 +4782,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -4737,7 +4836,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":48}],50:[function(require,module,exports){
+},{"./VerticalLayout":49}],51:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 21/10/2015.
  */
@@ -4782,7 +4881,7 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":45,"./VerticalLayout":48}],51:[function(require,module,exports){
+},{"./PopUp":46,"./VerticalLayout":49}],52:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -4937,7 +5036,7 @@ InteractiveCar.prototype.stop = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/Button":37,"../util/PopUp":45,"../util/ResourceBar":46}],52:[function(require,module,exports){
+},{"../util/Button":38,"../util/PopUp":46,"../util/ResourceBar":47}],53:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -4980,7 +5079,7 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":24,"../util/Button":37}],53:[function(require,module,exports){
+},{"../items/store/Store":25,"../util/Button":38}],54:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */
@@ -5012,4 +5111,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54]);

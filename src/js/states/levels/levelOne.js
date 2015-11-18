@@ -163,4 +163,12 @@ LevelOne.prototype.nextLevel = function() {
     level = this.game.state.states.levelTwo;
 };
 
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+LevelOne.prototype.playerWins = function() {
+    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
+};
+
 module.exports = LevelOne;

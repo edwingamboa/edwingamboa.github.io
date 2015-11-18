@@ -82,6 +82,7 @@ var Character = function(x, y, spriteKey, optionals) {
     this.weapons = [];
     this.weaponsKeys = [];
     this.onVehicle = false;
+    this.canFire = true;
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -208,10 +209,18 @@ Character.prototype.decreaseHealthLevel = function(decrease) {
  * @method Character.killCharacter
  */
 Character.prototype.killCharacter = function() {
+    this.killWeapons();
+    this.kill();
+};
+
+/**
+ * Kill the character's weapons.
+ * @method Character.killWeapons
+ */
+Character.prototype.killWeapons = function() {
     for (var weaponKey in this.weapons) {
         this.weapons[weaponKey].killWeapon();
     }
-    this.kill();
 };
 
 /**
@@ -273,7 +282,9 @@ Character.prototype.addWeapon = function(newWeapon) {
  * @param y {number} Y coordinate on the point to fire
  */
 Character.prototype.fireToXY = function(x, y) {
-    this.currentWeapon.fire(x, y);
+    if (this.canFire) {
+        this.currentWeapon.fire(x, y);
+    }
 };
 
 /**

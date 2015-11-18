@@ -82,9 +82,12 @@ StrongestEnemy.prototype.constructor = StrongestEnemy;
  */
 StrongestEnemy.prototype.decreaseHealthLevel = function(decrease) {
     this.healthLevel -= decrease;
-    if (this.healthLevel <= 10) {
+    if (this.healthLevel <= 10 && !level.lastGoalAimed) {
+        this.killWeapons();
+        this.canFire = false;
         this.dialogFriend.open();
         this.dialogForgive.open();
+        level.lastGoalAimed = true;
     }
 };
 

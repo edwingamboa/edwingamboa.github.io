@@ -56,7 +56,6 @@ Level.prototype.create = function() {
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
-
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
     this.createOtherItemsGroup();
@@ -279,9 +278,12 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {string} key - NPC texture key.
  * @param {string} comicKey - Texture key of the comic that represents the
  * interaction between this NPC and the player.
+ * @return {NPC} - Added NPC;
  */
 Level.prototype.addNPC = function(x, key, comicKey) {
-    this.npcs.add(new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey));
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey);
+    this.npcs.add(npc);
+    return npc;
 };
 
 /**
@@ -749,8 +751,6 @@ Level.prototype.addNameBoard = function(x, text) {
  * Determines whether the player has won
  * @returns {boolean}
  */
-Level.prototype.playerWins = function() {
-    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
-};
+Level.prototype.playerWins = function() {};
 
 module.exports = Level;

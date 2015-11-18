@@ -14,17 +14,26 @@ var Dialog = require('../util/Dialog');
  * @param {number} y - NPC's y coordinate within game world.
  * @param {string} key - NPC's texture key.
  * @param {string} message - Message that the NPC will tell to the player.
+ * @return {NPC}
  */
 var NPC = function(x, y, key, message) {
     Character.call(this, x, y, key);
     this.message = message;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 5;
+    this.frame = this.stopRightFrameIndex;
+    return this;
 };
 
 NPC.prototype = Object.create(Character.prototype);
 NPC.prototype.constructor = NPC;
 
+/**
+ * Shows the message that thhis NPC has for the Character
+ * @method NPC.showMessage
+ */
 NPC.prototype.showMessage = function() {
     var dialog = new Dialog(this.key, this.message);
     level.game.add.existing(dialog);

@@ -70,6 +70,8 @@ Preloader.prototype.loadAssets = function() {
 
     this.game.load.spritesheet('character', 'assets/sprites/character.png',
         64, 96);
+    this.game.load.spritesheet('wife', 'assets/sprites/wife.png',
+        64, 96);
     this.game.load.spritesheet('npc', 'assets/sprites/npc.png',
         64, 96);
     this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
@@ -153,6 +155,7 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/coffeeShop.png');
     this.game.load.image('hospital', 'assets/images/vocabulary/hospital.png');
     this.game.load.image('school', 'assets/images/vocabulary/school.png');
+    this.game.load.image('factory', 'assets/images/vocabulary/factory.png');
 
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');

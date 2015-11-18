@@ -7,6 +7,7 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var WifeNPC = require('../../character/WifeNPC');
 
 /**
  * Number of fights that player will have during this level.
@@ -43,7 +44,8 @@ LevelTwo.prototype.create = function() {
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
-    this.addNPCs();
+    this.lastGoalAimed = false;
+    this.metWife = false;
     this.addEnemies();
     this.addObjects();
     this.addPlaces();
@@ -77,25 +79,20 @@ LevelTwo.prototype.addObjects = function() {
         dialog, 'Necklace', 'My wife\'s necklace.');
     this.addOtherItem(necklace);
 
-    dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
-    var gunsStore = new InteractiveHouse(5 * this.firstCheckPointX,
-        this.GROUND_HEIGHT, 'redHouse', dialog);
-    gunsStore.anchor.set(0, 1);
-    this.addObject(gunsStore);
-
     this.addCar(3.7 * this.checkPointsDistance, 'bus');
 };
 
 /**
- * Adds level one non player characters.
- * @method LevelTwo.addNPCs
+ * Adds character's wife to the level scene.
+ * @method LevelTwo.addWife
  */
-LevelTwo.prototype.addNPCs = function() {
-    var message = 'I know that you are looking for \nyour family.' +
-        '\nI can help you.' +
-        '\n\nGo to the blue house after the Zoo,' +
-        '\nmaybe your family is there.';
-    this.addNPC(this.game.camera.width / 2, 'npc', message);
+LevelTwo.prototype.addWife = function() {
+    var message = 'Hello. I am so happy to see you again.' +
+        '\nBut our children are not here.' +
+        '\nYor friend has our daughter and \nour son.';
+    this.wife = new WifeNPC(this.checkPointsDistance *
+        (NUMBER_OF_FIGHTING_POINTS), this.GROUND_HEIGHT - 100, 'wife', message);
+    this.npcs.add(this.wife);
 };
 
 /**
@@ -129,8 +126,9 @@ LevelTwo.prototype.addEnemies = function() {
  */
 LevelTwo.prototype.addPlaces = function() {
     var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school'];
-    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School'];
+    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
+    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
+        'Old Factory'];
     var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
     var i;
     var houseIndex = 0;
@@ -154,8 +152,26 @@ LevelTwo.prototype.addPlaces = function() {
  * @method LevelTwo.nextLevel
  */
 LevelTwo.prototype.nextLevel = function() {
-    this.game.state.start('intro');
-    //level = this.game.state.states.levelThree;
+    if (this.wife === undefined) {
+        this.addWife();
+        this.wife.moveRight();
+    /*}else if (!this.metWife) {
+        this.game.physics.arcade.moveToXY(
+            this.wife,
+            this.player.x,
+            this.player.y); */
+    }else if (this.metWife && this.activePopUps === 0) {
+        this.game.state.start('intro');
+        //level = this.game.state.states.levelThree;
+    }
+};
+
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+LevelTwo.prototype.playerWins = function() {
+    return this.lastGoalAimed;
 };
 
 module.exports = LevelTwo;
