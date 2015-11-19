@@ -22,7 +22,7 @@ var ClueItem = function(x, y, key, popUP, name, description) {
     this.description = description;
     this.popUp = popUP;
     level.game.add.existing(this.popUp);
-    this.category = 'objects';
+    this.category = 'vocabulary';
 };
 
 ClueItem.prototype = Object.create(Item.prototype);

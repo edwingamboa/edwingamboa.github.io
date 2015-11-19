@@ -13,11 +13,6 @@ var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
  */
 var NUMBER_OF_FIGHTING_POINTS = 5;
 /**
- * Number of places form vocabulary for this level.
- * @type {number}
- */
-var NUMBER_OF_PLACES = 4;
-/**
  * Number of houses player should visit during this level.
  * @type {number}
  */
@@ -136,7 +131,7 @@ LevelOne.prototype.addPlaces = function() {
     var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
     var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
     var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
-    var x = level.WORLD_WIDTH / (NUMBER_OF_PLACES + 2);
+    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
     var place;

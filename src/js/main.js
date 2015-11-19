@@ -39,11 +39,17 @@ var LevelOne = require('./states/levels/LevelOne');
  * @type {LevelTwo}
  */
 var LevelTwo = require('./states/levels/LevelTwo');
+/**
+ * Level two state.
+ * @type {LevelThree}
+ */
+var LevelThree = require('./states/levels/LevelThree');
 
 game.state.add('boot', Boot);
 game.state.add('preloader', Preloader);
 game.state.add('menu', Menu);
 game.state.add('levelOne', LevelOne);
 game.state.add('levelTwo', LevelTwo);
+game.state.add('levelThree', LevelThree);
 game.state.add('intro', Intro);
 game.state.start('boot');

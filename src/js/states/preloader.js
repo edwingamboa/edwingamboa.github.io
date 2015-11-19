@@ -157,6 +157,14 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('school', 'assets/images/vocabulary/school.png');
     this.game.load.image('factory', 'assets/images/vocabulary/factory.png');
 
+    this.game.load.image('fireStation',
+        'assets/images/vocabulary/fireStation.png');
+    this.game.load.image('policeStation',
+        'assets/images/vocabulary/policeStation.png');
+    this.game.load.image('hotel', 'assets/images/vocabulary/hotel.png');
+    this.game.load.image('superMarket',
+        'assets/images/vocabulary/superMarket.png');
+
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
     this.game.load.image('greenHouse',
@@ -200,8 +208,9 @@ Preloader.prototype.update = function() {
         //this.game.state.start('menu');
         this.game.state.start('intro');
 
-        //level = this.game.state.states.levelTwo;
         level = this.game.state.states.levelOne;
+        //level = this.game.state.states.levelTwo;
+        //level = this.game.state.states.levelThree;
     }
 };
 

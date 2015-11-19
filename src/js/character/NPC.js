@@ -24,6 +24,7 @@ var NPC = function(x, y, key, message) {
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
     this.frame = this.stopRightFrameIndex;
+    this.hadContactWithPlayer = false;
     return this;
 };
 
@@ -35,9 +36,13 @@ NPC.prototype.constructor = NPC;
  * @method NPC.showMessage
  */
 NPC.prototype.showMessage = function() {
+    if (this.body.velocity.x > 0) {
+        this.stop();
+    }
     var dialog = new Dialog(this.key, this.message);
     level.game.add.existing(dialog);
     dialog.open();
+    this.hadContactWithPlayer = true;
 };
 
 module.exports = NPC;

@@ -1,7 +1,8 @@
 /**
- * Created by Edwin Gamboa on 05/11/2015.
+ * Created by Edwin Gamboa on 19/11/2015.
  */
 var Level = require ('../levels/Level');
+var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -11,29 +12,29 @@ var ClueItem = require('../../items/ClueItem');
  * Number of fights that player will have during this level.
  * @type {number}
  */
-var NUMBER_OF_FIGHTING_POINTS = 6;
+var NUMBER_OF_FIGHTING_POINTS = 7;
 
 /**
- * Manages LevelTwo.
- * @class LevelTwo
+ * Manages LevelThree.
+ * @class LevelThree
  * @constructor
  * @extends Level
  * @param {Phaser.Game} game - Pahser Game object.
  */
-var LevelTwo = function(game) {
+var LevelThree = function(game) {
     Level.call(this, game);
 };
 
-LevelTwo.prototype = Object.create(Level.prototype);
-LevelTwo.prototype.constructor = LevelTwo;
+LevelThree.prototype = Object.create(Level.prototype);
+LevelThree.prototype.constructor = LevelThree;
 
 /**
  * Creates level one specific objects and elements.
- * @method LevelTwo.create
+ * @method LevelThree.create
  */
-LevelTwo.prototype.create = function() {
+LevelThree.prototype.create = function() {
     Level.prototype.create.call(this);
-    this.game.stage.backgroundColor = '#C2501B';
+    this.game.stage.backgroundColor = '#09061F';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
@@ -55,9 +56,9 @@ LevelTwo.prototype.create = function() {
 
 /**
  * Add ClueItems, InteractiveCar and InteractiveHouses for this level.
- * @method LevelTwo.addObjects
+ * @method LevelThree.addObjects
  */
-LevelTwo.prototype.addObjects = function() {
+LevelThree.prototype.addObjects = function() {
     var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
     var necklaceIcon = level.game.make.sprite(0, 0, 'necklaceBig');
     var message = 'That is my wife\'s necklace!';
@@ -77,9 +78,9 @@ LevelTwo.prototype.addObjects = function() {
 
 /**
  * Adds character's wife to the level scene.
- * @method LevelTwo.addWife
+ * @method LevelThree.addWife
  */
-LevelTwo.prototype.addWife = function() {
+LevelThree.prototype.addWife = function() {
     var message = 'Hello. I am so happy to see you again.' +
         '\nBut our children are not here.' +
         '\nYor friend has our daughter and \nour son.';
@@ -89,38 +90,38 @@ LevelTwo.prototype.addWife = function() {
 
 /**
  * Adds this level enemies.
- * @method LevelTwo.addEnemies
+ * @method LevelThree.addEnemies
  */
-LevelTwo.prototype.addEnemies = function() {
+LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
-    var numberOfEnemies = 2;
-    var numberOfStrongEnemies = 2;
-    var i;
-    var j;
-    for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (j = 0; j < numberOfEnemies; j++) {
-            x += 50;
-            this.addSimpleEnemy(x);
-        }
-        for (j = 0; j < numberOfStrongEnemies; j++) {
-            x += 50;
-            this.addStrongEnemy(x);
-        }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
-    }
+    /*var numberOfEnemies = 2;
+     var numberOfStrongEnemies = 2;
+     var i;
+     var j;
+     for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
+     for (j = 0; j < numberOfEnemies; j++) {
+     x += 50;
+     this.addSimpleEnemy(x);
+     }
+     for (j = 0; j < numberOfStrongEnemies; j++) {
+     x += 50;
+     this.addStrongEnemy(x);
+     }
+     numberOfEnemies ++;
+     x += this.checkPointsDistance;
+     }*/
 };
 
 /**
  * Adds city places from vocabulary that corresponds to this level.
- * @method LevelTwo.addPlaces
+ * @method LevelThree.addPlaces
  */
-LevelTwo.prototype.addPlaces = function() {
-    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
-    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
-        'Old Factory'];
+LevelThree.prototype.addPlaces = function() {
+    var housesKeys = ['yellowHouse', 'greenHouse', 'orangeHouse', 'whiteHouse'];
+    var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
+    var placesNames = ['Police Station', 'Fire Station', 'Super Market',
+        'Hotel'];
     var x = level.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
@@ -141,17 +142,17 @@ LevelTwo.prototype.addPlaces = function() {
 
 /**
  * Lets the player to play second level.
- * @method LevelTwo.nextLevel
+ * @method LevelThree.nextLevel
  */
-LevelTwo.prototype.nextLevel = function() {
+LevelThree.prototype.nextLevel = function() {
     if (this.wife === undefined) {
         this.addWife();
         this.wife.moveRight();
-    /*}else if (!this.metWife) {
-        this.game.physics.arcade.moveToXY(
-            this.wife,
-            this.player.x,
-            this.player.y); */
+        /*}else if (!this.metWife) {
+         this.game.physics.arcade.moveToXY(
+         this.wife,
+         this.player.x,
+         this.player.y); */
     }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
         this.game.state.start('intro');
         //level = this.game.state.states.levelThree;
@@ -162,8 +163,8 @@ LevelTwo.prototype.nextLevel = function() {
  * Determines whether the player has won
  * @returns {boolean}
  */
-LevelTwo.prototype.playerWins = function() {
+LevelThree.prototype.playerWins = function() {
     return this.lastGoalAimed;
 };
 
-module.exports = LevelTwo;
+module.exports = LevelThree;
