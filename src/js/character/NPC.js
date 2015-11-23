@@ -45,4 +45,16 @@ NPC.prototype.showMessage = function() {
     this.hadContactWithPlayer = true;
 };
 
+/**
+ * Update animations of the wife.
+ * @method NPC.update
+ */
+/*NPC.prototype.update = function() {
+    if (this.body.velocity.x > 0) {
+        this.animations.play('right');
+    }else if (this.body.velocity.x < 0) {
+        this.animations.play('left');
+    }
+};*/
+
 module.exports = NPC;

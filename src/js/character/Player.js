@@ -37,7 +37,7 @@ var MINIMUM_SCORE = 20;
  */
 var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, 200, level.game.world.height - 150,
+    Character.call(this, 200, level.GROUND_HEIGHT - 50,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);

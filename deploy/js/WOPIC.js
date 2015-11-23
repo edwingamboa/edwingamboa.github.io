@@ -568,6 +568,18 @@ NPC.prototype.showMessage = function() {
     this.hadContactWithPlayer = true;
 };
 
+/**
+ * Update animations of the wife.
+ * @method NPC.update
+ */
+/*NPC.prototype.update = function() {
+    if (this.body.velocity.x > 0) {
+        this.animations.play('right');
+    }else if (this.body.velocity.x < 0) {
+        this.animations.play('left');
+    }
+};*/
+
 module.exports = NPC;
 
 },{"../util/Dialog":40,"./Character":2}],5:[function(require,module,exports){
@@ -610,7 +622,7 @@ var MINIMUM_SCORE = 20;
  */
 var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, 200, level.game.world.height - 150,
+    Character.call(this, 200, level.GROUND_HEIGHT - 50,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -997,52 +1009,81 @@ module.exports = StrongestEnemy;
 /**
  * Created by Edwin Gamboa on 13/11/2015.
  */
-var NPC = require('./NPC');
+var Character  = require('./Character');
+var ResourceBar = require('./../util/ResourceBar');
+
+/**
+ * Represents the right direction on the screen.
+ * @constant
+ * @type {number}
+ */
+var RIGHT_DIRECTION = 1;
+/**
+ * Represents the left direction on the screen.
+ * @constant
+ * @type {number}
+ */
+var LEFT_DIRECTION = -1;
 
 /**
  * Represents a non player character within the game, whom player will interact
  * with.
- * @class NPC
+ * @class Wife
  * @extends Character
  * @constructor
- * @param {number} x - WifeNPC's x coordinate within game world.
- * @param {number} y - WifeNPC's y coordinate within game world.
- * @param {string} key - WifeNPC's texture key.
- * @param {string} message - Message that the NPC will tell to the player.
- * @return {WifeNPC}
+ * @param {number} x - Wife's x coordinate within game world.
+ * @param {number} y - Wife's y coordinate within game world.
+ * @return {Wife}
  */
-var WifeNPC = function(x, y, key, message) {
-    return NPC.call(this, x, y, key, message);
+var Wife = function(x, y) {
+    Character.call(this, x, y, 'wife');
+    this.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 5;
+    this.heatlthBar = new ResourceBar(-this.width / 2, -this.height / 2 - 10,
+        {width: 40, height: 5});
+    this.addChild(this.heatlthBar);
+    this.direction = RIGHT_DIRECTION;
 };
 
-WifeNPC.prototype = Object.create(NPC.prototype);
-WifeNPC.prototype.constructor = WifeNPC;
-
-/**
- * Shows the message that thhis NPC has for the Character
- * @method NPC.showMessage
- */
-WifeNPC.prototype.showMessage = function() {
-    NPC.prototype.showMessage.call(this);
-    this.stop();
-    level.metWife = true;
-};
+Wife.prototype = Object.create(Character.prototype);
+Wife.prototype.constructor = Wife;
 
 /**
  * Update animations of the wife.
- * @method WifeNPC.update
+ * @method Wife.update
  */
-WifeNPC.prototype.update = function() {
+Wife.prototype.update = function() {
+    this.body.velocity.x = level.player.body.velocity.x;
     if (this.body.velocity.x > 0) {
+        this.direction = RIGHT_DIRECTION;
         this.animations.play('right');
     }else if (this.body.velocity.x < 0) {
+        this.direction = LEFT_DIRECTION;
         this.animations.play('left');
+    }else {
+        this.animations.stop();
+        if (this.direction === RIGHT_DIRECTION) {
+            this.frame = this.stopRightFrameIndex;
+        }else {
+            this.frame = this.stopLeftFrameIndex;
+        }
     }
 };
 
-module.exports = WifeNPC;
+/**
+ * Updates wife's health level bar.
+ * @method Wife.updateHealthLevel
+ */
+Wife.prototype.updateHealthLevel = function() {
+    this.heatlthBar.updateResourceBarLevel(this.healthLevel /
+        this.maxHealthLevel);
+};
 
-},{"./NPC":4}],10:[function(require,module,exports){
+module.exports = Wife;
+
+},{"./../util/ResourceBar":48,"./Character":2}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -3953,19 +3994,20 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var Wife = require('../../character/Wife');
 
 /**
  * Number of fights that player will have during this level.
  * @type {number}
  */
-var NUMBER_OF_FIGHTING_POINTS = 7;
+var NUMBER_OF_FIGHTING_POINTS = 8;
 
 /**
  * Manages LevelThree.
  * @class LevelThree
  * @constructor
  * @extends Level
- * @param {Phaser.Game} game - Pahser Game object.
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelThree = function(game) {
     Level.call(this, game);
@@ -3985,13 +4027,13 @@ LevelThree.prototype.create = function() {
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
-    this.metWife = false;
     this.addEnemies();
+    this.addWife();
     this.addObjects();
     this.addPlaces();
     this.addMachineGun(600, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(2000, this.GROUND_HEIGHT - 40, false);
-    this.addRevolver(4000, this.GROUND_HEIGHT - 40, false);
+    this.addMachineGun(4000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
     this.addMachineGun(7000, this.GROUND_HEIGHT - 40, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
@@ -4027,11 +4069,10 @@ LevelThree.prototype.addObjects = function() {
  * @method LevelThree.addWife
  */
 LevelThree.prototype.addWife = function() {
-    var message = 'Hello. I am so happy to see you again.' +
-        '\nBut our children are not here.' +
-        '\nYor friend has our daughter and \nour son.';
-    this.wife = this.addNPC(this.checkPointsDistance *
-        (NUMBER_OF_FIGHTING_POINTS), 'wife', message);
+    this.wife = new Wife(this.player.x - this.player.width,
+        this.GROUND_HEIGHT - 50);
+    this.add.existing(this.wife);
+    this.gameObjects.push(this.wife);
 };
 
 /**
@@ -4042,7 +4083,7 @@ LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     /*var numberOfEnemies = 2;
-     var numberOfStrongEnemies = 2;
+     var numberOfStrongEnemies = 3;
      var i;
      var j;
      for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
@@ -4068,7 +4109,7 @@ LevelThree.prototype.addPlaces = function() {
     var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
     var placesNames = ['Police Station', 'Fire Station', 'Super Market',
         'Hotel'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
+    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
     var place;
@@ -4092,7 +4133,6 @@ LevelThree.prototype.addPlaces = function() {
  */
 LevelThree.prototype.nextLevel = function() {
     if (this.wife === undefined) {
-        this.addWife();
         this.wife.moveRight();
         /*}else if (!this.metWife) {
          this.game.physics.arcade.moveToXY(
@@ -4115,7 +4155,7 @@ LevelThree.prototype.playerWins = function() {
 
 module.exports = LevelThree;
 
-},{"../../items/ClueItem":18,"../../items/HealthPack":19,"../../util/Dialog":40,"../../util/VerticalLayoutPopUp":52,"../../worldElements/InteractiveHouse":54,"../levels/Level":35}],38:[function(require,module,exports){
+},{"../../character/Wife":9,"../../items/ClueItem":18,"../../items/HealthPack":19,"../../util/Dialog":40,"../../util/VerticalLayoutPopUp":52,"../../worldElements/InteractiveHouse":54,"../levels/Level":35}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 05/11/2015.
  */
@@ -4136,7 +4176,7 @@ var NUMBER_OF_FIGHTING_POINTS = 6;
  * @class LevelTwo
  * @constructor
  * @extends Level
- * @param {Phaser.Game} game - Pahser Game object.
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelTwo = function(game) {
     Level.call(this, game);
@@ -4177,9 +4217,9 @@ LevelTwo.prototype.create = function() {
  */
 LevelTwo.prototype.addObjects = function() {
     var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
-    var necklaceIcon = level.game.make.sprite(0, 0, 'necklaceBig');
+    var necklaceIcon = this.game.make.sprite(0, 0, 'necklaceBig');
     var message = 'That is my wife\'s necklace!';
-    var dialogText = level.game.make.text(0, 0, message);
+    var dialogText = this.game.make.text(0, 0, message);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
@@ -4239,7 +4279,7 @@ LevelTwo.prototype.addPlaces = function() {
     var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
     var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
         'Old Factory'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
+    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
     var place;

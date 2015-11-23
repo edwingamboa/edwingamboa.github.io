@@ -18,7 +18,7 @@ var NUMBER_OF_FIGHTING_POINTS = 6;
  * @class LevelTwo
  * @constructor
  * @extends Level
- * @param {Phaser.Game} game - Pahser Game object.
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelTwo = function(game) {
     Level.call(this, game);
@@ -59,9 +59,9 @@ LevelTwo.prototype.create = function() {
  */
 LevelTwo.prototype.addObjects = function() {
     var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
-    var necklaceIcon = level.game.make.sprite(0, 0, 'necklaceBig');
+    var necklaceIcon = this.game.make.sprite(0, 0, 'necklaceBig');
     var message = 'That is my wife\'s necklace!';
-    var dialogText = level.game.make.text(0, 0, message);
+    var dialogText = this.game.make.text(0, 0, message);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
@@ -121,7 +121,7 @@ LevelTwo.prototype.addPlaces = function() {
     var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
     var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
         'Old Factory'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
+    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
     var place;

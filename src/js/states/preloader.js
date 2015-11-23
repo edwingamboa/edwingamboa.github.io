@@ -208,9 +208,9 @@ Preloader.prototype.update = function() {
         //this.game.state.start('menu');
         this.game.state.start('intro');
 
-        level = this.game.state.states.levelOne;
+        //level = this.game.state.states.levelOne;
         //level = this.game.state.states.levelTwo;
-        //level = this.game.state.states.levelThree;
+        level = this.game.state.states.levelThree;
     }
 };
 

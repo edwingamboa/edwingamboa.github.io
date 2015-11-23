@@ -7,19 +7,20 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var Wife = require('../../character/Wife');
 
 /**
  * Number of fights that player will have during this level.
  * @type {number}
  */
-var NUMBER_OF_FIGHTING_POINTS = 7;
+var NUMBER_OF_FIGHTING_POINTS = 8;
 
 /**
  * Manages LevelThree.
  * @class LevelThree
  * @constructor
  * @extends Level
- * @param {Phaser.Game} game - Pahser Game object.
+ * @param {Phaser.Game} game - Phaser Game object.
  */
 var LevelThree = function(game) {
     Level.call(this, game);
@@ -39,13 +40,13 @@ LevelThree.prototype.create = function() {
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
-    this.metWife = false;
     this.addEnemies();
+    this.addWife();
     this.addObjects();
     this.addPlaces();
     this.addMachineGun(600, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(2000, this.GROUND_HEIGHT - 40, false);
-    this.addRevolver(4000, this.GROUND_HEIGHT - 40, false);
+    this.addMachineGun(4000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
     this.addMachineGun(7000, this.GROUND_HEIGHT - 40, false);
     var heathPacksDistance = this.WORLD_WIDTH / 4;
@@ -81,11 +82,10 @@ LevelThree.prototype.addObjects = function() {
  * @method LevelThree.addWife
  */
 LevelThree.prototype.addWife = function() {
-    var message = 'Hello. I am so happy to see you again.' +
-        '\nBut our children are not here.' +
-        '\nYor friend has our daughter and \nour son.';
-    this.wife = this.addNPC(this.checkPointsDistance *
-        (NUMBER_OF_FIGHTING_POINTS), 'wife', message);
+    this.wife = new Wife(this.player.x - this.player.width,
+        this.GROUND_HEIGHT - 50);
+    this.add.existing(this.wife);
+    this.gameObjects.push(this.wife);
 };
 
 /**
@@ -96,7 +96,7 @@ LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     /*var numberOfEnemies = 2;
-     var numberOfStrongEnemies = 2;
+     var numberOfStrongEnemies = 3;
      var i;
      var j;
      for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
@@ -122,7 +122,7 @@ LevelThree.prototype.addPlaces = function() {
     var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
     var placesNames = ['Police Station', 'Fire Station', 'Super Market',
         'Hotel'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
+    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
     var place;
@@ -146,7 +146,6 @@ LevelThree.prototype.addPlaces = function() {
  */
 LevelThree.prototype.nextLevel = function() {
     if (this.wife === undefined) {
-        this.addWife();
         this.wife.moveRight();
         /*}else if (!this.metWife) {
          this.game.physics.arcade.moveToXY(
