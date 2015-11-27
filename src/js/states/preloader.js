@@ -82,10 +82,9 @@ Preloader.prototype.loadAssets = function() {
         'assets/sprites/strong_enemy.png', 64, 64);
     this.game.load.spritesheet('strongestEnemy',
         'assets/sprites/strongestEnemy.png', 80, 80);
-    this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5,
-        150);
-    this.game.load.spritesheet('bus', 'assets/sprites/bus.png', 400,
-        180);
+    this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5, 150);
+    this.game.load.spritesheet('bus', 'assets/sprites/bus.png', 400, 180);
+    this.game.load.spritesheet('taxi', 'assets/sprites/taxi.png', 215, 100);
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
         30, 16);
     this.game.load.spritesheet('machineGun',
@@ -184,6 +183,21 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('necklaceBig',
         'assets/images/vocabulary/necklaceBig.png');
     this.game.load.image('necklaceIcon', 'assets/icons/necklaceIcon.png');
+    this.game.load.image('sisterMom',
+        'assets/images/vocabulary/sisterMom.png');
+    this.game.load.image('sisterMomBig',
+        'assets/images/vocabulary/sisterMomBig.png');
+    this.game.load.image('sisterMomIcon', 'assets/icons/sisterMomIcon.png');
+    this.game.load.image('brother',
+        'assets/images/vocabulary/brother.png');
+    this.game.load.image('brotherBig',
+        'assets/images/vocabulary/brotherBig.png');
+    this.game.load.image('brotherIcon', 'assets/icons/brotherIcon.png');
+    this.game.load.image('dad',
+        'assets/images/vocabulary/dad.png');
+    this.game.load.image('dadBig',
+        'assets/images/vocabulary/dadBig.png');
+    this.game.load.image('dadIcon', 'assets/icons/dadIcon.png');
 
     this.game.load.image('comicBg', 'assets/images/comics/comicBg.png');
     var key;

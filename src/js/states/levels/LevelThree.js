@@ -60,21 +60,22 @@ LevelThree.prototype.create = function() {
  * @method LevelThree.addObjects
  */
 LevelThree.prototype.addObjects = function() {
-    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
-    var necklaceIcon = level.game.make.sprite(0, 0, 'necklaceBig');
-    var message = 'That is my wife\'s necklace!';
+    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null,
+        'Our daughter\'s drawing');
+    var momSisterIcon = level.game.make.sprite(0, 0, 'sisterMomBig');
+    var message = 'We are closer to our children!';
     var dialogText = level.game.make.text(0, 0, message);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
     dialogText.align = 'center';
-    dialog.addElement(necklaceIcon);
+    dialog.addElement(momSisterIcon);
     dialog.addElement(dialogText);
-    var necklace = new ClueItem(300, this.GROUND_HEIGHT - 30, 'necklace',
-        dialog, 'Necklace', 'My wife\'s necklace.');
-    this.addOtherItem(necklace);
+    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT - 30,
+        'sisterMom', dialog, 'My Family', 'Daughter\'s drawing.');
+    this.addOtherItem(systerMomDrawing);
 
-    this.addCar(3.7 * this.checkPointsDistance, 'bus');
+    this.addCar(3.7 * this.checkPointsDistance, 'taxi');
 };
 
 /**
@@ -84,8 +85,7 @@ LevelThree.prototype.addObjects = function() {
 LevelThree.prototype.addWife = function() {
     this.wife = new Wife(this.player.x - this.player.width,
         this.GROUND_HEIGHT - 50);
-    this.add.existing(this.wife);
-    this.gameObjects.push(this.wife);
+    this.addPlayerCharacter(this.wife);
 };
 
 /**
@@ -95,22 +95,22 @@ LevelThree.prototype.addWife = function() {
 LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
-    /*var numberOfEnemies = 2;
-     var numberOfStrongEnemies = 3;
-     var i;
-     var j;
-     for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-     for (j = 0; j < numberOfEnemies; j++) {
-     x += 50;
-     this.addSimpleEnemy(x);
-     }
-     for (j = 0; j < numberOfStrongEnemies; j++) {
-     x += 50;
-     this.addStrongEnemy(x);
-     }
-     numberOfEnemies ++;
-     x += this.checkPointsDistance;
-     }*/
+    var numberOfEnemies = 2;
+    var numberOfStrongEnemies = 3;
+    var i;
+    var j;
+    for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
+        for (j = 0; j < numberOfEnemies; j++) {
+            x += 50;
+            this.addSimpleEnemy(x);
+        }
+        for (j = 0; j < numberOfStrongEnemies; j++) {
+            x += 50;
+            this.addStrongEnemy(x);
+        }
+        numberOfEnemies ++;
+        x += this.checkPointsDistance;
+    }
 };
 
 /**

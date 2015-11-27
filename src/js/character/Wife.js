@@ -73,4 +73,13 @@ Wife.prototype.updateHealthLevel = function() {
         this.maxHealthLevel);
 };
 
+/**
+ * Kills the character, so that is not visible and functional in the game.
+ * @method Wife.killCharacter
+ */
+Wife.prototype.killCharacter = function() {
+    level.gameOver();
+    Character.prototype.killCharacter.call(this);
+};
+
 module.exports = Wife;

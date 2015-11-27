@@ -85,7 +85,7 @@ Level.prototype.updateEnemies = function() {
         var enemy = this.enemies.children[i];
         for (var enemyWeaponKey in enemy.weapons) {
             this.game.physics.arcade.overlap(
-                this.player,
+                this.playerCharacters,
                 enemy.weapons[enemyWeaponKey].bullets,
                 this.bulletHitCharacter,
                 null,
@@ -329,14 +329,26 @@ Level.prototype.addObject = function(object) {
 };
 
 /**
- * Adds the player to the game world.
+ * Adds the player to the game world and a Phaser group for characters
+ * controlled by player (When he has to protect i.e. his wife.)
  * @method Level.addPlayer
  */
 Level.prototype.addPlayer = function() {
+    this.playerCharacters = this.game.add.group();
     this.player = new Player(this);
-    this.game.add.existing(this.player);
-    this.gameObjects.push(this.player);
+    this.playerCharacters.add(this.player);
+    this.gameObjects.push(this.playerCharacters);
     this.player.useWeapon(new Revolver(700, 100, false));
+};
+
+/**
+ * Adds a character that will be controlled by player
+ * (When he has to protect i.e. his wife.)
+ * @method Level.addPlayerCharacter
+ * @param {Character} character - Character to be protected by player.
+ */
+Level.prototype.addPlayerCharacter = function(character) {
+    this.playerCharacters.add(character);
 };
 
 /**
@@ -590,11 +602,19 @@ Level.prototype.updateScoreText = function() {
  */
 Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
-        this.game.state.start('menu');
+        this.gameOver();
     }
     this.healthLevelText.text = '' + this.player.healthLevel;
     this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
+};
+
+/**
+ * Called when player loses.
+ * @method Level.gameOver
+ */
+Level.prototype.gameOver = function() {
+    this.game.state.start('menu');
 };
 
 /**
