@@ -103,6 +103,8 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('openDoor', 'assets/images/openDoor.png');
     this.game.load.image('working', 'assets/images/working.png');
     this.game.load.image('addCashButton', 'assets/images/addCash.png');
+    this.game.load.image('myVocabularyButton',
+        'assets/images/myVocabulary.png');
     this.game.load.image('button', 'assets/images/button.png');
     this.game.load.image('mother', 'assets/images/mother.png');
     this.game.load.image('father', 'assets/images/father.png');

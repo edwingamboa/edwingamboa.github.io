@@ -3,6 +3,7 @@
  */
 var Inventory = require('../../items/inventory/Inventory');
 var Store = require('../../items/store/Store');
+var MyVocabulary = require('../../items/vocabulary/MyVocabulary');
 var HealthPack = require('../../items/HealthPack');
 var Player = require('../../character/Player');
 var Revolver = require('../../items/weapons/Revolver');
@@ -70,6 +71,7 @@ Level.prototype.create = function() {
     this.addControls();
     this.addCamera();
     this.createInventory();
+    this.createMyVocabulary ();
     this.createEnglishChallengesMenu();
     this.createStore();
     this.updateHealthLevel();
@@ -148,8 +150,8 @@ Level.prototype.update = function() {
         this.collectWeapon, null, this);
     this.game.physics.arcade.overlap(this.cars, this.enemies,
         this.crashEnemy, null, this);
-    this.game.physics.arcade.overlap(this.player, this.otherItems,
-        this.collectItem, null, this);
+    this.game.physics.arcade.overlap(this.player, this.vocabularyItems,
+        this.collectVocabularyItem, null, this);
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
             this.enemies,
@@ -159,10 +161,6 @@ Level.prototype.update = function() {
             this
         );
     }
-
-    this.game.physics.arcade.overlap(this.player, this.healthPacks,
-        this.collectHealthPack, null, this);
-
     if (this.cursors.left.isDown) {
         this.xDirection = -1;
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.X)) {
@@ -441,8 +439,8 @@ Level.prototype.createHealthPacksGroup = function() {
  * @method Level.createOtherItemsGroup
  */
 Level.prototype.createOtherItemsGroup = function() {
-    this.otherItems = this.game.add.group();
-    this.gameObjects.push(this.otherItems);
+    this.vocabularyItems = this.game.add.group();
+    this.gameObjects.push(this.vocabularyItems);
 };
 
 /**
@@ -519,6 +517,27 @@ Level.prototype.createEnglishChallengesMenu = function() {
 };
 
 /**
+ * Creates the game vocabulary list and a button to access it.
+ * @method Level.createMyVocabulary
+ */
+Level.prototype.createMyVocabulary = function() {
+    this.myVocabulary = new MyVocabulary(this);
+    this.game.add.existing(this.myVocabulary);
+
+    this.myVocabularyButton = this.game.add.button(320,
+        this.game.camera.height - 70, 'myVocabularyButton',
+        this.myVocabulary.open, this.myVocabulary);
+    this.myVocabularyButton.anchor.setTo(0.5, 0);
+    this.myVocabularyButton.fixedToCamera = true;
+    this.myVocabularyButton.input.priorityID = 1;
+    this.myVocabularyButtonLabel = this.game.add.text(this.myVocabularyButton.x,
+        this.myVocabularyButton.y + this.myVocabularyButton.height,
+        'My Vocabulary', {fontSize: '16px', fill: '#000'});
+    this.myVocabularyButtonLabel.fixedToCamera = true;
+    this.myVocabularyButtonLabel.anchor.set(0.5, 0);
+};
+
+/**
  * Decrease the health level of character that was impacted with a bullet.
  * @method Level.bulletHitCharacter
  * @param {Character} character - Character that was impacted.
@@ -578,6 +597,17 @@ Level.prototype.collectHealthPack = function(player, healthPack) {
 Level.prototype.collectItem = function(player, item) {
     this.inventory.addItem(item);
     item.pickUp();
+};
+
+/**
+ * Allows the player to pick up an ItemVocabulary.
+ * @method Level.collectVocabularyItem
+ * @param {Player} player - Game main player.
+ * @param {Item} vocabularyItem - Item to be picked up.
+ */
+Level.prototype.collectVocabularyItem = function(player, vocabularyItem) {
+    this.myVocabulary.addItem(vocabularyItem);
+    vocabularyItem.pickUp();
 };
 
 /**
@@ -647,12 +677,12 @@ Level.prototype.addHealthPack = function(healthPack) {
 };
 
 /**
- * Adds a Item to healthPacks group.
- * @method Level.otherItems
- * @param {Item} healthPack - Item to be added.
+ * Adds a Item to vocabularyItems group.
+ * @method Level.addVocabularyItem
+ * @param {Item} item - Vocabulary item to be added.
  */
-Level.prototype.addOtherItem = function(healthPack) {
-    this.otherItems.add(healthPack);
+Level.prototype.addVocabularyItem = function(item) {
+    this.vocabularyItems.add(item);
 };
 
 /**

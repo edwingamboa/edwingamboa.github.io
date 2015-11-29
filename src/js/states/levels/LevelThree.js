@@ -72,8 +72,8 @@ LevelThree.prototype.addObjects = function() {
     dialog.addElement(momSisterIcon);
     dialog.addElement(dialogText);
     var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT - 30,
-        'sisterMom', dialog, 'My Family', 'Daughter\'s drawing.');
-    this.addOtherItem(systerMomDrawing);
+        'sisterMom', dialog, 'My Family', 'Daughter\'s drawing.', 'family');
+    this.addVocabularyItem(systerMomDrawing);
 
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
 };

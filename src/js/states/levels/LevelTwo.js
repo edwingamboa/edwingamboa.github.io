@@ -70,7 +70,7 @@ LevelTwo.prototype.addObjects = function() {
     dialog.addElement(dialogText);
     var necklace = new ClueItem(300, this.GROUND_HEIGHT - 30, 'necklace',
         dialog, 'Necklace', 'My wife\'s necklace.');
-    this.addOtherItem(necklace);
+    this.addVocabularyItem(necklace);
 
     this.addCar(3.7 * this.checkPointsDistance, 'bus');
 };

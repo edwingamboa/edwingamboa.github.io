@@ -11,8 +11,8 @@ var InventoryItem = require ('./InventoryItem');
  * @constructor
  */
 var Inventory = function() {
-    var tabsLabels = ['Weapons', 'Health Packs', 'Vocabulary'];
-    var categories = ['weapons', 'healthPacks', 'vocabulary'];
+    var tabsLabels = ['Weapons', 'Health Packs'];
+    var categories = ['weapons', 'healthPacks'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
 };
 

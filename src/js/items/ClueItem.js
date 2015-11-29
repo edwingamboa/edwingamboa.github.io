@@ -15,14 +15,15 @@ var Item = require('./Item');
  * for the player.
  * @param {string} name - ClueItem's name.
  * @param {string} description - ClueItem's name.
+ * @param {string} category - Vocabulary category to which this item belongs.
  */
-var ClueItem = function(x, y, key, popUP, name, description) {
+var ClueItem = function(x, y, key, popUP, name, description, category) {
     Item.call(this, x, y, key, 0);
     this.name = name;
     this.description = description;
     this.popUp = popUP;
     level.game.add.existing(this.popUp);
-    this.category = 'vocabulary';
+    this.category = category || 'other';
 };
 
 ClueItem.prototype = Object.create(Item.prototype);

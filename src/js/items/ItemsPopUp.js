@@ -40,7 +40,7 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
     this.panel.x = 20;
     this.panel.y = 100;
     this.createItemGroups();
-    this.fillPanel(categories[0]);
+    this.firstCategory = categories[0];
     this.addChild(this.panel);
 };
 
@@ -89,6 +89,16 @@ ItemsPopUp.prototype.createItemGroups = function() {
     this.addItem(healthPackItem);
     healthPackItem = new HealthPack(0, 0, 20);
     this.addItem(healthPackItem);
+};
+
+/**
+ * Opens the PopItem showing first tab.
+ * @method ItemsPopUp.open
+ */
+ItemsPopUp.prototype.open = function() {
+    this.panel.removeAllElements();
+    this.fillPanel(this.firstCategory);
+    PopUp.prototype.open.call(this);
 };
 
 module.exports = ItemsPopUp;
