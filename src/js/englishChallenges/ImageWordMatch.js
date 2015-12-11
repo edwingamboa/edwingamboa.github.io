@@ -28,20 +28,25 @@ ImageWordMatch.prototype.constructor = ImageWordMatch;
  */
 ImageWordMatch.prototype.newChallenge = function() {
     this.clearChallenge();
-    var familyKeys = ['mother', 'son', 'daughter'];
-    var familyMembersCells = [];
+    var words = level.myVocabulary.randomVocabularyItems(3);
+    var wordCells = [];
 
-    for (var key in familyKeys) {
+    for (var i in words) {
         var cell = new VerticalLayoutPanel('imageWordBg');
-        var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
+        var word = level.game.make.sprite(0, 0, words[i].key);
+        if (word.height > 120) {
+            var scale = 120 / word.height;
+            word.scale.x = scale;
+            word.scale.y = scale;
+        }
         var shade = new VerticalLayoutPanel('wordBg', 2);
-        shade.code = key;
+        shade.code = i;
 
         this.destinations.push(shade);
-        cell.addElement(familyMember);
+        cell.addElement(word);
         cell.addElement(shade);
 
-        var label = level.game.make.text(0, 0, familyKeys[key]);
+        var label = level.game.make.text(0, 0, words[i].name);
         //Font style
         label.font = 'Shojumaru';
         label.fontSize = 20;
@@ -51,9 +56,9 @@ ImageWordMatch.prototype.newChallenge = function() {
         //label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.dragAndDropControl.fixLocation,
             this.dragAndDropControl);
-        label.code = key;
+        label.code = i;
 
-        familyMembersCells.push(cell);
+        wordCells.push(cell);
         this.elements.push(label);
     }
 
@@ -63,8 +68,8 @@ ImageWordMatch.prototype.newChallenge = function() {
     var images = new GridLayoutPanel('englishChallengePanelBg', optionals);
 
     var familyMemberCell;
-    for (familyMemberCell in familyMembersCells) {
-        images.addElement(familyMembersCells[familyMemberCell]);
+    for (familyMemberCell in wordCells) {
+        images.addElement(wordCells[familyMemberCell]);
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();

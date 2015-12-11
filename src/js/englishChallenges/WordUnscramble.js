@@ -27,24 +27,29 @@ WordUnscramble.prototype.constructor = WordUnscramble;
  */
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
-    var word = 'mother';
-    var wordImage = level.game.make.sprite(0, 0, 'mother');
+    var word = level.myVocabulary.randomVocabularyItems(1)[0];
+    var wordImage = level.game.make.sprite(0, 0, word.key);
+    if (wordImage.height > 120) {
+        var scale = 120 / wordImage.height;
+        wordImage.scale.x = scale;
+        wordImage.scale.y = scale;
+    }
 
-    var optionals = {numberOfColumns: word.length, margin: 5};
+    var optionals = {numberOfColumns: word.name.length, margin: 5};
     var wordFieldAnswer = new GridLayoutPanel('lettersBg', optionals);
 
     this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
     var letterShade;
-    for (i = 0; i < word.length; i++) {
+    for (i = 0; i < word.name.length; i++) {
         letterShade = new VerticalLayoutPanel('letterBg', 2);
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
 
-        letter = level.game.make.text(0, 0, word.charAt(i));
+        letter = level.game.make.text(0, 0, word.name.charAt(i));
         //Font style
         letter.font = 'Shojumaru';
         letter.fontSize = 20;

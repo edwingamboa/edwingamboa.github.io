@@ -55,7 +55,7 @@ game.state.add('levelThree', LevelThree);
 game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":33,"./states/Menu":34,"./states/Preloader":35,"./states/levels/Intro":36,"./states/levels/LevelOne":38,"./states/levels/LevelThree":39,"./states/levels/LevelTwo":40}],2:[function(require,module,exports){
+},{"./states/Boot":37,"./states/Menu":38,"./states/Preloader":39,"./states/levels/Intro":41,"./states/levels/LevelOne":43,"./states/levels/LevelThree":44,"./states/levels/LevelTwo":45}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -520,7 +520,196 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":51,"./Character":2}],4:[function(require,module,exports){
+},{"./../util/ResourceBar":59,"./Character":2}],4:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 06/12/2015.
+ */
+var InteractionEnemy = require('./InteractionEnemy');
+var MachineGun = require('../items/weapons/MachineGun');
+var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+
+/**
+ * Texture key for a strong  enemy
+ * @constant
+ * @type {string}
+ */
+var SPRITE_KEY = 'friend';
+/**
+ * Greatest health level of a strong enemy
+ * @constant
+ * @type {number}
+ */
+var MAX_HEALTH_LEVEL = 40;
+/**
+ * Lowest distance in which a strong enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
+var MIN_RANGE_DETECTION = 800;
+/**
+ * Lowest distance in which a strong enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
+var MAX_RANGE_DETECTION = 1000;
+/**
+ * Longest distance in which a simple enemy can detect the player.
+ * @constant
+ * @type {number}
+ */
+var MIN_RANGE_ATTACK = 600;
+/**
+ * Longest distance in which a simple enemy can shoot the player.
+ * @constant
+ * @type {number}
+ */
+var MAX_RANGE_ATTACK = 800;
+
+/**
+ * Represents the strongest enemies of the game.
+ * @class Friend
+ * @extends Enemy
+ * @param {number} x - Strongest enemy's x coordinate within the game world.
+ * @param {number} y - Strongest enemy's y coordinate within the game world.
+ * @constructor
+ */
+var Friend = function(x, y) {
+    var messages = ['Message 1', 'Message 2'];
+    var titles = ['Title 1', 'Title 2'];
+    var imagesKeys = ['Key 1', 'Key 2'];
+    InteractionEnemy.call(
+        this,
+        SPRITE_KEY,
+        MAX_HEALTH_LEVEL,
+        x,
+        y,
+        MIN_RANGE_DETECTION,
+        MAX_RANGE_DETECTION,
+        MIN_RANGE_ATTACK,
+        MAX_RANGE_ATTACK,
+        messages,
+        titles,
+        imagesKeys
+    );
+    this.useWeapon(new MachineGun(this, x, y, true));
+};
+
+Friend.prototype = Object.create(InteractionEnemy.prototype);
+Friend.prototype.constructor = Friend;
+
+module.exports = Friend;
+
+},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./InteractionEnemy":5}],5:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 06/12/2015.
+ */
+/**
+ * Created by Edwin Gamboa on 11/11/2015.
+ */
+/**
+ * Created by Edwin Gamboa on 23/07/2015.
+ */
+var Enemy = require('./Enemy');
+var MachineGun = require('../items/weapons/MachineGun');
+var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+
+/**
+ * Represents the enemies that can interact with the player.
+ * @class InteractionEnemy
+ * @extends Enemy
+ * @constructor
+ * @param {string} spriteKey - Texture's key for the enemy sprite.
+ * @param {number} maxHealthLevel - Greatest health level for this enemy.
+ * @param {number} x - Strongest enemy's x coordinate within the game world.
+ * @param {number} y - Strongest enemy's y coordinate within the game world.
+ * @param {number} minDetection - Lowest distance in which the enemy can
+ * detect the player.
+ * @param {number} maxDetection - Longest distance in which the enemy can
+ * detect the player.
+ * @param {number} minAttack - Lowest distance in which the enemy can
+ * shoot the player.
+ * @param {number} maxAttack - Longest distance in which the enemy can
+ * shoot the player.
+ * @param {Array} messages - Messages that this enemy has to interact with the
+ * player.
+ * @param {Array} titles - Title associated to each message.
+ * @param {Array} imagesKeys - Icon associated to each message.
+ */
+var InteractionEnemy = function(spriteKey, maxHealthLevel, x, y, minDetection,
+                                maxDetection, minAttack, maxAttack, messages,
+                                titles, imagesKeys) {
+    Enemy.call(
+        this,
+        spriteKey,
+        maxHealthLevel,
+        x,
+        y,
+        minDetection,
+        maxDetection,
+        minAttack,
+        maxAttack
+    );
+    this.makeDialogs(messages, titles, imagesKeys);
+};
+
+InteractionEnemy.prototype = Object.create(Enemy.prototype);
+InteractionEnemy.prototype.constructor = InteractionEnemy;
+
+/**
+ * Decrease the character health level. If after the decreasing, the healthLevel
+ * is less than or equal to 10, then character will stop fighting and will ask
+ * for pardon.
+ * @method InteractionEnemy.decreaseHealthLevel
+ * @param {number} decrease - the amount to decrease.
+ */
+InteractionEnemy.prototype.decreaseHealthLevel = function(decrease) {
+    this.healthLevel -= decrease;
+    if (this.healthLevel <= 10 && !level.lastGoalAimed) {
+        this.killWeapons();
+        this.canFire = false;
+        this.openDialogs();
+        level.lastGoalAimed = true;
+    }
+};
+
+/**
+ * Lets the enemy to show the messages he has for the player. (Interaction)
+ */
+InteractionEnemy.prototype.openDialogs = function() {
+    var i;
+    for (i in this.dialogs) {
+        this.dialogs[i].open();
+    }
+};
+
+/**
+ * Makes the dialogs that allows this character interact with the player.
+ * @method InteractionEnemy.makeDialogs
+ */
+InteractionEnemy.prototype.makeDialogs = function(messages, titles,
+                                                  imagesKeys) {
+    this.dialogs = [];
+    var i;
+    var tempDialog;
+    for (i in messages) {
+        tempDialog =  new VerticalLayoutPopUp('mediumPopUpBg', null, titles[i]);
+        var dialogImage = level.game.make.sprite(0, 0, imagesKeys[i]);
+        var dialogText = level.game.make.text(0, 0, messages[i]);
+        dialogText.font = 'Arial';
+        dialogText.fontSize = 20;
+        dialogText.fill = '#000000';
+        dialogText.align = 'center';
+        tempDialog.addElement(dialogImage);
+        tempDialog.addElement(dialogText);
+        this.dialogs.push(tempDialog);
+        level.game.add.existing(tempDialog);
+    }
+};
+
+module.exports = InteractionEnemy;
+
+
+},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./Enemy":3}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -582,7 +771,7 @@ NPC.prototype.showMessage = function() {
 
 module.exports = NPC;
 
-},{"../util/Dialog":43,"./Character":2}],5:[function(require,module,exports){
+},{"../util/Dialog":51,"./Character":2}],7:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -736,7 +925,7 @@ Player.prototype.buyItem = function(item) {
 
 module.exports = Player;
 
-},{"./Character":2}],6:[function(require,module,exports){
+},{"./Character":2}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -807,7 +996,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":31,"./Enemy":3}],7:[function(require,module,exports){
+},{"../items/weapons/Revolver":35,"./Enemy":3}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -880,14 +1069,12 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":30,"./Enemy":3}],8:[function(require,module,exports){
+},{"../items/weapons/MachineGun":34,"./Enemy":3}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/11/2015.
  */
-/**
- * Created by Edwin Gamboa on 23/07/2015.
- */
-var Enemy = require('./Enemy');
+
+var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
 
@@ -937,7 +1124,11 @@ var MAX_RANGE_ATTACK = 600;
  * @constructor
  */
 var StrongestEnemy = function(x, y) {
-    Enemy.call(
+    var messages = ['Forgive me please!' + '\nI can liberate your wife.',
+        'I can liberate your wife.'];
+    var titles = ['Forgive me', 'Your Wife'];
+    var imagesKeys = ['forgive', 'mother'];
+    InteractionEnemy.call(
         this,
         SPRITE_KEY,
         MAX_HEALTH_LEVEL,
@@ -946,66 +1137,21 @@ var StrongestEnemy = function(x, y) {
         MIN_RANGE_DETECTION,
         MAX_RANGE_DETECTION,
         MIN_RANGE_ATTACK,
-        MAX_RANGE_ATTACK
+        MAX_RANGE_ATTACK,
+        messages,
+        titles,
+        imagesKeys
     );
     this.useWeapon(new MachineGun(this, x, y, true));
-
-    this.makeDialogs();
 };
 
-StrongestEnemy.prototype = Object.create(Enemy.prototype);
+StrongestEnemy.prototype = Object.create(InteractionEnemy.prototype);
 StrongestEnemy.prototype.constructor = StrongestEnemy;
-
-/**
- * Decrease the character health level. If after the decreasing, the healthLevel
- * is less than or equal to 10, then character will stop fighting and will ask
- * for pardon.
- * @method StrongestEnemy.decreaseHealthLevel
- * @param {number} decrease - the amount to decrease.
- */
-StrongestEnemy.prototype.decreaseHealthLevel = function(decrease) {
-    this.healthLevel -= decrease;
-    if (this.healthLevel <= 10 && !level.lastGoalAimed) {
-        this.killWeapons();
-        this.canFire = false;
-        this.dialogFriend.open();
-        this.dialogForgive.open();
-        level.lastGoalAimed = true;
-    }
-};
-
-/**
- * Makes the dialogs that allows this character interact with the player.
- * @method StrongestEnemy.makeDialogs
- */
-StrongestEnemy.prototype.makeDialogs = function() {
-    this.dialogForgive = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Forgive me');
-    var forgiveImage = level.game.make.sprite(0, 0, 'forgive');
-    var forgiveMessage = 'Forgive me please!' +
-        '\nI can liberate your wife.';
-    var dialogText = level.game.make.text(0, 0, forgiveMessage);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    this.dialogForgive.addElement(forgiveImage);
-    this.dialogForgive.addElement(dialogText);
-    level.game.add.existing(this.dialogForgive);
-
-    this.dialogFriend = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Your Wife');
-    var friendImage = level.game.make.sprite(0, 0, 'mother');
-    dialogText.text = 'I can liberate your wife.';
-    this.dialogFriend.addElement(friendImage);
-    this.dialogFriend.addElement(dialogText);
-    level.game.add.existing(this.dialogFriend);
-};
 
 module.exports = StrongestEnemy;
 
 
-},{"../items/weapons/MachineGun":30,"../util/VerticalLayoutPopUp":55,"./Enemy":3}],9:[function(require,module,exports){
+},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./InteractionEnemy":5}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/11/2015.
  */
@@ -1092,7 +1238,7 @@ Wife.prototype.killCharacter = function() {
 
 module.exports = Wife;
 
-},{"./../util/ResourceBar":51,"./Character":2}],10:[function(require,module,exports){
+},{"./../util/ResourceBar":59,"./Character":2}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1203,7 +1349,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":45,"../util/VerticalLayoutPanel":54,"./dragAndDrop/DragAndDropChallenge":14}],11:[function(require,module,exports){
+},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1259,7 +1405,7 @@ EnglishChallenge.prototype.incomplete = function(parent) {
 
 module.exports = EnglishChallenge;
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1290,20 +1436,25 @@ ImageWordMatch.prototype.constructor = ImageWordMatch;
  */
 ImageWordMatch.prototype.newChallenge = function() {
     this.clearChallenge();
-    var familyKeys = ['mother', 'son', 'daughter'];
-    var familyMembersCells = [];
+    var words = level.myVocabulary.randomVocabularyItems(3);
+    var wordCells = [];
 
-    for (var key in familyKeys) {
+    for (var i in words) {
         var cell = new VerticalLayoutPanel('imageWordBg');
-        var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
+        var word = level.game.make.sprite(0, 0, words[i].key);
+        if (word.height > 120) {
+            var scale = 120 / word.height;
+            word.scale.x = scale;
+            word.scale.y = scale;
+        }
         var shade = new VerticalLayoutPanel('wordBg', 2);
-        shade.code = key;
+        shade.code = i;
 
         this.destinations.push(shade);
-        cell.addElement(familyMember);
+        cell.addElement(word);
         cell.addElement(shade);
 
-        var label = level.game.make.text(0, 0, familyKeys[key]);
+        var label = level.game.make.text(0, 0, words[i].name);
         //Font style
         label.font = 'Shojumaru';
         label.fontSize = 20;
@@ -1313,9 +1464,9 @@ ImageWordMatch.prototype.newChallenge = function() {
         //label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.dragAndDropControl.fixLocation,
             this.dragAndDropControl);
-        label.code = key;
+        label.code = i;
 
-        familyMembersCells.push(cell);
+        wordCells.push(cell);
         this.elements.push(label);
     }
 
@@ -1325,8 +1476,8 @@ ImageWordMatch.prototype.newChallenge = function() {
     var images = new GridLayoutPanel('englishChallengePanelBg', optionals);
 
     var familyMemberCell;
-    for (familyMemberCell in familyMembersCells) {
-        images.addElement(familyMembersCells[familyMemberCell]);
+    for (familyMemberCell in wordCells) {
+        images.addElement(wordCells[familyMemberCell]);
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
@@ -1351,7 +1502,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":45,"../util/VerticalLayoutPanel":54,"./dragAndDrop/DragAndDropChallenge":14}],13:[function(require,module,exports){
+},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1381,24 +1532,29 @@ WordUnscramble.prototype.constructor = WordUnscramble;
  */
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
-    var word = 'mother';
-    var wordImage = level.game.make.sprite(0, 0, 'mother');
+    var word = level.myVocabulary.randomVocabularyItems(1)[0];
+    var wordImage = level.game.make.sprite(0, 0, word.key);
+    if (wordImage.height > 120) {
+        var scale = 120 / wordImage.height;
+        wordImage.scale.x = scale;
+        wordImage.scale.y = scale;
+    }
 
-    var optionals = {numberOfColumns: word.length, margin: 5};
+    var optionals = {numberOfColumns: word.name.length, margin: 5};
     var wordFieldAnswer = new GridLayoutPanel('lettersBg', optionals);
 
     this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
     var letterShade;
-    for (i = 0; i < word.length; i++) {
+    for (i = 0; i < word.name.length; i++) {
         letterShade = new VerticalLayoutPanel('letterBg', 2);
         letterShade.code = '' + i;
         this.destinations.push(letterShade);
 
         wordFieldAnswer.addElement(letterShade);
 
-        letter = level.game.make.text(0, 0, word.charAt(i));
+        letter = level.game.make.text(0, 0, word.name.charAt(i));
         //Font style
         letter.font = 'Shojumaru';
         letter.fontSize = 20;
@@ -1434,7 +1590,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":45,"../util/VerticalLayoutPanel":54,"./dragAndDrop/DragAndDropChallenge":14}],14:[function(require,module,exports){
+},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1511,7 +1667,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":11,"../../util/Button":42,"../../util/VerticalLayoutPanel":54,"../../util/VerticalLayoutPopUp":55,"./DragAndDropController":15}],15:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":13,"../../util/Button":50,"../../util/VerticalLayoutPanel":62,"../../util/VerticalLayoutPopUp":63,"./DragAndDropController":17}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1622,7 +1778,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":52}],16:[function(require,module,exports){
+},{"../../util/Utilities":60}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1671,7 +1827,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":45,"../../util/PopUp":50,"../ContextGroups":10,"../ImageWordMatch":12,"../WordUnscramble":13,"./MenuItem":17}],17:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":53,"../../util/PopUp":58,"../ContextGroups":12,"../ImageWordMatch":14,"../WordUnscramble":15,"./MenuItem":19}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1723,11 +1879,11 @@ MenuItem.prototype.updateScoreText = function() {
 module.exports = MenuItem;
 
 
-},{"../../items/ItemGroupView":21}],18:[function(require,module,exports){
+},{"../../items/ItemGroupView":23}],20:[function(require,module,exports){
 /**
- * Created by Edwin Gamboa on 06/11/2015.
+ * Created by Edwin Gamboa on 08/12/2015.
  */
-var Item = require('./Item');
+var VocabularyItem = require('./VocabularyItem');
 
 /**
  * Item that represents a clue for the player.
@@ -1737,22 +1893,27 @@ var Item = require('./Item');
  * @param {number} x - ClueItem's x coordinate within the game world.
  * @param {number} y - ClueItem's y coordinate within the game world.
  * @param {string} key - ClueItem's texture
- * @param {PopUP} popUP - PopUp that contains the clue or message.
- * for the player.
+ * @param {string} dialogMessage - Message to be displayed on this item's
+ * dialog.
  * @param {string} name - ClueItem's name.
  * @param {string} description - ClueItem's name.
  * @param {string} category - Vocabulary category to which this item belongs.
  */
-var ClueItem = function(x, y, key, popUP, name, description, category) {
-    Item.call(this, x, y, key, 0);
-    this.name = name;
-    this.description = description;
-    this.popUp = popUP;
-    level.game.add.existing(this.popUp);
-    this.category = category || 'other';
+var ClueItem = function(x,
+                        y,
+                        key,
+                        dialogMessage,
+                        name,
+                        description,
+                        category) {
+    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
+        category);
+    var scale = 50 / this.height;
+    this.scale.y = scale;
+    this.scale.x = scale;
 };
 
-ClueItem.prototype = Object.create(Item.prototype);
+ClueItem.prototype = Object.create(VocabularyItem.prototype);
 ClueItem.prototype.constructor = ClueItem;
 
 /**
@@ -1764,18 +1925,10 @@ ClueItem.prototype.pickUp = function() {
     this.popUp.open();
 };
 
-/**
- * Add this ClueItem to the game so that the player can pick it up.
- * @method ClueItem.use
- */
-ClueItem.prototype.use = function() {
-    this.popUp.open();
-};
-
 module.exports = ClueItem;
 
 
-},{"./Item":20}],19:[function(require,module,exports){
+},{"./VocabularyItem":25}],21:[function(require,module,exports){
 var Item = require('./Item');
 
 /**
@@ -1838,7 +1991,7 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"./Item":20}],20:[function(require,module,exports){
+},{"./Item":22}],22:[function(require,module,exports){
 /**
  * Bounce value for an Item
  * @constant
@@ -1858,7 +2011,7 @@ var BOUNCE = 0.7 + Math.random() * 0.2;
  */
 var Item = function(x, y, key, price) {
     Phaser.Sprite.call(this, level.game, x, y, key);
-    this.anchor.set(0.5, 0.5);
+    this.anchor.set(0, 1);
     level.game.physics.arcade.enable(this);
     this.body.bounce.y = BOUNCE;
     this.body.collideWorldBounds = true;
@@ -1890,7 +2043,7 @@ Item.prototype.setName = function(name) {
 
 module.exports = Item;
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -1911,6 +2064,8 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
     VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
+    var scale = 50 / this.icon.height;
+    this.icon.scale.y = scale;
 
     this.auxText = level.game.make.text(this.icon.width - 5, this.icon.height,
         '');
@@ -1984,7 +2139,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":42,"../util/VerticalLayoutPanel":54}],22:[function(require,module,exports){
+},{"../util/Button":50,"../util/VerticalLayoutPanel":62}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/10/2015.
  */
@@ -2090,7 +2245,125 @@ ItemsPopUp.prototype.open = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":42,"../util/GridLayoutPanel":45,"../util/PopUp":50,"./HealthPack":19,"./weapons/MachineGun":30,"./weapons/Revolver":31}],23:[function(require,module,exports){
+},{"../util/Button":50,"../util/GridLayoutPanel":53,"../util/PopUp":58,"./HealthPack":21,"./weapons/MachineGun":34,"./weapons/Revolver":35}],25:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 06/11/2015.
+ */
+var Item = require('./Item');
+var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
+
+/**
+ * Item that represents a clue for the player.
+ * @class VocabularyItem
+ * @extends Item
+ * @constructor
+ * @param {number} x - VocabularyItem's x coordinate within the game world.
+ * @param {number} y - VocabularyItem's y coordinate within the game world.
+ * @param {string} key - VocabularyItem's texture
+ * @param {string} dialogMessage - Message to be displayed on this item's
+ * dialog.
+ * @param {string} name - VocabularyItem's name.
+ * @param {string} description - VocabularyItem's name.
+ * @param {string} category - Vocabulary category to which this item belongs.
+ */
+var VocabularyItem = function(x,
+                              y,
+                              key,
+                              dialogMessage,
+                              name,
+                              description,
+                              category) {
+    Item.call(this, x, y, key, 0);
+    this.dialogMessage = dialogMessage;
+    this.category = category || 'other';
+    this.name = name;
+    this.description = description;
+    this.makeDialog();
+};
+
+VocabularyItem.prototype = Object.create(Item.prototype);
+VocabularyItem.prototype.constructor = VocabularyItem;
+
+/**
+ * Add this VocabularyItem to the game so that the player can pick it up.
+ * @method VocabularyItem.use
+ */
+VocabularyItem.prototype.use = function() {
+    this.popUp.open();
+    var category = level.myVocabulary.randomVocabularyItems(1);
+};
+
+/**
+ * Makes the dialog that is delivered to the player when he checks a vocabulary.
+ * @method VocabularyItem..makeDialog
+ */
+VocabularyItem.prototype.makeDialog = function() {
+    this.popUp = new VerticalLayoutPopUp('mediumPopUpBg', null, this.name);
+    var icon = level.game.make.sprite(0, 0, this.key);
+    if (icon.height > 200) {
+        var scale = 200 / icon.height;
+        icon.scale.x = scale;
+        icon.scale.y = scale;
+    }
+    var dialogText = level.game.make.text(0, 0, this.dialogMessage);
+    dialogText.font = 'Arial';
+    dialogText.fontSize = 20;
+    dialogText.fill = '#000000';
+    dialogText.align = 'center';
+    this.popUp.addElement(icon);
+    this.popUp.addElement(dialogText);
+    level.game.add.existing(this.popUp);
+};
+
+module.exports = VocabularyItem;
+
+
+},{"../util/VerticalLayoutPopUp":63,"./Item":22}],26:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 08/12/2015.
+ */
+var VocabularyItem = require('./VocabularyItem');
+
+/**
+ * Item that represents a clue for the player.
+ * @class WorldItem
+ * @extends Item
+ * @constructor
+ * @param {number} x - VocabularyItem's x coordinate within the game world.
+ * @param {number} y - VocabularyItem's y coordinate within the game world.
+ * @param {string} key - WorldItem's texture
+ * @param {string} dialogMessage - Message to be displayed on this item's
+ * dialog.
+ * @param {string} name - WorldItem's name.
+ * @param {string} description - WorldItem's name.
+ * @param {string} category - Vocabulary category to which this item belongs.
+ */
+var WorldItem = function(x,
+                         y,
+                         key,
+                         dialogMessage,
+                         name,
+                         description,
+                         category) {
+    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
+        category);
+};
+
+WorldItem.prototype = Object.create(VocabularyItem.prototype);
+WorldItem.prototype.constructor = WorldItem;
+
+/**
+ * Kills the this item whn player picks it up.
+ * @method WorldItem.pickUp
+ */
+WorldItem.prototype.pickUp = function() {
+    level.vocabularyItems.remove(this);
+    level.addObject(this);
+};
+
+module.exports = WorldItem;
+
+},{"./VocabularyItem":25}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2127,7 +2400,7 @@ Inventory.prototype.addItem = function(item) {
 
 module.exports = Inventory;
 
-},{"../ItemsPopUp":22,"./InventoryItem":24}],24:[function(require,module,exports){
+},{"../ItemsPopUp":24,"./InventoryItem":28}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2180,7 +2453,7 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../ItemGroupView":21}],25:[function(require,module,exports){
+},{"../ItemGroupView":23}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2223,7 +2496,7 @@ Store.prototype.addItem = function(item) {
 
 module.exports = Store;
 
-},{"../ItemsPopUp":22,"./StoreItem":26}],26:[function(require,module,exports){
+},{"../ItemsPopUp":24,"./StoreItem":30}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2273,12 +2546,13 @@ StoreItem.prototype.buttonAction = function() {
 
 module.exports = StoreItem;
 
-},{"../ItemGroupView":21}],27:[function(require,module,exports){
+},{"../ItemGroupView":23}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
 var ItemsPopUp = require('../ItemsPopUp');
 var MyVocabularyItem = require ('./MyVocabularyItem');
+var Utilities = require('../../util/Utilities');
 
 /**
  * Ui and control for the game MyVocabulary.
@@ -2288,8 +2562,8 @@ var MyVocabularyItem = require ('./MyVocabularyItem');
  */
 var MyVocabulary = function() {
     var tabsLabels = ['Family', 'Places', 'Transport', 'Others'];
-    var categories = ['family', 'places', 'transport', 'others'];
-    ItemsPopUp.call(this, tabsLabels, categories, 'My Vocabulary');
+    this.categories = ['family', 'places', 'transport', 'others'];
+    ItemsPopUp.call(this, tabsLabels, this.categories, 'My Vocabulary');
 };
 
 MyVocabulary.prototype = Object.create(ItemsPopUp.prototype);
@@ -2301,7 +2575,7 @@ MyVocabulary.prototype.constructor = MyVocabulary;
  * @param {Item} item - Item to be added to the inventory.
  */
 MyVocabulary.prototype.addItem = function(item) {
-    this.items[item.category][item.key] = new MyVocabularyItem(item, this);
+    this.items[item.category].push(new MyVocabularyItem(item, this));
 };
 
 /**
@@ -2310,13 +2584,53 @@ MyVocabulary.prototype.addItem = function(item) {
  */
 MyVocabulary.prototype.createItemGroups = function() {};
 
+/**
+ * Returns an array with the desired number of words.
+ * @method MyVocabulary.randomVocabularyItems
+ * @param {number} numberOfWords - Desired number of words
+ * @return {Array} - Array containing random words from the vocabulary.
+ */
+MyVocabulary.prototype.randomVocabularyItems = function(numberOfWords) {
+    var util = new Utilities();
+    var randomCategory = this.randomCategory(numberOfWords);
+    var indexes = util.randomIndexesArray(this.items[randomCategory].length);
+    var vocabularyItems = [];
+    var i;
+    for (i = 0; i < numberOfWords; i++) {
+        vocabularyItems.push(this.items[randomCategory][indexes[i]].item);
+    }
+    return vocabularyItems;
+};
+
+/**
+ * Returns a random category from the vocabulary, that has at least a certain
+ * number of words.
+ * @method MyVocabulary.randomCategory
+ * @param numberOfWords - Minimum number of words that should have the category.
+ * @returns {string} - a random category that has a certain number of words.
+ */
+MyVocabulary.prototype.randomCategory = function(numberOfWords) {
+    var emptyCategory = true;
+    var index;
+    var category;
+    while (emptyCategory) {
+        index = level.game.rnd.integerInRange(0, this.categories.length - 1);
+        category = this.categories[index];
+        if (this.items[category].length >= numberOfWords) {
+            emptyCategory = false;
+        }
+    }
+    return category;
+};
+
 module.exports = MyVocabulary;
 
-},{"../ItemsPopUp":22,"./MyVocabularyItem":28}],28:[function(require,module,exports){
+},{"../../util/Utilities":60,"../ItemsPopUp":24,"./MyVocabularyItem":32}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
-var ItemGroupView = require('../ItemGroupView');
+var VerticalLayoutPanel = require('../../util/VerticalLayoutPanel');
+var Button = require('../../util/Button');
 
 /**
  * View an inventory item.
@@ -2327,14 +2641,26 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var MyVocabularyItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Show', parentView);
-
+    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
     this.item = item;
-    this.setTitle(this.item.name);
-    this.setDescription(this.item.description);
+    this.icon = level.game.make.sprite(0, 0, this.item.key);
+    var scale = 50 / this.icon.height;
+    this.icon.scale.x = scale;
+    this.icon.scale.y = scale;
+    this.title = level.game.make.text(0, 0, this.item.name);
+    this.title.font = 'Arial';
+    this.title.fontSize = 20;
+    this.title.fill = '#0040FF';
+
+    this.button = new Button('Show', this.buttonAction, this);
+
+    this.addElement(this.title);
+    this.addElement(this.icon);
+    this.addElement(this.button);
+    this.parentView = parentView;
 };
 
-MyVocabularyItem.prototype = Object.create(ItemGroupView.prototype);
+MyVocabularyItem.prototype = Object.create(VerticalLayoutPanel.prototype);
 MyVocabularyItem.prototype.constructor = MyVocabularyItem;
 
 /**
@@ -2347,7 +2673,7 @@ MyVocabularyItem.prototype.buttonAction = function() {
 
 module.exports = MyVocabularyItem;
 
-},{"../ItemGroupView":21}],29:[function(require,module,exports){
+},{"../../util/Button":50,"../../util/VerticalLayoutPanel":62}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -2376,7 +2702,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2465,7 +2791,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":32}],31:[function(require,module,exports){
+},{"./Weapon":36}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2554,7 +2880,7 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":32}],32:[function(require,module,exports){
+},{"./Weapon":36}],36:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
@@ -2710,7 +3036,7 @@ Weapon.prototype.pointToLeft = function() {
 
 module.exports = Weapon;
 
-},{"../Item":20,"./Bullet":29}],33:[function(require,module,exports){
+},{"../Item":22,"./Bullet":33}],37:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -2746,7 +3072,7 @@ Boot.prototype.create = function() {
 
 module.exports = Boot;
 
-},{}],34:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -2785,7 +3111,7 @@ Menu.prototype.newGame = function() {
 
 module.exports = Menu;
 
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -3028,7 +3354,9 @@ Preloader.prototype.onLoadComplete = function() {
 
 module.exports = Preloader;
 
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
+arguments[4][37][0].apply(exports,arguments)
+},{"dup":37}],41:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -3165,7 +3493,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":42}],37:[function(require,module,exports){
+},{"../../util/Button":50}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -3973,7 +4301,7 @@ Level.prototype.playerWins = function() {};
 
 module.exports = Level;
 
-},{"../../character/NPC":4,"../../character/Player":5,"../../character/SimpleEnemy":6,"../../character/StrongEnemy":7,"../../character/StrongestEnemy":8,"../../englishChallenges/menu/EnglishChallengesMenu":16,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":27,"../../items/weapons/MachineGun":30,"../../items/weapons/Revolver":31,"../../util/Dialog":43,"../../util/PopUp":50,"../../util/ResourceBar":51,"../../worldElements/InteractiveCar":56,"../../worldElements/NameBoard":58}],38:[function(require,module,exports){
+},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":51,"../../util/PopUp":58,"../../util/ResourceBar":59,"../../worldElements/InteractiveCar":64,"../../worldElements/NameBoard":66}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -4144,7 +4472,7 @@ LevelOne.prototype.playerWins = function() {
 
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":19,"../../util/Dialog":43,"../../util/VerticalLayoutPopUp":55,"../../worldElements/InteractiveHouse":57,"../levels/Level":37}],39:[function(require,module,exports){
+},{"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/11/2015.
  */
@@ -4154,7 +4482,9 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var WorldItem = require('../../items/WorldItem');
 var Wife = require('../../character/Wife');
+var Friend = require('../../character/Friend');
 
 /**
  * Number of fights that player will have during this level.
@@ -4187,7 +4517,7 @@ LevelThree.prototype.create = function() {
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
-    this.addEnemies();
+    //this.addEnemies();
     this.addWife();
     this.addObjects();
     this.addPlaces();
@@ -4207,19 +4537,12 @@ LevelThree.prototype.create = function() {
  * @method LevelThree.addObjects
  */
 LevelThree.prototype.addObjects = function() {
-    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Our daughter\'s drawing');
-    var momSisterIcon = level.game.make.sprite(0, 0, 'sisterMomBig');
-    var message = 'We are closer to our children!';
-    var dialogText = level.game.make.text(0, 0, message);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    dialog.addElement(momSisterIcon);
-    dialog.addElement(dialogText);
-    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT - 30,
-        'sisterMom', dialog, 'My Family', 'Daughter\'s drawing.', 'family');
+    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family',
+        'Daughter\'s drawing.',
+        'family');
     this.addVocabularyItem(systerMomDrawing);
 
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
@@ -4241,7 +4564,7 @@ LevelThree.prototype.addWife = function() {
  */
 LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
-    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
+    this.addFriend(this.WORLD_WIDTH - 100);
     var numberOfEnemies = 2;
     var numberOfStrongEnemies = 3;
     var i;
@@ -4269,6 +4592,14 @@ LevelThree.prototype.addPlaces = function() {
     var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
     var placesNames = ['Police Station', 'Fire Station', 'Super Market',
         'Hotel'];
+    var placesDescriptions = ['A place where local \n police officers work',
+        'a building in which the members of a fire' +
+        '\n department and the equipment used to' +
+        '\nput out fires are located',
+        'a store where customers can buy a variety' +
+        '\nof foods and usually household items',
+        'a place that has rooms in which people' +
+        '\ncan stay especially when they are traveling'];
     var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
@@ -4278,7 +4609,15 @@ LevelThree.prototype.addPlaces = function() {
         if (houseIndex >= housesKeys.length) {
             houseIndex = 0;
         }
-        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
+        place = new WorldItem(
+            x * (i + 1),
+            this.GROUND_HEIGHT,
+            placesKeys[i],
+            placesDescriptions[i], //Message
+            placesNames[i],
+            placesDescriptions[i],
+            'places');
+        this.addVocabularyItem(place);
         this.addNeighbors(place, housesKeys[houseIndex],
             housesKeys[houseIndex + 1]);
 
@@ -4313,9 +4652,19 @@ LevelThree.prototype.playerWins = function() {
     return this.lastGoalAimed;
 };
 
+/**
+ * Adds the Friend (as Enemy) to enemies group.
+ * @method LevelThree.addFriend
+ * @param {number} x - X coordinate within the world where the enemy should
+ * appear.
+ */
+LevelThree.prototype.addFriend = function(x) {
+    this.enemies.add(new Friend(x, this.GROUND_HEIGHT - 100));
+};
+
 module.exports = LevelThree;
 
-},{"../../character/Wife":9,"../../items/ClueItem":18,"../../items/HealthPack":19,"../../util/Dialog":43,"../../util/VerticalLayoutPopUp":55,"../../worldElements/InteractiveHouse":57,"../levels/Level":37}],40:[function(require,module,exports){
+},{"../../character/Friend":4,"../../character/Wife":11,"../../items/ClueItem":20,"../../items/HealthPack":21,"../../items/WorldItem":26,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 05/11/2015.
  */
@@ -4486,9 +4835,15 @@ LevelTwo.prototype.playerWins = function() {
 
 module.exports = LevelTwo;
 
-},{"../../items/ClueItem":18,"../../items/HealthPack":19,"../../util/Dialog":43,"../../util/VerticalLayoutPopUp":55,"../levels/Level":37}],41:[function(require,module,exports){
-arguments[4][35][0].apply(exports,arguments)
-},{"dup":35}],42:[function(require,module,exports){
+},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../levels/Level":42}],46:[function(require,module,exports){
+arguments[4][42][0].apply(exports,arguments)
+},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":51,"../../util/PopUp":58,"../../util/ResourceBar":59,"../../worldElements/InteractiveCar":64,"../../worldElements/NameBoard":66,"dup":42}],47:[function(require,module,exports){
+arguments[4][43][0].apply(exports,arguments)
+},{"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42,"dup":43}],48:[function(require,module,exports){
+arguments[4][38][0].apply(exports,arguments)
+},{"dup":38}],49:[function(require,module,exports){
+arguments[4][39][0].apply(exports,arguments)
+},{"dup":39}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -4527,7 +4882,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],43:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4578,7 +4933,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":49}],44:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":57}],52:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4661,7 +5016,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],45:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4731,7 +5086,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":44}],46:[function(require,module,exports){
+},{"./GridLayout":52}],54:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4799,7 +5154,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":44,"./PopUp":50}],47:[function(require,module,exports){
+},{"./GridLayout":52,"./PopUp":58}],55:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4853,7 +5208,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],48:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -4892,7 +5247,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":47}],49:[function(require,module,exports){
+},{"./HorizontalLayout":55}],57:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4938,7 +5293,7 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":47,"./PopUp":50}],50:[function(require,module,exports){
+},{"./HorizontalLayout":55,"./PopUp":58}],58:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -5033,7 +5388,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],51:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -5074,7 +5429,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],52:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5111,7 +5466,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],53:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5164,7 +5519,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],54:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5218,7 +5573,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":53}],55:[function(require,module,exports){
+},{"./VerticalLayout":61}],63:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 21/10/2015.
  */
@@ -5263,7 +5618,7 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":50,"./VerticalLayout":53}],56:[function(require,module,exports){
+},{"./PopUp":58,"./VerticalLayout":61}],64:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -5418,7 +5773,7 @@ InteractiveCar.prototype.stop = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/Button":42,"../util/PopUp":50,"../util/ResourceBar":51}],57:[function(require,module,exports){
+},{"../util/Button":50,"../util/PopUp":58,"../util/ResourceBar":59}],65:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -5461,7 +5816,7 @@ InteractiveHouse.prototype.openActivity = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":25,"../util/Button":42}],58:[function(require,module,exports){
+},{"../items/store/Store":29,"../util/Button":50}],66:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */
@@ -5493,4 +5848,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,40,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66]);

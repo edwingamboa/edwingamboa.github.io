@@ -1,7 +1,7 @@
 /**
- * Created by Edwin Gamboa on 06/11/2015.
+ * Created by Edwin Gamboa on 08/12/2015.
  */
-var Item = require('./Item');
+var VocabularyItem = require('./VocabularyItem');
 
 /**
  * Item that represents a clue for the player.
@@ -11,22 +11,27 @@ var Item = require('./Item');
  * @param {number} x - ClueItem's x coordinate within the game world.
  * @param {number} y - ClueItem's y coordinate within the game world.
  * @param {string} key - ClueItem's texture
- * @param {PopUP} popUP - PopUp that contains the clue or message.
- * for the player.
+ * @param {string} dialogMessage - Message to be displayed on this item's
+ * dialog.
  * @param {string} name - ClueItem's name.
  * @param {string} description - ClueItem's name.
  * @param {string} category - Vocabulary category to which this item belongs.
  */
-var ClueItem = function(x, y, key, popUP, name, description, category) {
-    Item.call(this, x, y, key, 0);
-    this.name = name;
-    this.description = description;
-    this.popUp = popUP;
-    level.game.add.existing(this.popUp);
-    this.category = category || 'other';
+var ClueItem = function(x,
+                        y,
+                        key,
+                        dialogMessage,
+                        name,
+                        description,
+                        category) {
+    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
+        category);
+    var scale = 50 / this.height;
+    this.scale.y = scale;
+    this.scale.x = scale;
 };
 
-ClueItem.prototype = Object.create(Item.prototype);
+ClueItem.prototype = Object.create(VocabularyItem.prototype);
 ClueItem.prototype.constructor = ClueItem;
 
 /**
@@ -35,14 +40,6 @@ ClueItem.prototype.constructor = ClueItem;
  */
 ClueItem.prototype.pickUp = function() {
     this.kill();
-    this.popUp.open();
-};
-
-/**
- * Add this ClueItem to the game so that the player can pick it up.
- * @method ClueItem.use
- */
-ClueItem.prototype.use = function() {
     this.popUp.open();
 };
 

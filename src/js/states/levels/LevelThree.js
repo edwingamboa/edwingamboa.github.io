@@ -7,7 +7,9 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var WorldItem = require('../../items/WorldItem');
 var Wife = require('../../character/Wife');
+var Friend = require('../../character/Friend');
 
 /**
  * Number of fights that player will have during this level.
@@ -40,7 +42,7 @@ LevelThree.prototype.create = function() {
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
-    this.addEnemies();
+    //this.addEnemies();
     this.addWife();
     this.addObjects();
     this.addPlaces();
@@ -60,19 +62,12 @@ LevelThree.prototype.create = function() {
  * @method LevelThree.addObjects
  */
 LevelThree.prototype.addObjects = function() {
-    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Our daughter\'s drawing');
-    var momSisterIcon = level.game.make.sprite(0, 0, 'sisterMomBig');
-    var message = 'We are closer to our children!';
-    var dialogText = level.game.make.text(0, 0, message);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    dialog.addElement(momSisterIcon);
-    dialog.addElement(dialogText);
-    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT - 30,
-        'sisterMom', dialog, 'My Family', 'Daughter\'s drawing.', 'family');
+    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family',
+        'Daughter\'s drawing.',
+        'family');
     this.addVocabularyItem(systerMomDrawing);
 
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
@@ -94,7 +89,7 @@ LevelThree.prototype.addWife = function() {
  */
 LevelThree.prototype.addEnemies = function() {
     var x = this.firstCheckPointX * 0.75;
-    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
+    this.addFriend(this.WORLD_WIDTH - 100);
     var numberOfEnemies = 2;
     var numberOfStrongEnemies = 3;
     var i;
@@ -122,6 +117,14 @@ LevelThree.prototype.addPlaces = function() {
     var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
     var placesNames = ['Police Station', 'Fire Station', 'Super Market',
         'Hotel'];
+    var placesDescriptions = ['A place where local \n police officers work',
+        'a building in which the members of a fire' +
+        '\n department and the equipment used to' +
+        '\nput out fires are located',
+        'a store where customers can buy a variety' +
+        '\nof foods and usually household items',
+        'a place that has rooms in which people' +
+        '\ncan stay especially when they are traveling'];
     var x = this.WORLD_WIDTH / (placesKeys.length + 2);
     var i;
     var houseIndex = 0;
@@ -131,7 +134,15 @@ LevelThree.prototype.addPlaces = function() {
         if (houseIndex >= housesKeys.length) {
             houseIndex = 0;
         }
-        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
+        place = new WorldItem(
+            x * (i + 1),
+            this.GROUND_HEIGHT,
+            placesKeys[i],
+            placesDescriptions[i], //Message
+            placesNames[i],
+            placesDescriptions[i],
+            'places');
+        this.addVocabularyItem(place);
         this.addNeighbors(place, housesKeys[houseIndex],
             housesKeys[houseIndex + 1]);
 
@@ -164,6 +175,16 @@ LevelThree.prototype.nextLevel = function() {
  */
 LevelThree.prototype.playerWins = function() {
     return this.lastGoalAimed;
+};
+
+/**
+ * Adds the Friend (as Enemy) to enemies group.
+ * @method LevelThree.addFriend
+ * @param {number} x - X coordinate within the world where the enemy should
+ * appear.
+ */
+LevelThree.prototype.addFriend = function(x) {
+    this.enemies.add(new Friend(x, this.GROUND_HEIGHT - 100));
 };
 
 module.exports = LevelThree;

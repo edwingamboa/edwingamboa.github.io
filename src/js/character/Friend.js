@@ -1,7 +1,6 @@
 /**
- * Created by Edwin Gamboa on 11/11/2015.
+ * Created by Edwin Gamboa on 06/12/2015.
  */
-
 var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
@@ -11,13 +10,13 @@ var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
  * @constant
  * @type {string}
  */
-var SPRITE_KEY = 'strongestEnemy';
+var SPRITE_KEY = 'friend';
 /**
  * Greatest health level of a strong enemy
  * @constant
  * @type {number}
  */
-var MAX_HEALTH_LEVEL = 30;
+var MAX_HEALTH_LEVEL = 40;
 /**
  * Lowest distance in which a strong enemy can detect the player.
  * @constant
@@ -35,27 +34,26 @@ var MAX_RANGE_DETECTION = 1000;
  * @constant
  * @type {number}
  */
-var MIN_RANGE_ATTACK = 500;
+var MIN_RANGE_ATTACK = 600;
 /**
  * Longest distance in which a simple enemy can shoot the player.
  * @constant
  * @type {number}
  */
-var MAX_RANGE_ATTACK = 600;
+var MAX_RANGE_ATTACK = 800;
 
 /**
  * Represents the strongest enemies of the game.
- * @class StrongestEnemy
+ * @class Friend
  * @extends Enemy
  * @param {number} x - Strongest enemy's x coordinate within the game world.
  * @param {number} y - Strongest enemy's y coordinate within the game world.
  * @constructor
  */
-var StrongestEnemy = function(x, y) {
-    var messages = ['Forgive me please!' + '\nI can liberate your wife.',
-        'I can liberate your wife.'];
-    var titles = ['Forgive me', 'Your Wife'];
-    var imagesKeys = ['forgive', 'mother'];
+var Friend = function(x, y) {
+    var messages = ['Message 1', 'Message 2'];
+    var titles = ['Title 1', 'Title 2'];
+    var imagesKeys = ['Key 1', 'Key 2'];
     InteractionEnemy.call(
         this,
         SPRITE_KEY,
@@ -73,8 +71,7 @@ var StrongestEnemy = function(x, y) {
     this.useWeapon(new MachineGun(this, x, y, true));
 };
 
-StrongestEnemy.prototype = Object.create(InteractionEnemy.prototype);
-StrongestEnemy.prototype.constructor = StrongestEnemy;
+Friend.prototype = Object.create(InteractionEnemy.prototype);
+Friend.prototype.constructor = Friend;
 
-module.exports = StrongestEnemy;
-
+module.exports = Friend;

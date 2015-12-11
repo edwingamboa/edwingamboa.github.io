@@ -1,7 +1,8 @@
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
-var ItemGroupView = require('../ItemGroupView');
+var VerticalLayoutPanel = require('../../util/VerticalLayoutPanel');
+var Button = require('../../util/Button');
 
 /**
  * View an inventory item.
@@ -12,14 +13,26 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var MyVocabularyItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Show', parentView);
-
+    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
     this.item = item;
-    this.setTitle(this.item.name);
-    this.setDescription(this.item.description);
+    this.icon = level.game.make.sprite(0, 0, this.item.key);
+    var scale = 50 / this.icon.height;
+    this.icon.scale.x = scale;
+    this.icon.scale.y = scale;
+    this.title = level.game.make.text(0, 0, this.item.name);
+    this.title.font = 'Arial';
+    this.title.fontSize = 20;
+    this.title.fill = '#0040FF';
+
+    this.button = new Button('Show', this.buttonAction, this);
+
+    this.addElement(this.title);
+    this.addElement(this.icon);
+    this.addElement(this.button);
+    this.parentView = parentView;
 };
 
-MyVocabularyItem.prototype = Object.create(ItemGroupView.prototype);
+MyVocabularyItem.prototype = Object.create(VerticalLayoutPanel.prototype);
 MyVocabularyItem.prototype.constructor = MyVocabularyItem;
 
 /**

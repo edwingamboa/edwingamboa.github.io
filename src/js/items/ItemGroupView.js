@@ -18,6 +18,8 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
     VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
+    var scale = 50 / this.icon.height;
+    this.icon.scale.y = scale;
 
     this.auxText = level.game.make.text(this.icon.width - 5, this.icon.height,
         '');
