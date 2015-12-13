@@ -12,9 +12,10 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    var tabsLabels = ['Family', 'Places', 'Transport', 'Others'];
+    this.categoriesLabels = ['Family', 'Places', 'Transport', 'Others'];
     this.categories = ['family', 'places', 'transport', 'others'];
-    ItemsPopUp.call(this, tabsLabels, this.categories, 'My Vocabulary');
+    ItemsPopUp.call(this, this.categoriesLabels, this.categories,
+        'My Vocabulary');
 };
 
 MyVocabulary.prototype = Object.create(ItemsPopUp.prototype);
@@ -26,7 +27,8 @@ MyVocabulary.prototype.constructor = MyVocabulary;
  * @param {Item} item - Item to be added to the inventory.
  */
 MyVocabulary.prototype.addItem = function(item) {
-    this.items[item.category].push(new MyVocabularyItem(item, this));
+    this.items[this.categories[item.categoryIndex]].push(
+        new MyVocabularyItem(item, this));
 };
 
 /**

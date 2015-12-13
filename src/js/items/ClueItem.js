@@ -15,7 +15,7 @@ var VocabularyItem = require('./VocabularyItem');
  * dialog.
  * @param {string} name - ClueItem's name.
  * @param {string} description - ClueItem's name.
- * @param {string} category - Vocabulary category to which this item belongs.
+ * @param {number} categoryIndex - Index of the category to which this item.
  */
 var ClueItem = function(x,
                         y,
@@ -23,9 +23,9 @@ var ClueItem = function(x,
                         dialogMessage,
                         name,
                         description,
-                        category) {
+                        categoryIndex) {
     VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
-        category);
+        categoryIndex);
     var scale = 50 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;

@@ -1276,13 +1276,23 @@ ContextGroups.prototype.constructor = ContextGroups;
  */
 ContextGroups.prototype.newChallenge = function() {
     this.clearChallenge();
+    var numberOfWords = 3;
+    var vocabularyItems = [];
+    var wordsContext1 = level.myVocabulary.randomVocabularyItems(numberOfWords);
+    vocabularyItems.push(wordsContext1);
+    var wordsContext2;
+    do {
+        wordsContext2 = level.myVocabulary.randomVocabularyItems(numberOfWords);
+    }while (wordsContext1[0].categoryIndex == wordsContext2[0].categoryIndex);
+    vocabularyItems.push(wordsContext2);
 
-    var contextsNames = ['Family', 'House'];
-    var words = ['Mother', 'Son', 'Father', 'Living room', 'Dining room',
-        'Kitchen'];
+    var contextsNames = [
+        level.myVocabulary.categories[wordsContext1[0].categoryIndex],
+        level.myVocabulary.categories[wordsContext2[0].categoryIndex]
+    ];
 
     this.contexts = [];
-    var optionals = {numberOfColumns: words.length / 2, numberOfRows : 2,
+    var optionals = {numberOfColumns: numberOfWords, numberOfRows : 2,
         margin: 5};
     this.source = new GridLayoutPanel('wordsBg', optionals);
 
@@ -1296,7 +1306,7 @@ ContextGroups.prototype.newChallenge = function() {
     var wordShade;
     var context;
     var contextTitle;
-    this.numberOfWords = words.length / NUMBER_OF_CONTEXTS;
+
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
         context = new VerticalLayoutPanel('contextBg', 5);
         contextTitle = level.game.make.text(0, 0, contextsNames[i]);
@@ -1307,9 +1317,8 @@ ContextGroups.prototype.newChallenge = function() {
         this.contexts.push(context);
         contextsPanels.addElement(context);
 
-        for (j = i * (NUMBER_OF_CONTEXTS + 1);
-             j < (i + 1) * this.numberOfWords; j++) {
-            word = level.game.make.text(0, 0, words[j]);
+        for (j = 0; j < numberOfWords; j++) {
+            word = level.game.make.text(0, 0, vocabularyItems[i][j].name);
             //Font style
             word.font = 'Shojumaru';
             word.fontSize = 20;
@@ -1897,7 +1906,7 @@ var VocabularyItem = require('./VocabularyItem');
  * dialog.
  * @param {string} name - ClueItem's name.
  * @param {string} description - ClueItem's name.
- * @param {string} category - Vocabulary category to which this item belongs.
+ * @param {number} categoryIndex - Index of the category to which this item.
  */
 var ClueItem = function(x,
                         y,
@@ -1905,9 +1914,9 @@ var ClueItem = function(x,
                         dialogMessage,
                         name,
                         description,
-                        category) {
+                        categoryIndex) {
     VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
-        category);
+        categoryIndex);
     var scale = 50 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;
@@ -2264,7 +2273,8 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * dialog.
  * @param {string} name - VocabularyItem's name.
  * @param {string} description - VocabularyItem's name.
- * @param {string} category - Vocabulary category to which this item belongs.
+ * @param {number} categoryIndex - Index of the category to which this item
+ * belongs.
  */
 var VocabularyItem = function(x,
                               y,
@@ -2272,10 +2282,10 @@ var VocabularyItem = function(x,
                               dialogMessage,
                               name,
                               description,
-                              category) {
+                              categoryIndex) {
     Item.call(this, x, y, key, 0);
     this.dialogMessage = dialogMessage;
-    this.category = category || 'other';
+    this.categoryIndex = categoryIndex;
     this.name = name;
     this.description = description;
     this.makeDialog();
@@ -2290,7 +2300,6 @@ VocabularyItem.prototype.constructor = VocabularyItem;
  */
 VocabularyItem.prototype.use = function() {
     this.popUp.open();
-    var category = level.myVocabulary.randomVocabularyItems(1);
 };
 
 /**
@@ -2561,9 +2570,10 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    var tabsLabels = ['Family', 'Places', 'Transport', 'Others'];
+    this.categoriesLabels = ['Family', 'Places', 'Transport', 'Others'];
     this.categories = ['family', 'places', 'transport', 'others'];
-    ItemsPopUp.call(this, tabsLabels, this.categories, 'My Vocabulary');
+    ItemsPopUp.call(this, this.categoriesLabels, this.categories,
+        'My Vocabulary');
 };
 
 MyVocabulary.prototype = Object.create(ItemsPopUp.prototype);
@@ -2575,7 +2585,8 @@ MyVocabulary.prototype.constructor = MyVocabulary;
  * @param {Item} item - Item to be added to the inventory.
  */
 MyVocabulary.prototype.addItem = function(item) {
-    this.items[item.category].push(new MyVocabularyItem(item, this));
+    this.items[this.categories[item.categoryIndex]].push(
+        new MyVocabularyItem(item, this));
 };
 
 /**
@@ -4542,7 +4553,21 @@ LevelThree.prototype.addObjects = function() {
         'We are closer to our children!',
         'My Family',
         'Daughter\'s drawing.',
-        'family');
+        0);
+    this.addVocabularyItem(systerMomDrawing);
+    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family 1',
+        'Daughter\'s drawing.',
+        0);
+    this.addVocabularyItem(systerMomDrawing);
+    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family 2',
+        'Daughter\'s drawing.',
+        0);
     this.addVocabularyItem(systerMomDrawing);
 
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
@@ -4616,7 +4641,7 @@ LevelThree.prototype.addPlaces = function() {
             placesDescriptions[i], //Message
             placesNames[i],
             placesDescriptions[i],
-            'places');
+            1);
         this.addVocabularyItem(place);
         this.addNeighbors(place, housesKeys[houseIndex],
             housesKeys[houseIndex + 1]);

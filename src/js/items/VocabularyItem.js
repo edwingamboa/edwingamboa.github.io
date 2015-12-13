@@ -16,7 +16,8 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * dialog.
  * @param {string} name - VocabularyItem's name.
  * @param {string} description - VocabularyItem's name.
- * @param {string} category - Vocabulary category to which this item belongs.
+ * @param {number} categoryIndex - Index of the category to which this item
+ * belongs.
  */
 var VocabularyItem = function(x,
                               y,
@@ -24,10 +25,10 @@ var VocabularyItem = function(x,
                               dialogMessage,
                               name,
                               description,
-                              category) {
+                              categoryIndex) {
     Item.call(this, x, y, key, 0);
     this.dialogMessage = dialogMessage;
-    this.category = category || 'other';
+    this.categoryIndex = categoryIndex;
     this.name = name;
     this.description = description;
     this.makeDialog();
@@ -42,7 +43,6 @@ VocabularyItem.prototype.constructor = VocabularyItem;
  */
 VocabularyItem.prototype.use = function() {
     this.popUp.open();
-    var category = level.myVocabulary.randomVocabularyItems(1);
 };
 
 /**

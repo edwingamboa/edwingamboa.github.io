@@ -67,7 +67,21 @@ LevelThree.prototype.addObjects = function() {
         'We are closer to our children!',
         'My Family',
         'Daughter\'s drawing.',
-        'family');
+        0);
+    this.addVocabularyItem(systerMomDrawing);
+    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family 1',
+        'Daughter\'s drawing.',
+        0);
+    this.addVocabularyItem(systerMomDrawing);
+    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
+        'sisterMom',
+        'We are closer to our children!',
+        'My Family 2',
+        'Daughter\'s drawing.',
+        0);
     this.addVocabularyItem(systerMomDrawing);
 
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
@@ -141,7 +155,7 @@ LevelThree.prototype.addPlaces = function() {
             placesDescriptions[i], //Message
             placesNames[i],
             placesDescriptions[i],
-            'places');
+            1);
         this.addVocabularyItem(place);
         this.addNeighbors(place, housesKeys[houseIndex],
             housesKeys[houseIndex + 1]);
