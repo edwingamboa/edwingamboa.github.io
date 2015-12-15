@@ -1555,25 +1555,35 @@ WordUnscramble.prototype.newChallenge = function() {
     this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
+    var letterText;
     var letterShade;
+    var code;
     for (i = 0; i < word.name.length; i++) {
-        letterShade = new VerticalLayoutPanel('letterBg', 2);
-        letterShade.code = '' + i;
+        letter = word.name.charAt(i);
+        code = letter.toLowerCase().charCodeAt(0);
+
+        letterText = level.game.make.text(0, 0, letter);
+        letterText.code = code;
+        if(letter === ' ') {
+            letterShade = new VerticalLayoutPanel('spaceBg', 2);
+            letterShade.addElement(letterText);
+        }else{
+            letterShade = new VerticalLayoutPanel('letterBg', 2);
+            //Font style
+            letterText.font = 'Shojumaru';
+            letterText.fontSize = 20;
+            letterText.fill = '#0040FF';
+            letterText.inputEnabled = true;
+            letterText.input.enableDrag(true, true);
+            letterText.events.onDragStop.add(
+                this.dragAndDropControl.fixLocation,
+                this.dragAndDropControl
+            );
+            this.elements.push(letterText);
+        }
+        letterShade.code = code;
         this.destinations.push(letterShade);
-
         wordFieldAnswer.addElement(letterShade);
-
-        letter = level.game.make.text(0, 0, word.name.charAt(i));
-        //Font style
-        letter.font = 'Shojumaru';
-        letter.fontSize = 20;
-        letter.fill = '#0040FF';
-        letter.inputEnabled = true;
-        letter.input.enableDrag(true, true);
-        letter.events.onDragStop.add(this.dragAndDropControl.fixLocation,
-            this.dragAndDropControl);
-        letter.code = '' + i;
-        this.elements.push(letter);
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();
@@ -3240,6 +3250,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
     this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
     this.game.load.image('wordBg', 'assets/images/wordBg.png');
+    this.game.load.image('spaceBg', 'assets/images/spaceBg.png');
     this.game.load.image('letterBg', 'assets/images/letterBg.png');
     this.game.load.image('transparent', 'assets/images/transparent.png');
     this.game.load.image('healthBarBackground',

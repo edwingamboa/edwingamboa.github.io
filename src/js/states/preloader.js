@@ -115,6 +115,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
     this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
     this.game.load.image('wordBg', 'assets/images/wordBg.png');
+    this.game.load.image('spaceBg', 'assets/images/spaceBg.png');
     this.game.load.image('letterBg', 'assets/images/letterBg.png');
     this.game.load.image('transparent', 'assets/images/transparent.png');
     this.game.load.image('healthBarBackground',
