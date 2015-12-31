@@ -60,6 +60,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
     this.game.load.image('inventory_button', 'assets/images/inventory.png');
     this.game.load.image('storeButton', 'assets/images/store.png');
+    this.game.load.image('store', 'assets/images/storeBig.png');
     this.game.load.image('popUpBg',
         'assets/images/popUpBg.png');
     this.game.load.image('close', 'assets/images/close.png');
@@ -224,10 +225,7 @@ Preloader.prototype.update = function() {
     if (!!this.ready) {
         //this.game.state.start('menu');
         this.game.state.start('intro');
-
-        //level = this.game.state.states.levelOne;
-        //level = this.game.state.states.levelTwo;
-        level = this.game.state.states.levelThree;
+        level = this.game.state.states.levelOne;
     }
 };
 

@@ -28,6 +28,13 @@ var GRAVITY = 300;
  * @type {number}
  */
 var MINIMUM_SCORE = 20;
+/**
+ * Default initial health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
+var INITIAL_HEALTH_LEVEL = 100;
 
 /**
  * Represents player's character within the game.
@@ -43,7 +50,6 @@ var Player = function() {
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
-    this.score = MINIMUM_SCORE;
     this.frame = this.stopRightFrameIndex;
 };
 
@@ -147,6 +153,65 @@ Player.prototype.buyItem = function(item) {
     }else {
         return false;
     }
+};
+
+Player.prototype.serialize = function(savePosition) {
+    if (savePosition === undefined) savePosition = true;
+    var fields = [
+        'healthLevel',
+        'score'
+    ];
+
+    if (savePosition) {
+        fields.push('x');
+    }
+
+    var obj = {};
+
+    for (var i in fields) {
+        var field = fields[i];
+        obj[field] = this[field];
+    }
+
+    return JSON.stringify(obj);
+};
+
+/**
+ * This is a class method, not an instance method!
+ *
+ * @param state string | object the state to unserialize into a character
+ *
+ * @return Character instance, class depending on the state restored
+ */
+Player.Unserialize = function(state) {
+    // We should be able to accept an object or a string.
+    if (typeof state === 'string') {
+        state = JSON.parse(state);
+    }
+
+    // Default class name
+    var className = 'Player';
+
+    // Class name can be specified in the serialized data.
+    if (state.options.className) {
+        className = state.options.className;
+    }
+
+    // Call our character factory to make a new instance of className
+    var instance = Player.Factory(
+        className,
+        game, // Game reference. Required
+        0, // x-pos. Required, but overridden by unserialize
+        0, // y-pos. Required, but overridden by unserialize
+        {} // options. Required, but overridden by unserialize
+    );
+
+    // Copy our saved state into the new object
+    for (var i in state) {
+        instance[i] = state[i];
+    }
+
+    return instance;
 };
 
 module.exports = Player;

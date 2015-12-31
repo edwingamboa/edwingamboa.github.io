@@ -20,11 +20,10 @@ var VocabularyItem = require('./VocabularyItem');
 var WorldItem = function(x,
                          y,
                          key,
-                         dialogMessage,
                          name,
                          description,
                          category) {
-    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
+    VocabularyItem.call(this, x, y, key, name, description,
         category);
 };
 
@@ -32,7 +31,7 @@ WorldItem.prototype = Object.create(VocabularyItem.prototype);
 WorldItem.prototype.constructor = WorldItem;
 
 /**
- * Kills the this item whn player picks it up.
+ * Kills this item when player picks it up.
  * @method WorldItem.pickUp
  */
 WorldItem.prototype.pickUp = function() {

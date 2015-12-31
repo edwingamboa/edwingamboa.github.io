@@ -50,10 +50,10 @@ WordUnscramble.prototype.newChallenge = function() {
 
         letterText = level.game.make.text(0, 0, letter);
         letterText.code = code;
-        if(letter === ' ') {
+        if (letter === ' ') {
             letterShade = new VerticalLayoutPanel('spaceBg', 2);
             letterShade.addElement(letterText);
-        }else{
+        }else {
             letterShade = new VerticalLayoutPanel('letterBg', 2);
             //Font style
             letterText.font = 'Shojumaru';

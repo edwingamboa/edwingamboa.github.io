@@ -326,4 +326,5 @@ Character.prototype.jump = function() {
     this.body.velocity.y = -350;
 };
 
+
 module.exports = Character;

@@ -5,6 +5,7 @@
 var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+var InteractionManager = require('../util/InteractionManager');
 
 /**
  * Texture key for a strong  enemy
@@ -56,6 +57,7 @@ var StrongestEnemy = function(x, y) {
         'I can liberate your wife.'];
     var titles = ['Forgive me', 'Your Wife'];
     var imagesKeys = ['forgive', 'mother'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
         this,
         SPRITE_KEY,
@@ -66,9 +68,7 @@ var StrongestEnemy = function(x, y) {
         MAX_RANGE_DETECTION,
         MIN_RANGE_ATTACK,
         MAX_RANGE_ATTACK,
-        messages,
-        titles,
-        imagesKeys
+        intManager
     );
     this.useWeapon(new MachineGun(this, x, y, true));
 };

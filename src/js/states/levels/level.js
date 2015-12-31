@@ -19,6 +19,8 @@ var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
 var NameBoard = require('../../worldElements/NameBoard');
+var WorldItem = require('../../items/WorldItem');
+var InteractionManager = require('../../util/InteractionManager');
 
 /**
  * Represents a game level.
@@ -37,11 +39,10 @@ Level.prototype.constructor = Level;
  * @method Level.preload
  */
 Level.prototype.preload = function() {
-    this.game.stage.backgroundColor = '#C7D2FC';
-
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    level = this;
 };
 
 /**
@@ -119,7 +120,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            npc.showMessage();
+            npc.openDialogs();
             if (this.player.x < npc.x) {
                 this.player.x += 2 * npc.width;
             } else {
@@ -274,12 +275,15 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {number} x - X coordinate within the world where the character should
  * appear.
  * @param {string} key - NPC texture key.
- * @param {string} comicKey - Texture key of the comic that represents the
- * interaction between this NPC and the player.
+ * @param {Array} messages - Messages that this NPC has to interact with the
+ * player.
+ * @param {Array} titles - Title associated to each message.
+ * @param {Array} imagesKeys - Icon associated to each message.
  * @return {NPC} - Added NPC;
  */
-Level.prototype.addNPC = function(x, key, comicKey) {
-    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey);
+Level.prototype.addNPC = function(x, key, messages, titles, imagesKeys) {
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, intManager);
     this.npcs.add(npc);
     return npc;
 };
@@ -802,5 +806,91 @@ Level.prototype.addNameBoard = function(x, text) {
  * @returns {boolean}
  */
 Level.prototype.playerWins = function() {};
+
+/**
+ * Adds this level enemies.
+ * @method Level.addEnemies
+ */
+Level.prototype.addEnemies = function() {
+    var x = this.firstCheckPointX * 0.75;
+    var i;
+    var j;
+    for (i = 0; i < this.numberOfFightingPoints; i++) {
+        for (j = 0; j < this.numberOfEnemies; j++) {
+            x += 50;
+            this.addSimpleEnemy(x);
+        }
+        for (j = 0; j < this.numberOfStrongEnemies; j++) {
+            x += 50;
+            this.addStrongEnemy(x);
+        }
+        numberOfEnemies ++;
+        x += this.checkPointsDistance;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelT.addPlaces
+ */
+Level.prototype.addPlaces = function() {
+    var x = this.WORLD_WIDTH / (this.placesKeys.length + 2);
+    var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
+    for (i = 0; i < this.placesKeys.length; i++) {
+        if (houseIndex >= this.housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = new WorldItem(
+            x * (i + 1),
+            this.GROUND_HEIGHT,
+            this.placesKeys[i],
+            this.placesNames[i],
+            this.placesDescriptions[i],
+            0);
+        this.addVocabularyItem(place);
+        this.addNeighbors(place, this.housesKeys[houseIndex],
+            this.housesKeys[houseIndex + 1]);
+
+        houseIndex += 2;
+        this.addNameBoard(place.x - 70, this.placesNames[i] + ' Street');
+    }
+};
+
+/**
+ * Adds the health packs for this level
+ * @method Level.addHealthPacks
+ */
+Level.prototype.addHealthPacks = function() {
+    var heathPacksDistance = this.WORLD_WIDTH / this.numberOfFightingPoints;
+    var i;
+    for (i = 1; i <= this.numberOfFightingPoints; i++) {
+        this.addHealthPack(new HealthPack(heathPacksDistance * i, 10, 5, this));
+    }
+};
+
+/**
+ * Lets the player to play next level.
+ * @method Level.nextLevel
+ */
+Level.prototype.nextLevel = function() {
+    /*if (this.wife === undefined) {
+        this.wife.moveRight();
+    }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
+        this.game.state.start(this.nextSate);
+    }*/
+    this.game.state.start(this.nextSate);
+};
+
+/**
+ * Determines whether the player has won
+ * @method Level.playerWins
+ * @returns {boolean}
+ */
+Level.prototype.playerWins = function() {
+    return this.lastGoalAimed;
+};
 
 module.exports = Level;

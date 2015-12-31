@@ -20,15 +20,17 @@ var VocabularyItem = require('./VocabularyItem');
 var ClueItem = function(x,
                         y,
                         key,
-                        dialogMessage,
                         name,
                         description,
-                        categoryIndex) {
-    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
-        categoryIndex);
+                        categoryIndex,
+                        dialogMessage,
+                        interactionManager) {
+    VocabularyItem.call(this, x, y, key, name, dialogMessage, categoryIndex);
     var scale = 50 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;
+    this.descriptionTemp = description;
+    this.interactionManager = interactionManager;
 };
 
 ClueItem.prototype = Object.create(VocabularyItem.prototype);
@@ -40,7 +42,15 @@ ClueItem.prototype.constructor = ClueItem;
  */
 ClueItem.prototype.pickUp = function() {
     this.kill();
-    this.popUp.open();
+    this.interactionManager.openDialogs();
+};
+
+/**
+ * Displays this house dialog
+ * @method ClueItem.openActivity
+ */
+ClueItem.prototype.openActivity = function() {
+    this.interactionManager.openDialogs();
 };
 
 module.exports = ClueItem;

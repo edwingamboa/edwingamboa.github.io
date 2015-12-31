@@ -12,8 +12,8 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    this.categoriesLabels = ['Family', 'Places', 'Transport', 'Others'];
-    this.categories = ['family', 'places', 'transport', 'others'];
+    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Others'];
+    this.categories = ['places', 'family', 'transport', 'others'];
     ItemsPopUp.call(this, this.categoriesLabels, this.categories,
         'My Vocabulary');
 };

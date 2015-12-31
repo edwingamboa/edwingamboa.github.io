@@ -12,26 +12,26 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * @param {number} x - VocabularyItem's x coordinate within the game world.
  * @param {number} y - VocabularyItem's y coordinate within the game world.
  * @param {string} key - VocabularyItem's texture
- * @param {string} dialogMessage - Message to be displayed on this item's
- * dialog.
  * @param {string} name - VocabularyItem's name.
  * @param {string} description - VocabularyItem's name.
  * @param {number} categoryIndex - Index of the category to which this item
  * belongs.
+ * @param {boolean} openImmediately - Indicates whether this vocabulary item
+ * should display the message when the player picksItUp
  */
 var VocabularyItem = function(x,
                               y,
                               key,
-                              dialogMessage,
                               name,
                               description,
-                              categoryIndex) {
+                              categoryIndex,
+                              openImmediately) {
     Item.call(this, x, y, key, 0);
-    this.dialogMessage = dialogMessage;
     this.categoryIndex = categoryIndex;
     this.name = name;
     this.description = description;
     this.makeDialog();
+    this.openImmediately = openImmediately || false;
 };
 
 VocabularyItem.prototype = Object.create(Item.prototype);
@@ -47,7 +47,7 @@ VocabularyItem.prototype.use = function() {
 
 /**
  * Makes the dialog that is delivered to the player when he checks a vocabulary.
- * @method VocabularyItem..makeDialog
+ * @method VocabularyItem.makeDialog
  */
 VocabularyItem.prototype.makeDialog = function() {
     this.popUp = new VerticalLayoutPopUp('mediumPopUpBg', null, this.name);
@@ -57,7 +57,7 @@ VocabularyItem.prototype.makeDialog = function() {
         icon.scale.x = scale;
         icon.scale.y = scale;
     }
-    var dialogText = level.game.make.text(0, 0, this.dialogMessage);
+    var dialogText = level.game.make.text(0, 0, this.description);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';

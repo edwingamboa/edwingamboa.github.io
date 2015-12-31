@@ -520,13 +520,14 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":59,"./Character":2}],4:[function(require,module,exports){
+},{"./../util/ResourceBar":58,"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 06/12/2015.
  */
 var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+var InteractionManager = require('../util/InteractionManager');
 
 /**
  * Texture key for a strong  enemy
@@ -577,6 +578,7 @@ var Friend = function(x, y) {
     var messages = ['Message 1', 'Message 2'];
     var titles = ['Title 1', 'Title 2'];
     var imagesKeys = ['Key 1', 'Key 2'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
         this,
         SPRITE_KEY,
@@ -587,9 +589,7 @@ var Friend = function(x, y) {
         MAX_RANGE_DETECTION,
         MIN_RANGE_ATTACK,
         MAX_RANGE_ATTACK,
-        messages,
-        titles,
-        imagesKeys
+        intManager
     );
     this.useWeapon(new MachineGun(this, x, y, true));
 };
@@ -599,19 +599,12 @@ Friend.prototype.constructor = Friend;
 
 module.exports = Friend;
 
-},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./InteractionEnemy":5}],5:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 06/12/2015.
- */
-/**
- * Created by Edwin Gamboa on 11/11/2015.
- */
+},{"../items/weapons/MachineGun":34,"../util/InteractionManager":56,"../util/VerticalLayoutPopUp":62,"./InteractionEnemy":5}],5:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('./Enemy');
 var MachineGun = require('../items/weapons/MachineGun');
-var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
 
 /**
  * Represents the enemies that can interact with the player.
@@ -630,14 +623,12 @@ var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
  * shoot the player.
  * @param {number} maxAttack - Longest distance in which the enemy can
  * shoot the player.
- * @param {Array} messages - Messages that this enemy has to interact with the
- * player.
- * @param {Array} titles - Title associated to each message.
- * @param {Array} imagesKeys - Icon associated to each message.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player
  */
 var InteractionEnemy = function(spriteKey, maxHealthLevel, x, y, minDetection,
-                                maxDetection, minAttack, maxAttack, messages,
-                                titles, imagesKeys) {
+                                maxDetection, minAttack, maxAttack,
+                                interactionManager) {
     Enemy.call(
         this,
         spriteKey,
@@ -649,7 +640,7 @@ var InteractionEnemy = function(spriteKey, maxHealthLevel, x, y, minDetection,
         minAttack,
         maxAttack
     );
-    this.makeDialogs(messages, titles, imagesKeys);
+    this.interactionManager = interactionManager;
 };
 
 InteractionEnemy.prototype = Object.create(Enemy.prototype);
@@ -674,42 +665,17 @@ InteractionEnemy.prototype.decreaseHealthLevel = function(decrease) {
 
 /**
  * Lets the enemy to show the messages he has for the player. (Interaction)
+ * @method  InteractionEnemy.openDialogs
+
  */
 InteractionEnemy.prototype.openDialogs = function() {
-    var i;
-    for (i in this.dialogs) {
-        this.dialogs[i].open();
-    }
-};
-
-/**
- * Makes the dialogs that allows this character interact with the player.
- * @method InteractionEnemy.makeDialogs
- */
-InteractionEnemy.prototype.makeDialogs = function(messages, titles,
-                                                  imagesKeys) {
-    this.dialogs = [];
-    var i;
-    var tempDialog;
-    for (i in messages) {
-        tempDialog =  new VerticalLayoutPopUp('mediumPopUpBg', null, titles[i]);
-        var dialogImage = level.game.make.sprite(0, 0, imagesKeys[i]);
-        var dialogText = level.game.make.text(0, 0, messages[i]);
-        dialogText.font = 'Arial';
-        dialogText.fontSize = 20;
-        dialogText.fill = '#000000';
-        dialogText.align = 'center';
-        tempDialog.addElement(dialogImage);
-        tempDialog.addElement(dialogText);
-        this.dialogs.push(tempDialog);
-        level.game.add.existing(tempDialog);
-    }
+    this.interactionManager.openDialogs();
 };
 
 module.exports = InteractionEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./Enemy":3}],6:[function(require,module,exports){
+},{"../items/weapons/MachineGun":34,"./Enemy":3}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -725,18 +691,20 @@ var Dialog = require('../util/Dialog');
  * @param {number} x - NPC's x coordinate within game world.
  * @param {number} y - NPC's y coordinate within game world.
  * @param {string} key - NPC's texture key.
- * @param {string} message - Message that the NPC will tell to the player.
+ * shoot the player.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player
  * @return {NPC}
  */
-var NPC = function(x, y, key, message) {
+var NPC = function(x, y, key, interactionManager) {
     Character.call(this, x, y, key);
-    this.message = message;
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
     this.frame = this.stopRightFrameIndex;
     this.hadContactWithPlayer = false;
+    this.interactionManager = interactionManager;
     return this;
 };
 
@@ -744,34 +712,16 @@ NPC.prototype = Object.create(Character.prototype);
 NPC.prototype.constructor = NPC;
 
 /**
- * Shows the message that thhis NPC has for the Character
- * @method NPC.showMessage
+ * Lets the NPC to show the messages he has for the player. (Interaction)
+ * @method NPC.openDialogs
  */
-NPC.prototype.showMessage = function() {
-    if (this.body.velocity.x > 0) {
-        this.stop();
-    }
-    var dialog = new Dialog(this.key, this.message);
-    level.game.add.existing(dialog);
-    dialog.open();
-    this.hadContactWithPlayer = true;
+NPC.prototype.openDialogs = function() {
+    this.interactionManager.openDialogs();
 };
-
-/**
- * Update animations of the wife.
- * @method NPC.update
- */
-/*NPC.prototype.update = function() {
-    if (this.body.velocity.x > 0) {
-        this.animations.play('right');
-    }else if (this.body.velocity.x < 0) {
-        this.animations.play('left');
-    }
-};*/
 
 module.exports = NPC;
 
-},{"../util/Dialog":51,"./Character":2}],7:[function(require,module,exports){
+},{"../util/Dialog":49,"./Character":2}],7:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -1077,6 +1027,7 @@ module.exports = StrongEnemy;
 var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+var InteractionManager = require('../util/InteractionManager');
 
 /**
  * Texture key for a strong  enemy
@@ -1128,6 +1079,7 @@ var StrongestEnemy = function(x, y) {
         'I can liberate your wife.'];
     var titles = ['Forgive me', 'Your Wife'];
     var imagesKeys = ['forgive', 'mother'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
         this,
         SPRITE_KEY,
@@ -1138,9 +1090,7 @@ var StrongestEnemy = function(x, y) {
         MAX_RANGE_DETECTION,
         MIN_RANGE_ATTACK,
         MAX_RANGE_ATTACK,
-        messages,
-        titles,
-        imagesKeys
+        intManager
     );
     this.useWeapon(new MachineGun(this, x, y, true));
 };
@@ -1151,7 +1101,7 @@ StrongestEnemy.prototype.constructor = StrongestEnemy;
 module.exports = StrongestEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"../util/VerticalLayoutPopUp":63,"./InteractionEnemy":5}],11:[function(require,module,exports){
+},{"../items/weapons/MachineGun":34,"../util/InteractionManager":56,"../util/VerticalLayoutPopUp":62,"./InteractionEnemy":5}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/11/2015.
  */
@@ -1238,7 +1188,7 @@ Wife.prototype.killCharacter = function() {
 
 module.exports = Wife;
 
-},{"./../util/ResourceBar":59,"./Character":2}],12:[function(require,module,exports){
+},{"./../util/ResourceBar":58,"./Character":2}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1358,7 +1308,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],13:[function(require,module,exports){
+},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1511,7 +1461,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],15:[function(require,module,exports){
+},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1564,10 +1514,10 @@ WordUnscramble.prototype.newChallenge = function() {
 
         letterText = level.game.make.text(0, 0, letter);
         letterText.code = code;
-        if(letter === ' ') {
+        if (letter === ' ') {
             letterShade = new VerticalLayoutPanel('spaceBg', 2);
             letterShade.addElement(letterText);
-        }else{
+        }else {
             letterShade = new VerticalLayoutPanel('letterBg', 2);
             //Font style
             letterText.font = 'Shojumaru';
@@ -1609,7 +1559,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":53,"../util/VerticalLayoutPanel":62,"./dragAndDrop/DragAndDropChallenge":16}],16:[function(require,module,exports){
+},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1686,7 +1636,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":13,"../../util/Button":50,"../../util/VerticalLayoutPanel":62,"../../util/VerticalLayoutPopUp":63,"./DragAndDropController":17}],17:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":13,"../../util/Button":48,"../../util/VerticalLayoutPanel":61,"../../util/VerticalLayoutPopUp":62,"./DragAndDropController":17}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1797,7 +1747,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":60}],18:[function(require,module,exports){
+},{"../../util/Utilities":59}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1846,7 +1796,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":53,"../../util/PopUp":58,"../ContextGroups":12,"../ImageWordMatch":14,"../WordUnscramble":15,"./MenuItem":19}],19:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":51,"../../util/PopUp":57,"../ContextGroups":12,"../ImageWordMatch":14,"../WordUnscramble":15,"./MenuItem":19}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1921,15 +1871,17 @@ var VocabularyItem = require('./VocabularyItem');
 var ClueItem = function(x,
                         y,
                         key,
-                        dialogMessage,
                         name,
                         description,
-                        categoryIndex) {
-    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
-        categoryIndex);
+                        categoryIndex,
+                        dialogMessage,
+                        interactionManager) {
+    VocabularyItem.call(this, x, y, key, name, dialogMessage, categoryIndex);
     var scale = 50 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;
+    this.descriptionTemp = description;
+    this.interactionManager = interactionManager;
 };
 
 ClueItem.prototype = Object.create(VocabularyItem.prototype);
@@ -1941,7 +1893,15 @@ ClueItem.prototype.constructor = ClueItem;
  */
 ClueItem.prototype.pickUp = function() {
     this.kill();
-    this.popUp.open();
+    this.interactionManager.openDialogs();
+};
+
+/**
+ * Displays this house dialog
+ * @method ClueItem.openActivity
+ */
+ClueItem.prototype.openActivity = function() {
+    this.interactionManager.openDialogs();
 };
 
 module.exports = ClueItem;
@@ -2158,7 +2118,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":50,"../util/VerticalLayoutPanel":62}],24:[function(require,module,exports){
+},{"../util/Button":48,"../util/VerticalLayoutPanel":61}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/10/2015.
  */
@@ -2264,7 +2224,7 @@ ItemsPopUp.prototype.open = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":50,"../util/GridLayoutPanel":53,"../util/PopUp":58,"./HealthPack":21,"./weapons/MachineGun":34,"./weapons/Revolver":35}],25:[function(require,module,exports){
+},{"../util/Button":48,"../util/GridLayoutPanel":51,"../util/PopUp":57,"./HealthPack":21,"./weapons/MachineGun":34,"./weapons/Revolver":35}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 06/11/2015.
  */
@@ -2279,26 +2239,26 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * @param {number} x - VocabularyItem's x coordinate within the game world.
  * @param {number} y - VocabularyItem's y coordinate within the game world.
  * @param {string} key - VocabularyItem's texture
- * @param {string} dialogMessage - Message to be displayed on this item's
- * dialog.
  * @param {string} name - VocabularyItem's name.
  * @param {string} description - VocabularyItem's name.
  * @param {number} categoryIndex - Index of the category to which this item
  * belongs.
+ * @param {boolean} openImmediately - Indicates whether this vocabulary item
+ * should display the message when the player picksItUp
  */
 var VocabularyItem = function(x,
                               y,
                               key,
-                              dialogMessage,
                               name,
                               description,
-                              categoryIndex) {
+                              categoryIndex,
+                              openImmediately) {
     Item.call(this, x, y, key, 0);
-    this.dialogMessage = dialogMessage;
     this.categoryIndex = categoryIndex;
     this.name = name;
     this.description = description;
     this.makeDialog();
+    this.openImmediately = openImmediately || false;
 };
 
 VocabularyItem.prototype = Object.create(Item.prototype);
@@ -2314,7 +2274,7 @@ VocabularyItem.prototype.use = function() {
 
 /**
  * Makes the dialog that is delivered to the player when he checks a vocabulary.
- * @method VocabularyItem..makeDialog
+ * @method VocabularyItem.makeDialog
  */
 VocabularyItem.prototype.makeDialog = function() {
     this.popUp = new VerticalLayoutPopUp('mediumPopUpBg', null, this.name);
@@ -2324,7 +2284,7 @@ VocabularyItem.prototype.makeDialog = function() {
         icon.scale.x = scale;
         icon.scale.y = scale;
     }
-    var dialogText = level.game.make.text(0, 0, this.dialogMessage);
+    var dialogText = level.game.make.text(0, 0, this.description);
     dialogText.font = 'Arial';
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
@@ -2337,7 +2297,7 @@ VocabularyItem.prototype.makeDialog = function() {
 module.exports = VocabularyItem;
 
 
-},{"../util/VerticalLayoutPopUp":63,"./Item":22}],26:[function(require,module,exports){
+},{"../util/VerticalLayoutPopUp":62,"./Item":22}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/12/2015.
  */
@@ -2360,11 +2320,10 @@ var VocabularyItem = require('./VocabularyItem');
 var WorldItem = function(x,
                          y,
                          key,
-                         dialogMessage,
                          name,
                          description,
                          category) {
-    VocabularyItem.call(this, x, y, key, dialogMessage, name, description,
+    VocabularyItem.call(this, x, y, key, name, description,
         category);
 };
 
@@ -2372,7 +2331,7 @@ WorldItem.prototype = Object.create(VocabularyItem.prototype);
 WorldItem.prototype.constructor = WorldItem;
 
 /**
- * Kills the this item whn player picks it up.
+ * Kills this item when player picks it up.
  * @method WorldItem.pickUp
  */
 WorldItem.prototype.pickUp = function() {
@@ -2580,8 +2539,8 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    this.categoriesLabels = ['Family', 'Places', 'Transport', 'Others'];
-    this.categories = ['family', 'places', 'transport', 'others'];
+    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Others'];
+    this.categories = ['places', 'family', 'transport', 'others'];
     ItemsPopUp.call(this, this.categoriesLabels, this.categories,
         'My Vocabulary');
 };
@@ -2646,7 +2605,7 @@ MyVocabulary.prototype.randomCategory = function(numberOfWords) {
 
 module.exports = MyVocabulary;
 
-},{"../../util/Utilities":60,"../ItemsPopUp":24,"./MyVocabularyItem":32}],32:[function(require,module,exports){
+},{"../../util/Utilities":59,"../ItemsPopUp":24,"./MyVocabularyItem":32}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
@@ -2694,7 +2653,7 @@ MyVocabularyItem.prototype.buttonAction = function() {
 
 module.exports = MyVocabularyItem;
 
-},{"../../util/Button":50,"../../util/VerticalLayoutPanel":62}],33:[function(require,module,exports){
+},{"../../util/Button":48,"../../util/VerticalLayoutPanel":61}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -3195,6 +3154,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('healthPack50', 'assets/images/healthPack50.png');
     this.game.load.image('inventory_button', 'assets/images/inventory.png');
     this.game.load.image('storeButton', 'assets/images/store.png');
+    this.game.load.image('store', 'assets/images/storeBig.png');
     this.game.load.image('popUpBg',
         'assets/images/popUpBg.png');
     this.game.load.image('close', 'assets/images/close.png');
@@ -3359,10 +3319,7 @@ Preloader.prototype.update = function() {
     if (!!this.ready) {
         //this.game.state.start('menu');
         this.game.state.start('intro');
-
-        //level = this.game.state.states.levelOne;
-        //level = this.game.state.states.levelTwo;
-        level = this.game.state.states.levelThree;
+        level = this.game.state.states.levelOne;
     }
 };
 
@@ -3454,9 +3411,9 @@ Intro.prototype.create = function() {
  * @method Intro.continue
  */
 Intro.prototype.continue = function() {
-    //this.game.state.start('levelOne');
+    this.game.state.start('levelOne');
     //this.game.state.start('levelTwo');
-    this.game.state.start('levelThree');
+    //this.game.state.start('levelThree');
 };
 
 /**
@@ -3515,7 +3472,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":50}],42:[function(require,module,exports){
+},{"../../util/Button":48}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -3537,6 +3494,8 @@ var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
 var NameBoard = require('../../worldElements/NameBoard');
+var WorldItem = require('../../items/WorldItem');
+var InteractionManager = require('../../util/InteractionManager');
 
 /**
  * Represents a game level.
@@ -3555,11 +3514,10 @@ Level.prototype.constructor = Level;
  * @method Level.preload
  */
 Level.prototype.preload = function() {
-    this.game.stage.backgroundColor = '#C7D2FC';
-
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    level = this;
 };
 
 /**
@@ -3637,7 +3595,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            npc.showMessage();
+            npc.openDialogs();
             if (this.player.x < npc.x) {
                 this.player.x += 2 * npc.width;
             } else {
@@ -3792,12 +3750,15 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {number} x - X coordinate within the world where the character should
  * appear.
  * @param {string} key - NPC texture key.
- * @param {string} comicKey - Texture key of the comic that represents the
- * interaction between this NPC and the player.
+ * @param {Array} messages - Messages that this NPC has to interact with the
+ * player.
+ * @param {Array} titles - Title associated to each message.
+ * @param {Array} imagesKeys - Icon associated to each message.
  * @return {NPC} - Added NPC;
  */
-Level.prototype.addNPC = function(x, key, comicKey) {
-    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey);
+Level.prototype.addNPC = function(x, key, messages, titles, imagesKeys) {
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, intManager);
     this.npcs.add(npc);
     return npc;
 };
@@ -4321,28 +4282,111 @@ Level.prototype.addNameBoard = function(x, text) {
  */
 Level.prototype.playerWins = function() {};
 
+/**
+ * Adds this level enemies.
+ * @method Level.addEnemies
+ */
+Level.prototype.addEnemies = function() {
+    var x = this.firstCheckPointX * 0.75;
+    var i;
+    var j;
+    for (i = 0; i < this.numberOfFightingPoints; i++) {
+        for (j = 0; j < this.numberOfEnemies; j++) {
+            x += 50;
+            this.addSimpleEnemy(x);
+        }
+        for (j = 0; j < this.numberOfStrongEnemies; j++) {
+            x += 50;
+            this.addStrongEnemy(x);
+        }
+        numberOfEnemies ++;
+        x += this.checkPointsDistance;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelT.addPlaces
+ */
+Level.prototype.addPlaces = function() {
+    var x = this.WORLD_WIDTH / (this.placesKeys.length + 2);
+    var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
+    for (i = 0; i < this.placesKeys.length; i++) {
+        if (houseIndex >= this.housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = new WorldItem(
+            x * (i + 1),
+            this.GROUND_HEIGHT,
+            this.placesKeys[i],
+            this.placesNames[i],
+            this.placesDescriptions[i],
+            0);
+        this.addVocabularyItem(place);
+        this.addNeighbors(place, this.housesKeys[houseIndex],
+            this.housesKeys[houseIndex + 1]);
+
+        houseIndex += 2;
+        this.addNameBoard(place.x - 70, this.placesNames[i] + ' Street');
+    }
+};
+
+/**
+ * Adds the health packs for this level
+ * @method Level.addHealthPacks
+ */
+Level.prototype.addHealthPacks = function() {
+    var heathPacksDistance = this.WORLD_WIDTH / this.numberOfFightingPoints;
+    var i;
+    for (i = 1; i <= this.numberOfFightingPoints; i++) {
+        this.addHealthPack(new HealthPack(heathPacksDistance * i, 10, 5, this));
+    }
+};
+
+/**
+ * Lets the player to play next level.
+ * @method Level.nextLevel
+ */
+Level.prototype.nextLevel = function() {
+    /*if (this.wife === undefined) {
+        this.wife.moveRight();
+    }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
+        this.game.state.start(this.nextSate);
+    }*/
+    this.game.state.start(this.nextSate);
+};
+
+/**
+ * Determines whether the player has won
+ * @method Level.playerWins
+ * @returns {boolean}
+ */
+Level.prototype.playerWins = function() {
+    return this.lastGoalAimed;
+};
+
 module.exports = Level;
 
-},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":51,"../../util/PopUp":58,"../../util/ResourceBar":59,"../../worldElements/InteractiveCar":64,"../../worldElements/NameBoard":66}],43:[function(require,module,exports){
+},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/WorldItem":26,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":49,"../../util/InteractionManager":56,"../../util/PopUp":57,"../../util/ResourceBar":58,"../../worldElements/InteractiveCar":63,"../../worldElements/NameBoard":65}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
-var Level = require ('../levels/Level');
+var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var InteractionManager = require('../../util/InteractionManager');
+var ClueItem = require('../../items/ClueItem');
 
 /**
  * Number of fights that player will have during this level.
  * @type {number}
  */
 var NUMBER_OF_FIGHTING_POINTS = 5;
-/**
- * Number of houses player should visit during this level.
- * @type {number}
- */
-var NUMBER_OF_HOUSES = 2;
 
 /**
  * Manages LevelOne.
@@ -4364,24 +4408,33 @@ LevelOne.prototype.constructor = LevelOne;
  */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
+    this.nextState = 'levelTwo';
+    this.game.stage.backgroundColor = '#C7D2FC';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
+    this.lastGoalAimed = false;
+    this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
+    this.numberOfEnemies = 3;
+    this.numberOfStrongEnemies = 0;
     this.addNPCs();
-    this.addEnemies();
+    //this.addEnemies();
     this.addObjects();
-    this.addPlaces();
+    this.createPlaces();
+    this.addHealthPacks();
+};
+
+/**
+ * Creates the needed arrays to add level weapons
+ */
+LevelOne.prototype.createWeapons = function() {
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
-    var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
 };
 
 /**
  * Add InteractiveCar and InteractiveHouses for this level.
- * @method LevelOne.addObjects
+ * @method LevelOne.createWeapons
  */
 LevelOne.prototype.addObjects = function() {
     var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
@@ -4389,28 +4442,27 @@ LevelOne.prototype.addObjects = function() {
     var house = this.addStaticBuilding(500, 'whiteHouse');
     this.addNeighbors(house, 'greenHouse', 'yellowHouse');
 
-    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
+    var messages = ['Use the store to buy a weapon.'];
+    var titles = ['Buy weapons'];
+    var imagesKeys = ['store'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
     var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
-        this.GROUND_HEIGHT, 'redHouse', dialog);
-    gunsStore.anchor.set(0, 1);
-    this.addObject(gunsStore);
+        this.GROUND_HEIGHT, 'store', 'Store',
+        'A building or room where things are sold', 0, interactionManager);
+    this.addVocabularyItem(gunsStore);
+    this.addNeighbors(gunsStore, 'orangeHouse', 'yellowHouse');
 
-    dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'So late!');
-    var emptyRoom = level.game.make.sprite(0, 0, 'emptyRoom');
-    var finishMessage = 'Your family is now somewhere else.' +
-        '\nContinue trying, because this game is just starting!';
-    var dialogText = level.game.make.text(0, 0, finishMessage);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    dialog.addElement(emptyRoom);
-    dialog.addElement(dialogText);
-
+    messages = ['Your family is now somewhere else.',
+        'Continue trying, because this game is just starting!'];
+    titles = ['Your family is not here', 'Your family is not here'];
+    imagesKeys = ['emptyRoom', 'emptyRoom'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT, 'blueHouse', dialog);
-    friendsHouse.anchor.set(0, 1);
-    this.addObject(friendsHouse);
+        this.GROUND_HEIGHT, 'blueHouse', 'vocabulary name',
+        'vocabulary description', 3, interactionManager);
+    this.addVocabularyItem(friendsHouse);
     this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
 
     this.addCar(3.7 * this.checkPointsDistance, 'jeep');
@@ -4421,67 +4473,33 @@ LevelOne.prototype.addObjects = function() {
  * @method LevelOne.addNPCs
  */
 LevelOne.prototype.addNPCs = function() {
-    var message = 'I know that you are looking for \nyour family.' +
-        '\nI can help you.' +
-        '\n\nGo to the blue house after the Zoo,' +
-        '\nmaybe your family is there.';
-    this.addNPC(this.game.camera.width / 2, 'npc', message);
-    message = 'Hi my friend!.' +
-        '\n\nGo to the red House before the' +
-        '\nPlayground, \nthere you can buy a new weapon.';
-    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
+    var messages = [
+        'I know that you are looking for \nyour family.',
+        'Yor wife and children are in \nthe Big Blue House after the Zoo.'
+    ];
+    var titles = ['I can help you', 'Go to Big Blue House'];
+    var imagesKeys = ['npc', 'blueHouse'];
+    this.addNPC(this.game.camera.width / 2, 'npc', messages, titles,
+        imagesKeys);
 };
 
 /**
- * Adds this level enemies.
- * @method LevelOne.addEnemies
+ * Creates the needed arrays to add this level places
+ * @method LevelOne.createPlaces
  */
-LevelOne.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
-    var numberOfEnemies = 3;
-    for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (var j = 0; j < numberOfEnemies; j++) {
-            x += 50;
-            this.addSimpleEnemy(x);
-        }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
-    }
-};
-
-/**
- * Adds city places from vocabulary that corresponds to this level.
- * @method LevelOne.addPlaces
- */
-LevelOne.prototype.addPlaces = function() {
-    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
-    var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
-    var i;
-    var houseIndex = 0;
-    var place;
-    var leftHouse;
-    for (i = 0; i < placesKeys.length; i++) {
-        if (houseIndex >= housesKeys.length) {
-            houseIndex = 0;
-        }
-        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
-        this.addNeighbors(place, housesKeys[houseIndex],
-            housesKeys[houseIndex + 1]);
-
-        houseIndex += 2;
-        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
-    }
-};
-
-/**
- * Lets the player to play second level.
- * @method LevelOne.nextLevel
- */
-LevelOne.prototype.nextLevel = function() {
-    this.game.state.start('levelTwo');
-    level = this.game.state.states.levelTwo;
+LevelOne.prototype.createPlaces = function() {
+    this.housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse',
+        'orangeHouse'];
+    this.placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    this.placesNames = ['Bookstore', 'Playground', 'Gas Station', 'Zoo'];
+    this.placesDescriptions = [
+        'A store that sells books',
+        'An outdoor area where children can play.',
+        'A place where gasoline for vehicles is sold',
+        'A place where many kinds of animals are ' +
+        '\nkept so that people can see them'
+    ];
+    this.addPlaces();
 };
 
 /**
@@ -4494,17 +4512,16 @@ LevelOne.prototype.playerWins = function() {
 
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42}],44:[function(require,module,exports){
+},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/InteractionManager":56,"../../util/VerticalLayoutPopUp":62,"../../worldElements/InteractiveHouse":64,"./Level":42}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/11/2015.
  */
-var Level = require ('../levels/Level');
+var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
-var WorldItem = require('../../items/WorldItem');
 var Wife = require('../../character/Wife');
 var Friend = require('../../character/Friend');
 
@@ -4534,24 +4551,54 @@ LevelThree.prototype.constructor = LevelThree;
  */
 LevelThree.prototype.create = function() {
     Level.prototype.create.call(this);
+    this.nextState = 'intro';
     this.game.stage.backgroundColor = '#09061F';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
+    this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
+    this.numberOfEnemies = 2;
+    this.numberOfStrongEnemies = 3;
     //this.addEnemies();
     this.addWife();
+    this.addFriend(this.WORLD_WIDTH - 100);
     this.addObjects();
-    this.addPlaces();
+    this.createPlaces();
+    this.createWeapons();
+    this.addHealthPacks();
+};
+
+/**
+ * Creates the needed arrays to add level weapons
+ * @method LevelThree.createWeapons
+ */
+LevelThree.prototype.createWeapons = function() {
     this.addMachineGun(600, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(2000, this.GROUND_HEIGHT - 40, false);
     this.addMachineGun(4000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
     this.addMachineGun(7000, this.GROUND_HEIGHT - 40, false);
-    var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
+};
+
+/**
+ * Creates the needed arrays to add this level places
+ */
+LevelThree.prototype.createPlaces = function() {
+    this.housesKeys = ['yellowHouse', 'greenHouse', 'orangeHouse',
+        'whiteHouse'];
+    this.placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
+    this.placesNames = ['Police Station', 'Fire Station', 'Super Market',
+        'Hotel'];
+    this.placesDescriptions = ['A place where local \n police officers work',
+        'a building in which the members of a fire' +
+        '\n department and the equipment used to' +
+        '\nput out fires are located',
+        'a store where customers can buy a variety' +
+        '\nof foods and usually household items',
+        'a place that has rooms in which people' +
+        '\ncan stay especially when they are traveling'];
+    this.addPlaces();
 };
 
 /**
@@ -4566,21 +4613,6 @@ LevelThree.prototype.addObjects = function() {
         'Daughter\'s drawing.',
         0);
     this.addVocabularyItem(systerMomDrawing);
-    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
-        'sisterMom',
-        'We are closer to our children!',
-        'My Family 1',
-        'Daughter\'s drawing.',
-        0);
-    this.addVocabularyItem(systerMomDrawing);
-    systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
-        'sisterMom',
-        'We are closer to our children!',
-        'My Family 2',
-        'Daughter\'s drawing.',
-        0);
-    this.addVocabularyItem(systerMomDrawing);
-
     this.addCar(3.7 * this.checkPointsDistance, 'taxi');
 };
 
@@ -4592,92 +4624,6 @@ LevelThree.prototype.addWife = function() {
     this.wife = new Wife(this.player.x - this.player.width,
         this.GROUND_HEIGHT - 50);
     this.addPlayerCharacter(this.wife);
-};
-
-/**
- * Adds this level enemies.
- * @method LevelThree.addEnemies
- */
-LevelThree.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
-    this.addFriend(this.WORLD_WIDTH - 100);
-    var numberOfEnemies = 2;
-    var numberOfStrongEnemies = 3;
-    var i;
-    var j;
-    for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (j = 0; j < numberOfEnemies; j++) {
-            x += 50;
-            this.addSimpleEnemy(x);
-        }
-        for (j = 0; j < numberOfStrongEnemies; j++) {
-            x += 50;
-            this.addStrongEnemy(x);
-        }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
-    }
-};
-
-/**
- * Adds city places from vocabulary that corresponds to this level.
- * @method LevelThree.addPlaces
- */
-LevelThree.prototype.addPlaces = function() {
-    var housesKeys = ['yellowHouse', 'greenHouse', 'orangeHouse', 'whiteHouse'];
-    var placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
-    var placesNames = ['Police Station', 'Fire Station', 'Super Market',
-        'Hotel'];
-    var placesDescriptions = ['A place where local \n police officers work',
-        'a building in which the members of a fire' +
-        '\n department and the equipment used to' +
-        '\nput out fires are located',
-        'a store where customers can buy a variety' +
-        '\nof foods and usually household items',
-        'a place that has rooms in which people' +
-        '\ncan stay especially when they are traveling'];
-    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
-    var i;
-    var houseIndex = 0;
-    var place;
-    var leftHouse;
-    for (i = 0; i < placesKeys.length; i++) {
-        if (houseIndex >= housesKeys.length) {
-            houseIndex = 0;
-        }
-        place = new WorldItem(
-            x * (i + 1),
-            this.GROUND_HEIGHT,
-            placesKeys[i],
-            placesDescriptions[i], //Message
-            placesNames[i],
-            placesDescriptions[i],
-            1);
-        this.addVocabularyItem(place);
-        this.addNeighbors(place, housesKeys[houseIndex],
-            housesKeys[houseIndex + 1]);
-
-        houseIndex += 2;
-        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
-    }
-};
-
-/**
- * Lets the player to play second level.
- * @method LevelThree.nextLevel
- */
-LevelThree.prototype.nextLevel = function() {
-    if (this.wife === undefined) {
-        this.wife.moveRight();
-        /*}else if (!this.metWife) {
-         this.game.physics.arcade.moveToXY(
-         this.wife,
-         this.player.x,
-         this.player.y); */
-    }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
-        this.game.state.start('intro');
-        //level = this.game.state.states.levelThree;
-    }
 };
 
 /**
@@ -4700,11 +4646,11 @@ LevelThree.prototype.addFriend = function(x) {
 
 module.exports = LevelThree;
 
-},{"../../character/Friend":4,"../../character/Wife":11,"../../items/ClueItem":20,"../../items/HealthPack":21,"../../items/WorldItem":26,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42}],45:[function(require,module,exports){
+},{"../../character/Friend":4,"../../character/Wife":11,"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/VerticalLayoutPopUp":62,"../../worldElements/InteractiveHouse":64,"./Level":42}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 05/11/2015.
  */
-var Level = require ('../levels/Level');
+var Level = require ('./Level');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -4736,24 +4682,33 @@ LevelTwo.prototype.constructor = LevelTwo;
  */
 LevelTwo.prototype.create = function() {
     Level.prototype.create.call(this);
+    this.nextState = 'levelThree';
     this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
     this.lastGoalAimed = false;
+    this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
+    this.numberOfEnemies = 2;
+    this.numberOfStrongEnemies = 2;
     this.metWife = false;
-    this.addEnemies();
+    //this.addEnemies();
+    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     this.addObjects();
-    this.addPlaces();
+    this.createPlaces();
+    this.addHealthPacks();
+};
+
+/**
+ * Creates the needed arrays to add level weapons
+ * @method LevelTwo.createWeapons
+ */
+LevelTwo.prototype.createWeapons = function() {
     this.addMachineGun(600, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(2000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(4000, this.GROUND_HEIGHT - 40, false);
     this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
     this.addMachineGun(7000, this.GROUND_HEIGHT - 40, false);
-    var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
 };
 
 /**
@@ -4761,20 +4716,17 @@ LevelTwo.prototype.create = function() {
  * @method LevelTwo.addObjects
  */
 LevelTwo.prototype.addObjects = function() {
-    var dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'Necklace');
-    var necklaceIcon = this.game.make.sprite(0, 0, 'necklaceBig');
-    var message = 'That is my wife\'s necklace!';
-    var dialogText = this.game.make.text(0, 0, message);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    dialog.addElement(necklaceIcon);
-    dialog.addElement(dialogText);
-    var necklace = new ClueItem(300, this.GROUND_HEIGHT - 30, 'necklace',
-        dialog, 'Necklace', 'My wife\'s necklace.');
+    var messages = ['That is my wife\'s necklace!'];
+    var titles = ['My wife\'s necklace'];
+    var imagesKeys = ['necklace'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var necklace = new ClueItem(300, this.GROUND_HEIGHT,
+        'necklace',
+        'Necklace',
+        'A piece of jewelry that is worn around your neck',
+        3);
     this.addVocabularyItem(necklace);
-
     this.addCar(3.7 * this.checkPointsDistance, 'bus');
 };
 
@@ -4791,95 +4743,36 @@ LevelTwo.prototype.addWife = function() {
 };
 
 /**
- * Adds this level enemies.
- * @method LevelTwo.addEnemies
- */
-LevelTwo.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
-    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
-    var numberOfEnemies = 2;
-    var numberOfStrongEnemies = 2;
-    var i;
-    var j;
-    for (i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (j = 0; j < numberOfEnemies; j++) {
-            x += 50;
-            this.addSimpleEnemy(x);
-        }
-        for (j = 0; j < numberOfStrongEnemies; j++) {
-            x += 50;
-            this.addStrongEnemy(x);
-        }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
-    }
-};
-
-/**
  * Adds city places from vocabulary that corresponds to this level.
  * @method LevelTwo.addPlaces
  */
-LevelTwo.prototype.addPlaces = function() {
-    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
-    var placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
+LevelTwo.prototype.createPlaces = function() {
+    this.housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse',
+        'orangeHouse'];
+    this.placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
+    this.placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
         'Old Factory'];
-    var x = this.WORLD_WIDTH / (placesKeys.length + 2);
-    var i;
-    var houseIndex = 0;
-    var place;
-    var leftHouse;
-    for (i = 0; i < placesKeys.length; i++) {
-        if (houseIndex >= housesKeys.length) {
-            houseIndex = 0;
-        }
-        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
-        this.addNeighbors(place, housesKeys[houseIndex],
-            housesKeys[houseIndex + 1]);
-
-        houseIndex += 2;
-        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
-    }
-};
-
-/**
- * Lets the player to play second level.
- * @method LevelTwo.nextLevel
- */
-LevelTwo.prototype.nextLevel = function() {
-    if (this.wife === undefined) {
-        this.addWife();
-        this.wife.moveRight();
-    /*}else if (!this.metWife) {
-        this.game.physics.arcade.moveToXY(
-            this.wife,
-            this.player.x,
-            this.player.y); */
-    }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
-        this.game.state.start('intro');
-        //level = this.game.state.states.levelThree;
-    }
-};
-
-/**
- * Determines whether the player has won
- * @returns {boolean}
- */
-LevelTwo.prototype.playerWins = function() {
-    return this.lastGoalAimed;
+    this.placesDescriptions = [
+        'An organization that keeps and lends money',
+        'A small restaurant that serves coffee and' +
+        '\nother drinks as well as simple foods',
+        'A place where sick or injured people' +
+        '\nare given medical care',
+        'A place for education; a place where' +
+        '\npeople go to learn',
+        'A building or group of buildings' +
+        '\nwhere products are made'
+    ];
+    this.addPlaces();
 };
 
 module.exports = LevelTwo;
 
-},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../levels/Level":42}],46:[function(require,module,exports){
-arguments[4][42][0].apply(exports,arguments)
-},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":51,"../../util/PopUp":58,"../../util/ResourceBar":59,"../../worldElements/InteractiveCar":64,"../../worldElements/NameBoard":66,"dup":42}],47:[function(require,module,exports){
-arguments[4][43][0].apply(exports,arguments)
-},{"../../items/HealthPack":21,"../../util/Dialog":51,"../../util/VerticalLayoutPopUp":63,"../../worldElements/InteractiveHouse":65,"../levels/Level":42,"dup":43}],48:[function(require,module,exports){
+},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/VerticalLayoutPopUp":62,"./Level":42}],46:[function(require,module,exports){
 arguments[4][38][0].apply(exports,arguments)
-},{"dup":38}],49:[function(require,module,exports){
+},{"dup":38}],47:[function(require,module,exports){
 arguments[4][39][0].apply(exports,arguments)
-},{"dup":39}],50:[function(require,module,exports){
+},{"dup":39}],48:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -4918,7 +4811,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],51:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4969,7 +4862,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":57}],52:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":55}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5052,7 +4945,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],53:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5122,7 +5015,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":52}],54:[function(require,module,exports){
+},{"./GridLayout":50}],52:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5190,7 +5083,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":52,"./PopUp":58}],55:[function(require,module,exports){
+},{"./GridLayout":50,"./PopUp":57}],53:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5244,7 +5137,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],56:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -5283,7 +5176,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":55}],57:[function(require,module,exports){
+},{"./HorizontalLayout":53}],55:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5329,7 +5222,54 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":55,"./PopUp":58}],58:[function(require,module,exports){
+},{"./HorizontalLayout":53,"./PopUp":57}],56:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 20/12/2015.
+ */
+
+var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+
+/**
+ * Represents a sequence of messages that should be devlivvered to the player.
+ * @class InteractionManager
+ * @constructor
+ * @param {Array} messages - Messages that should be delivered the player.
+ * @param {Array} titles - Title associated to each message.
+ * @param {Array} imagesKeys - Icon associated to each message.
+ */
+var InteractionManager = function(messages, titles, imagesKeys) {
+    this.dialogs = [];
+    var i;
+    var tempDialog;
+    for (i in messages) {
+        tempDialog =  new VerticalLayoutPopUp('mediumPopUpBg', null, titles[i]);
+        var dialogImage = level.game.make.sprite(0, 0, imagesKeys[i]);
+        var dialogText = level.game.make.text(0, 0, messages[i]);
+        dialogText.font = 'Arial';
+        dialogText.fontSize = 20;
+        dialogText.fill = '#000000';
+        dialogText.align = 'center';
+        tempDialog.addElement(dialogImage);
+        tempDialog.addElement(dialogText);
+        this.dialogs.push(tempDialog);
+        level.game.add.existing(tempDialog);
+    }
+};
+
+/**
+ * Lets the enemy to show the messages he has for the player. (Interaction)
+ * @method  InteractionEnemy.openDialogs
+ */
+InteractionManager.prototype.openDialogs = function() {
+    var i;
+    for (i = this.dialogs.length - 1; i >= 0; i--) {
+        this.dialogs[i].open();
+    }
+};
+
+module.exports = InteractionManager;
+
+},{"../util/VerticalLayoutPopUp":62}],57:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -5424,7 +5364,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -5465,7 +5405,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5502,7 +5442,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5555,7 +5495,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5609,7 +5549,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":61}],63:[function(require,module,exports){
+},{"./VerticalLayout":60}],62:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 21/10/2015.
  */
@@ -5654,7 +5594,7 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":58,"./VerticalLayout":61}],64:[function(require,module,exports){
+},{"./PopUp":57,"./VerticalLayout":60}],63:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -5809,11 +5749,11 @@ InteractiveCar.prototype.stop = function() {
 
 module.exports = InteractiveCar;
 
-},{"../util/Button":50,"../util/PopUp":58,"../util/ResourceBar":59}],65:[function(require,module,exports){
+},{"../util/Button":48,"../util/PopUp":57,"../util/ResourceBar":58}],64:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
-var Store = require('../items/store/Store');
+var VocabularyItem = require('../items/VocabularyItem');
 var Button = require('../util/Button');
 
 /**
@@ -5824,22 +5764,24 @@ var Button = require('../util/Button');
  * @param {number} x - House x coordinate within the world.
  * @param {number} y - House y coordinate within the world.
  * @param {string} backgroundKey - House texture key.
- * @param {PopUp} dialog - Dialog to be displayed when player interact with
- * the house.
+ * @param {string} vocabularyMessage - Message to be displayed on this item's
+ * dialog.
+ * @param {string} vocabularyName - VocabularyItem's name.
+ * @param {string} vocabularyDescription - VocabularyItem's name.
+ * @param {number} categoryIndex - Index of the category to which this item
+ * belongs.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player the house.
  */
-var InteractiveHouse = function(x, y, backgroundKey, dialog) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.getOnButton = new Button ('Get in', this.openActivity, this);
-    this.getOnButton.x = (this.width - this.getOnButton.width) / 2;
-    this.getOnButton.y = -this.height + 50;
-
-    this.dialog = dialog;
-    level.game.add.existing(this.dialog);
-
-    this.addChild(this.getOnButton);
+var InteractiveHouse = function(x, y, backgroundKey, vocabularyName,
+                                vocabularyDescription, categoryIndex,
+                                interactionManager) {
+    VocabularyItem.call(this, x, y, backgroundKey, vocabularyName,
+        vocabularyDescription, categoryIndex, true);
+    this.interactionManager = interactionManager;
 };
 
-InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveHouse.prototype = Object.create(VocabularyItem.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
@@ -5847,12 +5789,22 @@ InteractiveHouse.prototype.constructor = InteractiveHouse;
  * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
-    this.dialog.open();
+    this.interactionManager.openDialogs();
+};
+
+/**
+ * Kills this item when player picks it up.
+ * @method WorldItem.pickUp
+ */
+InteractiveHouse.prototype.pickUp = function() {
+    this.openActivity();
+    level.vocabularyItems.remove(this);
+    level.addObject(this);
 };
 
 module.exports = InteractiveHouse;
 
-},{"../items/store/Store":29,"../util/Button":50}],66:[function(require,module,exports){
+},{"../items/VocabularyItem":25,"../util/Button":48}],65:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */
@@ -5884,4 +5836,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,40,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65]);
