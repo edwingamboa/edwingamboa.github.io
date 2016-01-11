@@ -15,8 +15,13 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
  */
 var ImageWordMatch = function() {
     var dimensions = {numberOfRows: 3};
-    DragAndDropChallenge.call(this, 'imageWord', 'Image Match', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'imageWord',
+        'Image Match',
+        'Match the words \nwith their images',
+        10,
+        dimensions
+    );
 };
 
 ImageWordMatch.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -33,24 +38,34 @@ ImageWordMatch.prototype.newChallenge = function() {
 
     for (var i in words) {
         var cell = new VerticalLayoutPanel('imageWordBg');
-        var word = level.game.make.sprite(0, 0, words[i].key);
-        if (word.height > 120) {
-            var scale = 120 / word.height;
-            word.scale.x = scale;
-            word.scale.y = scale;
+        var image = level.game.make.sprite(0, 0, words[i].key);
+        var scaleX;
+        var scaleY;
+        if (image.height > 120 || image.width > 180) {
+            scaleY = 120 / image.height;
+            scaleX = 180 / image.width;
+            if (scaleX > scaleY) {
+                image.scale.x = scaleY;
+                image.scale.y = scaleY;
+            }else {
+                image.scale.x = scaleX;
+                image.scale.y = scaleX;
+            }
         }
         var shade = new VerticalLayoutPanel('wordBg', 2);
         shade.code = i;
 
         this.destinations.push(shade);
-        cell.addElement(word);
+        cell.addElement(image);
         cell.addElement(shade);
 
         var label = level.game.make.text(0, 0, words[i].name);
         //Font style
-        label.font = 'Shojumaru';
+        label.font = level.font;
         label.fontSize = 20;
-        label.fill = '#0040FF';
+        label.fill = '#473e2c';
+        label.stroke = '#fff';
+        label.strokeThickness = 2;
         label.inputEnabled = true;
         label.input.enableDrag(true, true);
         //label.events.onDragStart.add(this.bringItemToTop, this);

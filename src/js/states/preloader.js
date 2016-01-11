@@ -65,6 +65,8 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/popUpBg.png');
     this.game.load.image('close', 'assets/images/close.png');
     this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
+    this.game.load.image('myVocabularyItemBg',
+        'assets/images/myVocabularyItemBg.png');
     this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
     this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
     this.game.load.image('successIcon', 'assets/images/successIcon.png');
@@ -83,9 +85,15 @@ Preloader.prototype.loadAssets = function() {
         'assets/sprites/strong_enemy.png', 64, 64);
     this.game.load.spritesheet('strongestEnemy',
         'assets/sprites/strongestEnemy.png', 80, 80);
+
     this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5, 150);
     this.game.load.spritesheet('bus', 'assets/sprites/bus.png', 400, 180);
     this.game.load.spritesheet('taxi', 'assets/sprites/taxi.png', 215, 100);
+    this.game.load.spritesheet('truck', 'assets/sprites/truck.png', 400, 239);
+    this.game.load.spritesheet('car', 'assets/sprites/car.png', 237, 100);
+    this.game.load.spritesheet('ambulance', 'assets/sprites/ambulance.png', 300,
+        144);
+
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
         30, 16);
     this.game.load.spritesheet('machineGun',
@@ -107,6 +115,9 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('myVocabularyButton',
         'assets/images/myVocabulary.png');
     this.game.load.image('button', 'assets/images/button.png');
+    this.game.load.image('iconButton', 'assets/images/iconButton.png');
+    this.game.load.image('toolsBar', 'assets/images/toolsBar.png');
+
     this.game.load.image('mother', 'assets/images/mother.png');
     this.game.load.image('father', 'assets/images/father.png');
     this.game.load.image('daughter', 'assets/images/daughter.png');
@@ -140,7 +151,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/popUpPanelBg.png');
     this.game.load.image('tabBg', 'assets/images/tabBg.png');
     this.game.load.image('contextBg', 'assets/images/contextBg.png');
-
     this.game.load.image('englishChallengePanelBg',
         'assets/images/englishChallengePanelBg.png');
     this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
@@ -182,11 +192,14 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/blueHouse.png');
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
-    this.game.load.image('necklace',
-        'assets/images/vocabulary/necklace.png');
-    this.game.load.image('necklaceBig',
-        'assets/images/vocabulary/necklaceBig.png');
-    this.game.load.image('necklaceIcon', 'assets/icons/necklaceIcon.png');
+    this.game.load.image('necklace', 'assets/images/vocabulary/necklace.png');
+    this.game.load.image('glasses', 'assets/images/vocabulary/glasses.png');
+    this.game.load.image('watch', 'assets/images/vocabulary/watch.png');
+    this.game.load.image('ring', 'assets/images/vocabulary/ring.png');
+    this.game.load.image('cap', 'assets/images/vocabulary/cap.png');
+    this.game.load.image('bracelet', 'assets/images/vocabulary/bracelet.png');
+    this.game.load.image('family', 'assets/images/vocabulary/family.png');
+
     this.game.load.image('sisterMom',
         'assets/images/vocabulary/sisterMom.png');
     this.game.load.image('sisterMomBig',

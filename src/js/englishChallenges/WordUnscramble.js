@@ -14,8 +14,13 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
  */
 var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'unscramble', 'Unscrambler', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'unscramble',
+        'Unscramble',
+        'Form the word \nusing the letters',
+        10,
+        dimensions
+    );
 };
 
 WordUnscramble.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -56,9 +61,11 @@ WordUnscramble.prototype.newChallenge = function() {
         }else {
             letterShade = new VerticalLayoutPanel('letterBg', 2);
             //Font style
-            letterText.font = 'Shojumaru';
-            letterText.fontSize = 20;
-            letterText.fill = '#0040FF';
+            letterText.font = level.font;
+            letterText.fontSize = 30;
+            letterText.fill = '#473e2c';
+            letterText.stroke = '#fff';
+            letterText.strokeThickness = 2;
             letterText.inputEnabled = true;
             letterText.input.enableDrag(true, true);
             letterText.events.onDragStop.add(

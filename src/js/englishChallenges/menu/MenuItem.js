@@ -20,7 +20,7 @@ var MenuItem = function(challenge, parentView) {
     this.challenge = challenge;
     this.updateScoreText();
     this.setTitle(challenge.englishChallenge.name);
-    //this.setDescription(challenge.englishChallenge.description);
+    this.setDescription(challenge.englishChallenge.description);
 };
 
 MenuItem.prototype = Object.create(ItemGroupView.prototype);

@@ -18,14 +18,16 @@ var Button = function(text, action, parent, buttonKey) {
 
     this.text = level.game.make.text(this.width / 2, this.height / 2, text);
     this.text.anchor.set(0.5, 0.5);
-    this.text.font = 'Shojumaru';
-    this.text.fontSize = 18;
+    this.text.font = level.font;
+    this.text.fontSize = 20;
     this.text.fill = '#FFFFFF';
+    this.text.stroke = '#000000';
+    this.text.strokeThickness = 3;
 
     this.inputEnabled = true;
     this.events.onInputDown.add(action, parent);
 
-    var scale = (this.text.width + 20) / this.width;
+    scale = (this.text.width + 20) / this.width;
     this.scale.x = scale;
     this.addChild(this.text);
     this.text.scale.x = 1 / scale;

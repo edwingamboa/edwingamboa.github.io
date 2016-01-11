@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 var Character = require('./Character');
+var Revolver = require('../items/weapons/Revolver');
+var MachineGun = require('../items/weapons/MachineGun');
+
 /**
  * Default player speed
  * @constant
@@ -51,6 +54,7 @@ var Player = function() {
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
     this.frame = this.stopRightFrameIndex;
+    this.score = MINIMUM_SCORE;
 };
 
 Player.prototype = Object.create(Character.prototype);
@@ -155,63 +159,89 @@ Player.prototype.buyItem = function(item) {
     }
 };
 
-Player.prototype.serialize = function(savePosition) {
-    if (savePosition === undefined) savePosition = true;
-    var fields = [
-        'healthLevel',
-        'score'
-    ];
-
-    if (savePosition) {
-        fields.push('x');
-    }
-
-    var obj = {};
-
-    for (var i in fields) {
-        var field = fields[i];
-        obj[field] = this[field];
-    }
-
-    return JSON.stringify(obj);
+/**
+ * Updates player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
+ */
+Player.prototype.updateCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+    localStorage.setItem('currentWeapon', weaponKey);
 };
 
 /**
- * This is a class method, not an instance method!
- *
- * @param state string | object the state to unserialize into a character
- *
- * @return Character instance, class depending on the state restored
+ * Loads player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
  */
-Player.Unserialize = function(state) {
-    // We should be able to accept an object or a string.
-    if (typeof state === 'string') {
-        state = JSON.parse(state);
+Player.prototype.loadCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+};
+
+/**
+ * Add a new weapon to character's weapons.
+ * @method Player.addWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.addWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+    newWeapon.saveWeapon();
+};
+
+/**
+ * Loads a weapon that player has acquired.
+ * @method Player.loadWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.loadWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+};
+
+/**
+ * Changes player's current weapon, to the next one in the weapons array.
+ * Updates currentWeaponIndex property.
+ * @method Player.nextWeapon
+ */
+Player.prototype.nextWeapon = function() {
+    Character.prototype.nextWeapon.call(this);
+    level.updateAmmoText();
+};
+
+/**
+ * Loads the player's information from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadPlayer = function() {
+    if (localStorage.getItem('score') !== null) {
+        this.score = parseInt(localStorage.getItem('score'));
     }
-
-    // Default class name
-    var className = 'Player';
-
-    // Class name can be specified in the serialized data.
-    if (state.options.className) {
-        className = state.options.className;
+    if (localStorage.getItem('healthLevel') !== null) {
+        this.healthLevel = parseInt(localStorage.getItem('healthLevel'));
     }
-
-    // Call our character factory to make a new instance of className
-    var instance = Player.Factory(
-        className,
-        game, // Game reference. Required
-        0, // x-pos. Required, but overridden by unserialize
-        0, // y-pos. Required, but overridden by unserialize
-        {} // options. Required, but overridden by unserialize
-    );
-
-    // Copy our saved state into the new object
-    for (var i in state) {
-        instance[i] = state[i];
+    this.loadWeapons();
+    if (localStorage.getItem('currentWeapon') !== null) {
+        this.loadCurrentWeapon(localStorage.getItem('currentWeapon'));
+    }else {
+        this.useWeapon(new Revolver(700, 100, false));
     }
+};
 
-    return instance;
+/**
+ * Loads the player's weapons from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadWeapons = function() {
+    var weapon;
+    if (localStorage.getItem('revolver') !== null) {
+        weapon = new Revolver(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('revolver'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('machineGun') !== null) {
+        weapon = new MachineGun(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('machineGun'));
+        this.loadWeapon(weapon);
+    }
 };
 
 module.exports = Player;

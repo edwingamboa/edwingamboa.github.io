@@ -53,9 +53,11 @@ var MAX_RANGE_ATTACK = 600;
  * @constructor
  */
 var StrongestEnemy = function(x, y) {
-    var messages = ['Forgive me please!' + '\nI can liberate your wife.',
-        'I can liberate your wife.'];
-    var titles = ['Forgive me', 'Your Wife'];
+    var messages = ['Forgive me please! \nI can liberate your wife.',
+		'But your children are not here. \nThey are somewhere else,' +
+		'\nbut I do not know where',
+        'I am not the boss, \nI work for someone else'];
+    var titles = ['Forgive me', 'Look for your children', 'I am not the boss'];
     var imagesKeys = ['forgive', 'mother'];
     var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(

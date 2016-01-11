@@ -6,6 +6,8 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var InteractionManager = require('../../util/InteractionManager');
+var VocabularyItem = require('../../items/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -67,7 +69,7 @@ LevelTwo.prototype.createWeapons = function() {
  * @method LevelTwo.addObjects
  */
 LevelTwo.prototype.addObjects = function() {
-    var messages = ['That is my wife\'s necklace!'];
+    var messages = ['Oh Great, that is my wife\'s necklace!'];
     var titles = ['My wife\'s necklace'];
     var imagesKeys = ['necklace'];
     var interactionManager = new InteractionManager(messages, titles,
@@ -76,9 +78,26 @@ LevelTwo.prototype.addObjects = function() {
         'necklace',
         'Necklace',
         'A piece of jewelry that is worn around your neck',
-        3);
+        3,
+        interactionManager
+    );
     this.addVocabularyItem(necklace);
-    this.addCar(3.7 * this.checkPointsDistance, 'bus');
+
+    messages = ['Oh Great, that is my wife\'s ring!'];
+    titles = ['My wife\'s ring'];
+    imagesKeys = ['ring'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var ring = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
+        'ring',
+        'Ring',
+        'A piece of jewelry that is worn usually on a finger',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(ring);
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'Bus', 'bus', 300, 350, 200);
 };
 
 /**
@@ -86,9 +105,27 @@ LevelTwo.prototype.addObjects = function() {
  * @method LevelTwo.addWife
  */
 LevelTwo.prototype.addWife = function() {
-    var message = 'Hello. I am so happy to see you again.' +
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0,
+        'child',
+        'Child',
+        'A young person; a son or daughter',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
+    vocabularyItem = new VocabularyItem(0, 0,
+        'child',
+        'Child',
+        'A young person; a son or daughter',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
+
+    var message = 'Hello my husband. I am so happy to see you again.' +
         '\nBut our children are not here.' +
-        '\nYor friend has our daughter and \nour son.';
+        '\nYor friend has kidnapped \n our daughter and our son.';
     this.wife = this.addNPC(this.checkPointsDistance *
         (NUMBER_OF_FIGHTING_POINTS), 'wife', message);
 };

@@ -12,10 +12,10 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Others'];
-    this.categories = ['places', 'family', 'transport', 'others'];
+    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Personal Items'];
+    this.categories = ['places', 'family', 'transport', 'personalItems'];
     ItemsPopUp.call(this, this.categoriesLabels, this.categories,
-        'My Vocabulary');
+        'Vocabulary');
 };
 
 MyVocabulary.prototype = Object.create(ItemsPopUp.prototype);

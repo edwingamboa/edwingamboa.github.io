@@ -17,12 +17,15 @@ var Button = require('../../util/Button');
  * @param {string} iconKey - Texture key of the Challenge icon
  * @param {string} challengeName - Challenge name to show in UI.
  * @param {number} score - Score to be increased in case of success.
+ * @param {string} description - Description of the challenge.
  */
-var DragAndDropChallenge = function(iconKey, challengeName, score) {
-    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
+var DragAndDropChallenge = function(iconKey, challengeName, description,
+                                    score) {
+    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName, 5);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
+        description,
         score
     );
     this.destinations = [];

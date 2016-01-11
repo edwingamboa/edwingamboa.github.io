@@ -9,7 +9,7 @@ var Button = require('../util/Button');
  * @class ItemGroupView
  * @extends VerticalLayoutPanel
  * @constructor
- * @param {string} iconKey - Texture's key for the item icon.
+ * @param {string} iconKey - Item's icon
  * @param {string} buttonText - Text to show on the action button.
  * @param {ItemsPopUp} parentView - View on which the ItemGroupView will be
  * displayed.
@@ -19,34 +19,34 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
     var scale = 50 / this.icon.height;
+    this.icon.scale.x = scale;
     this.icon.scale.y = scale;
 
-    this.auxText = level.game.make.text(this.icon.width - 5, this.icon.height,
-        '');
-    this.auxText.font = 'Arial';
+    this.auxText = level.game.make.text(this.width - 20, this.height / 2, '');
+    this.auxText.font = level.font;
     this.auxText.fontSize = 20;
-    this.auxText.fill = '#FFFF99';
-    this.auxText.stroke = '#000000';
+    this.auxText.fill = '#FFF12B';
+    this.auxText.stroke = '#7d655f';
     this.auxText.strokeThickness = 2;
     this.auxText.setShadow(1, 1, 'rgba(0,0,0,0.5)', 5);
     this.auxText.anchor.set(1, 0.8);
 
-    this.icon.addChild(this.auxText);
-
     this.title = level.game.make.text(0, 0, 'Title');
-    this.title.font = 'Arial';
+    this.title.font = level.font;
     this.title.fontSize = 20;
-    this.title.fill = '#0040FF';
+    this.title.fill = '#473e2c';
 
     this.description = level.game.make.text(0, 0, 'Des 1 \n Des 2');
-    this.description.font = 'Arial';
+    this.description.font = level.font;
     this.description.fontSize = 12;
     this.description.fill = '#000000';
+    this.description.align = 'center';
 
     this.button = new Button(buttonText, this.buttonAction, this);
 
     this.addElement(this.title);
     this.addElement(this.icon);
+    this.addChild(this.auxText);
     this.addElement(this.description);
     this.addElement(this.button);
     this.parentView = parentView;

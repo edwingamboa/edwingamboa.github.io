@@ -12,8 +12,7 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var InventoryItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
-
+    ItemGroupView.call(this, item.key, 'Use', parentView);
     this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();

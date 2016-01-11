@@ -9,6 +9,7 @@ var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
 var Wife = require('../../character/Wife');
 var Friend = require('../../character/Friend');
+var VocabularyItem = require('../../items/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -91,14 +92,36 @@ LevelThree.prototype.createPlaces = function() {
  * @method LevelThree.addObjects
  */
 LevelThree.prototype.addObjects = function() {
-    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
-        'sisterMom',
-        'We are closer to our children!',
-        'My Family',
-        'Daughter\'s drawing.',
-        0);
-    this.addVocabularyItem(systerMomDrawing);
-    this.addCar(3.7 * this.checkPointsDistance, 'taxi');
+    var messages = ['Oh Great, that is our son\'s cap!'];
+    var titles = ['Our son\'s cap'];
+    var imagesKeys = ['cap'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var cap = new ClueItem(300, this.GROUND_HEIGHT,
+        'cap',
+        'Cap',
+        'A small, soft hat that often has a hard curved part' +
+        '\n(called a visor) that extends out over your eyes',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(cap);
+
+    messages = ['Oh Great, that is our daughtere\'s bracelet!'];
+    titles = ['My wife\'s bracelet'];
+    imagesKeys = ['bracelet'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var bracelet = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
+        'bracelet',
+        'Bracelet',
+        'A piece of jewelry worn on the wrist',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(bracelet);
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'Taxi1', 'taxi', 200, 500, 100);
 };
 
 /**

@@ -22,8 +22,13 @@ var NUMBER_OF_CONTEXTS = 2;
  */
 var ContextGroups = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'contexts', 'Contexts', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'contexts',
+        'Contexts',
+        'Match the words \nwith their category',
+        10,
+        dimensions
+    );
 };
 
 ContextGroups.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -46,8 +51,8 @@ ContextGroups.prototype.newChallenge = function() {
     vocabularyItems.push(wordsContext2);
 
     var contextsNames = [
-        level.myVocabulary.categories[wordsContext1[0].categoryIndex],
-        level.myVocabulary.categories[wordsContext2[0].categoryIndex]
+        level.myVocabulary.categoriesLabels[wordsContext1[0].categoryIndex],
+        level.myVocabulary.categoriesLabels[wordsContext2[0].categoryIndex]
     ];
 
     this.contexts = [];
@@ -69,9 +74,11 @@ ContextGroups.prototype.newChallenge = function() {
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
         context = new VerticalLayoutPanel('contextBg', 5);
         contextTitle = level.game.make.text(0, 0, contextsNames[i]);
-        contextTitle.font = 'Shojumaru';
-        contextTitle.fontSize = 20;
-        contextTitle.fill = '#0040FF';
+        contextTitle.font = level.font;
+        contextTitle.fontSize = 30;
+        contextTitle.fill = '#f00000';
+        contextTitle.stroke = '#000000';
+        contextTitle.strokeThickness = 2;
         context.addElement(contextTitle);
         this.contexts.push(context);
         contextsPanels.addElement(context);
@@ -79,9 +86,11 @@ ContextGroups.prototype.newChallenge = function() {
         for (j = 0; j < numberOfWords; j++) {
             word = level.game.make.text(0, 0, vocabularyItems[i][j].name);
             //Font style
-            word.font = 'Shojumaru';
+            word.font = level.font;
             word.fontSize = 20;
-            word.fill = '#0040FF';
+            word.fill = '#473e2c';
+            word.stroke = '#fff';
+            word.strokeThickness = 2;
             word.inputEnabled = true;
             word.input.enableDrag(true, true);
             word.events.onDragStop.add(this.dragAndDropControl.fixLocation,

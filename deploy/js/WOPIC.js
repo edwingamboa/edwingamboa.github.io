@@ -55,7 +55,7 @@ game.state.add('levelThree', LevelThree);
 game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":37,"./states/Menu":38,"./states/Preloader":39,"./states/levels/Intro":41,"./states/levels/LevelOne":43,"./states/levels/LevelThree":44,"./states/levels/LevelTwo":45}],2:[function(require,module,exports){
+},{"./states/Boot":38,"./states/Menu":39,"./states/Preloader":40,"./states/levels/Intro":42,"./states/levels/LevelOne":44,"./states/levels/LevelThree":45,"./states/levels/LevelTwo":46}],2:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -309,7 +309,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 };
 
 /**
- * Changes player's current weapon, to the next one in the weapons array.
+ * Changes character's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
  * @method Character.nextWeapon
  */
@@ -520,7 +520,7 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":58,"./Character":2}],4:[function(require,module,exports){
+},{"./../util/ResourceBar":60,"./Character":2}],4:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 06/12/2015.
  */
@@ -599,7 +599,7 @@ Friend.prototype.constructor = Friend;
 
 module.exports = Friend;
 
-},{"../items/weapons/MachineGun":34,"../util/InteractionManager":56,"../util/VerticalLayoutPopUp":62,"./InteractionEnemy":5}],5:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../util/InteractionManager":58,"../util/VerticalLayoutPopUp":64,"./InteractionEnemy":5}],5:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -675,7 +675,7 @@ InteractionEnemy.prototype.openDialogs = function() {
 module.exports = InteractionEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"./Enemy":3}],6:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"./Enemy":3}],6:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -721,13 +721,16 @@ NPC.prototype.openDialogs = function() {
 
 module.exports = NPC;
 
-},{"../util/Dialog":49,"./Character":2}],7:[function(require,module,exports){
+},{"../util/Dialog":50,"./Character":2}],7:[function(require,module,exports){
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 var Character = require('./Character');
+var Revolver = require('../items/weapons/Revolver');
+var MachineGun = require('../items/weapons/MachineGun');
+
 /**
  * Default player speed
  * @constant
@@ -752,6 +755,13 @@ var GRAVITY = 300;
  * @type {number}
  */
 var MINIMUM_SCORE = 20;
+/**
+ * Default initial health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
+var INITIAL_HEALTH_LEVEL = 100;
 
 /**
  * Represents player's character within the game.
@@ -767,8 +777,8 @@ var Player = function() {
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
-    this.score = MINIMUM_SCORE;
     this.frame = this.stopRightFrameIndex;
+    this.score = MINIMUM_SCORE;
 };
 
 Player.prototype = Object.create(Character.prototype);
@@ -873,9 +883,94 @@ Player.prototype.buyItem = function(item) {
     }
 };
 
+/**
+ * Updates player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
+ */
+Player.prototype.updateCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+    localStorage.setItem('currentWeapon', weaponKey);
+};
+
+/**
+ * Loads player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
+ */
+Player.prototype.loadCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+};
+
+/**
+ * Add a new weapon to character's weapons.
+ * @method Player.addWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.addWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+    newWeapon.saveWeapon();
+};
+
+/**
+ * Loads a weapon that player has acquired.
+ * @method Player.loadWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.loadWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+};
+
+/**
+ * Changes player's current weapon, to the next one in the weapons array.
+ * Updates currentWeaponIndex property.
+ * @method Player.nextWeapon
+ */
+Player.prototype.nextWeapon = function() {
+    Character.prototype.nextWeapon.call(this);
+    level.updateAmmoText();
+};
+
+/**
+ * Loads the player's information from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadPlayer = function() {
+    if (localStorage.getItem('score') !== null) {
+        this.score = parseInt(localStorage.getItem('score'));
+    }
+    if (localStorage.getItem('healthLevel') !== null) {
+        this.healthLevel = parseInt(localStorage.getItem('healthLevel'));
+    }
+    this.loadWeapons();
+    if (localStorage.getItem('currentWeapon') !== null) {
+        this.loadCurrentWeapon(localStorage.getItem('currentWeapon'));
+    }else {
+        this.useWeapon(new Revolver(700, 100, false));
+    }
+};
+
+/**
+ * Loads the player's weapons from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadWeapons = function() {
+    var weapon;
+    if (localStorage.getItem('revolver') !== null) {
+        weapon = new Revolver(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('revolver'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('machineGun') !== null) {
+        weapon = new MachineGun(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('machineGun'));
+        this.loadWeapon(weapon);
+    }
+};
+
 module.exports = Player;
 
-},{"./Character":2}],8:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../items/weapons/Revolver":36,"./Character":2}],8:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -946,7 +1041,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":35,"./Enemy":3}],9:[function(require,module,exports){
+},{"../items/weapons/Revolver":36,"./Enemy":3}],9:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1019,7 +1114,7 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":34,"./Enemy":3}],10:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"./Enemy":3}],10:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/11/2015.
  */
@@ -1075,9 +1170,11 @@ var MAX_RANGE_ATTACK = 600;
  * @constructor
  */
 var StrongestEnemy = function(x, y) {
-    var messages = ['Forgive me please!' + '\nI can liberate your wife.',
-        'I can liberate your wife.'];
-    var titles = ['Forgive me', 'Your Wife'];
+    var messages = ['Forgive me please! \nI can liberate your wife.',
+		'But your children are not here. \nThey are somewhere else,' +
+		'\nbut I do not know where',
+        'I am not the boss, \nI work for someone else'];
+    var titles = ['Forgive me', 'Look for your children', 'I am not the boss'];
     var imagesKeys = ['forgive', 'mother'];
     var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
@@ -1101,7 +1198,7 @@ StrongestEnemy.prototype.constructor = StrongestEnemy;
 module.exports = StrongestEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"../util/InteractionManager":56,"../util/VerticalLayoutPopUp":62,"./InteractionEnemy":5}],11:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../util/InteractionManager":58,"../util/VerticalLayoutPopUp":64,"./InteractionEnemy":5}],11:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/11/2015.
  */
@@ -1188,7 +1285,7 @@ Wife.prototype.killCharacter = function() {
 
 module.exports = Wife;
 
-},{"./../util/ResourceBar":58,"./Character":2}],12:[function(require,module,exports){
+},{"./../util/ResourceBar":60,"./Character":2}],12:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1213,8 +1310,13 @@ var NUMBER_OF_CONTEXTS = 2;
  */
 var ContextGroups = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'contexts', 'Contexts', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'contexts',
+        'Contexts',
+        'Match the words \nwith their category',
+        10,
+        dimensions
+    );
 };
 
 ContextGroups.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -1237,8 +1339,8 @@ ContextGroups.prototype.newChallenge = function() {
     vocabularyItems.push(wordsContext2);
 
     var contextsNames = [
-        level.myVocabulary.categories[wordsContext1[0].categoryIndex],
-        level.myVocabulary.categories[wordsContext2[0].categoryIndex]
+        level.myVocabulary.categoriesLabels[wordsContext1[0].categoryIndex],
+        level.myVocabulary.categoriesLabels[wordsContext2[0].categoryIndex]
     ];
 
     this.contexts = [];
@@ -1260,9 +1362,11 @@ ContextGroups.prototype.newChallenge = function() {
     for (i = 0; i < NUMBER_OF_CONTEXTS; i++) {
         context = new VerticalLayoutPanel('contextBg', 5);
         contextTitle = level.game.make.text(0, 0, contextsNames[i]);
-        contextTitle.font = 'Shojumaru';
-        contextTitle.fontSize = 20;
-        contextTitle.fill = '#0040FF';
+        contextTitle.font = level.font;
+        contextTitle.fontSize = 30;
+        contextTitle.fill = '#f00000';
+        contextTitle.stroke = '#000000';
+        contextTitle.strokeThickness = 2;
         context.addElement(contextTitle);
         this.contexts.push(context);
         contextsPanels.addElement(context);
@@ -1270,9 +1374,11 @@ ContextGroups.prototype.newChallenge = function() {
         for (j = 0; j < numberOfWords; j++) {
             word = level.game.make.text(0, 0, vocabularyItems[i][j].name);
             //Font style
-            word.font = 'Shojumaru';
+            word.font = level.font;
             word.fontSize = 20;
-            word.fill = '#0040FF';
+            word.fill = '#473e2c';
+            word.stroke = '#fff';
+            word.strokeThickness = 2;
             word.inputEnabled = true;
             word.input.enableDrag(true, true);
             word.events.onDragStop.add(this.dragAndDropControl.fixLocation,
@@ -1308,7 +1414,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],13:[function(require,module,exports){
+},{"../util/GridLayoutPanel":52,"../util/VerticalLayoutPanel":63,"./dragAndDrop/DragAndDropChallenge":16}],13:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1320,12 +1426,14 @@ module.exports = ContextGroups;
  * @constructor
  * @param iconKey {string} - Texture's key for the icon of the challenge
  * @param name {string} - Name of the challenge
+ * @param description {string} - Description of the challenge.
  * @param score {number} - Score to be increased in case of success.
  */
-var EnglishChallenge = function(iconKey, name, score) {
+var EnglishChallenge = function(iconKey, name, description, score) {
     this.iconKey = iconKey;
     this.name = name;
     this.score = score;
+    this.description = description;
 };
 
 EnglishChallenge.prototype.constructor = EnglishChallenge;
@@ -1382,8 +1490,13 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
  */
 var ImageWordMatch = function() {
     var dimensions = {numberOfRows: 3};
-    DragAndDropChallenge.call(this, 'imageWord', 'Image Match', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'imageWord',
+        'Image Match',
+        'Match the words \nwith their images',
+        10,
+        dimensions
+    );
 };
 
 ImageWordMatch.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -1400,24 +1513,34 @@ ImageWordMatch.prototype.newChallenge = function() {
 
     for (var i in words) {
         var cell = new VerticalLayoutPanel('imageWordBg');
-        var word = level.game.make.sprite(0, 0, words[i].key);
-        if (word.height > 120) {
-            var scale = 120 / word.height;
-            word.scale.x = scale;
-            word.scale.y = scale;
+        var image = level.game.make.sprite(0, 0, words[i].key);
+        var scaleX;
+        var scaleY;
+        if (image.height > 120 || image.width > 180) {
+            scaleY = 120 / image.height;
+            scaleX = 180 / image.width;
+            if (scaleX > scaleY) {
+                image.scale.x = scaleY;
+                image.scale.y = scaleY;
+            }else {
+                image.scale.x = scaleX;
+                image.scale.y = scaleX;
+            }
         }
         var shade = new VerticalLayoutPanel('wordBg', 2);
         shade.code = i;
 
         this.destinations.push(shade);
-        cell.addElement(word);
+        cell.addElement(image);
         cell.addElement(shade);
 
         var label = level.game.make.text(0, 0, words[i].name);
         //Font style
-        label.font = 'Shojumaru';
+        label.font = level.font;
         label.fontSize = 20;
-        label.fill = '#0040FF';
+        label.fill = '#473e2c';
+        label.stroke = '#fff';
+        label.strokeThickness = 2;
         label.inputEnabled = true;
         label.input.enableDrag(true, true);
         //label.events.onDragStart.add(this.bringItemToTop, this);
@@ -1461,7 +1584,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],15:[function(require,module,exports){
+},{"../util/GridLayoutPanel":52,"../util/VerticalLayoutPanel":63,"./dragAndDrop/DragAndDropChallenge":16}],15:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1478,8 +1601,13 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
  */
 var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'unscramble', 'Unscrambler', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'unscramble',
+        'Unscramble',
+        'Form the word \nusing the letters',
+        10,
+        dimensions
+    );
 };
 
 WordUnscramble.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -1520,9 +1648,11 @@ WordUnscramble.prototype.newChallenge = function() {
         }else {
             letterShade = new VerticalLayoutPanel('letterBg', 2);
             //Font style
-            letterText.font = 'Shojumaru';
-            letterText.fontSize = 20;
-            letterText.fill = '#0040FF';
+            letterText.font = level.font;
+            letterText.fontSize = 30;
+            letterText.fill = '#473e2c';
+            letterText.stroke = '#fff';
+            letterText.strokeThickness = 2;
             letterText.inputEnabled = true;
             letterText.input.enableDrag(true, true);
             letterText.events.onDragStop.add(
@@ -1559,7 +1689,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":51,"../util/VerticalLayoutPanel":61,"./dragAndDrop/DragAndDropChallenge":16}],16:[function(require,module,exports){
+},{"../util/GridLayoutPanel":52,"../util/VerticalLayoutPanel":63,"./dragAndDrop/DragAndDropChallenge":16}],16:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1579,12 +1709,15 @@ var Button = require('../../util/Button');
  * @param {string} iconKey - Texture key of the Challenge icon
  * @param {string} challengeName - Challenge name to show in UI.
  * @param {number} score - Score to be increased in case of success.
+ * @param {string} description - Description of the challenge.
  */
-var DragAndDropChallenge = function(iconKey, challengeName, score) {
-    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
+var DragAndDropChallenge = function(iconKey, challengeName, description,
+                                    score) {
+    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName, 5);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
+        description,
         score
     );
     this.destinations = [];
@@ -1636,7 +1769,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":13,"../../util/Button":48,"../../util/VerticalLayoutPanel":61,"../../util/VerticalLayoutPopUp":62,"./DragAndDropController":17}],17:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":13,"../../util/Button":49,"../../util/VerticalLayoutPanel":63,"../../util/VerticalLayoutPopUp":64,"./DragAndDropController":17}],17:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1747,7 +1880,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":59}],18:[function(require,module,exports){
+},{"../../util/Utilities":61}],18:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1796,7 +1929,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":51,"../../util/PopUp":57,"../ContextGroups":12,"../ImageWordMatch":14,"../WordUnscramble":15,"./MenuItem":19}],19:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":52,"../../util/PopUp":59,"../ContextGroups":12,"../ImageWordMatch":14,"../WordUnscramble":15,"./MenuItem":19}],19:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -1819,7 +1952,7 @@ var MenuItem = function(challenge, parentView) {
     this.challenge = challenge;
     this.updateScoreText();
     this.setTitle(challenge.englishChallenge.name);
-    //this.setDescription(challenge.englishChallenge.description);
+    this.setDescription(challenge.englishChallenge.description);
 };
 
 MenuItem.prototype = Object.create(ItemGroupView.prototype);
@@ -1848,7 +1981,7 @@ MenuItem.prototype.updateScoreText = function() {
 module.exports = MenuItem;
 
 
-},{"../../items/ItemGroupView":23}],20:[function(require,module,exports){
+},{"../../items/ItemGroupView":24}],20:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/12/2015.
  */
@@ -1862,25 +1995,23 @@ var VocabularyItem = require('./VocabularyItem');
  * @param {number} x - ClueItem's x coordinate within the game world.
  * @param {number} y - ClueItem's y coordinate within the game world.
  * @param {string} key - ClueItem's texture
- * @param {string} dialogMessage - Message to be displayed on this item's
- * dialog.
  * @param {string} name - ClueItem's name.
- * @param {string} description - ClueItem's name.
+ * @param {string} definition - ClueItem's definition.
  * @param {number} categoryIndex - Index of the category to which this item.
+ * @param {InteractionManager} interactionManager - Object that allows
+ * displaying player's messages
  */
 var ClueItem = function(x,
                         y,
                         key,
                         name,
-                        description,
+                        definition,
                         categoryIndex,
-                        dialogMessage,
                         interactionManager) {
-    VocabularyItem.call(this, x, y, key, name, dialogMessage, categoryIndex);
-    var scale = 50 / this.height;
+    VocabularyItem.call(this, x, y, key, name, definition, categoryIndex);
+    var scale = 30 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;
-    this.descriptionTemp = description;
     this.interactionManager = interactionManager;
 };
 
@@ -1907,7 +2038,7 @@ ClueItem.prototype.openActivity = function() {
 module.exports = ClueItem;
 
 
-},{"./VocabularyItem":25}],21:[function(require,module,exports){
+},{"./VocabularyItem":26}],21:[function(require,module,exports){
 var Item = require('./Item');
 
 /**
@@ -1940,7 +2071,7 @@ var HealthPack = function(x, y, maxIncreasing) {
     this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
     this.name = 'Health Pack';
-    this.description = '+ ' + maxIncreasing + ' Health Level';
+    this.description = 'Increasing: + ' + maxIncreasing + '\n Health Level';
     this.category = 'healthPacks';
 };
 
@@ -1970,7 +2101,179 @@ HealthPack.prototype.use = function() {
 
 module.exports = HealthPack;
 
-},{"./Item":22}],22:[function(require,module,exports){
+},{"./Item":23}],22:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 29/08/2015.
+ */
+var VocabularyItem = require('./VocabularyItem');
+var ResourceBar = require('../util/ResourceBar');
+var Button = require('../util/Button');
+
+/**
+ * Car gravity.
+ * @constant
+ * @type {number}
+ */
+var CAR_GRAVITY = 30000;
+/**
+ * Fuel bar width.
+ * @constant
+ * @type {number}
+ */
+var BAR_WIDTH = 100;
+/**
+ * Fuel bar height.
+ * @constant
+ * @type {number}
+ */
+var BAR_HEIGHT = 10;
+
+/**
+ * Represents a car, which player can interact with.
+ * @class InteractiveCar
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - Car x coordinate within the world.
+ * @param {number} y - Car y coordinate within the world.
+ * @param {string} name - Car name.
+ * @param {string} backgroundKey - Car texture key.
+ * @param {number} price - Car price
+ * @param {number} speed - Car speed
+ * @param {number} gasoline - Car max gasoline
+ */
+var InteractiveCar = function(x,
+                              y,
+                              name,
+                              backgroundKey,
+                              price,
+                              speed,
+                              gasoline,
+                              definition) {
+    VocabularyItem.call(this, x, y, backgroundKey, name, definition, 2, false,
+        price);
+
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    this.anchor.set(0.5, 1);
+    this.animations.add('left', [0], 10, true);
+    this.animations.add('right', [1], 10, true);
+    this.occupied = false;
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 1;
+    this.remainingGas = gasoline;
+    this.gasoline = gasoline;
+    this.speed = speed;
+    this.maxSpeed = speed * 1.5;
+
+    this.name = name;
+    this.description = 'Speed: ' + this.speed +
+        '\nGasoline: ' + this.gasoline;
+    this.category = 'transport';
+
+    this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
+        -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
+    this.gasBar.visible = false;
+    this.addChild(this.gasBar);
+
+    this.getOnButton = new Button ('Get on', this.getOn, this);
+    this.getOnButton.x = -(this.width - this.getOnButton.width) / 2;
+    this.getOnButton.y = -this.height;
+    this.addChild(this.getOnButton);
+};
+
+InteractiveCar.prototype = Object.create(VocabularyItem.prototype);
+InteractiveCar.prototype.constructor = InteractiveCar;
+
+/**
+ * Allows the player to get on the car.
+ * @method InteractiveCar.getOn
+ */
+InteractiveCar.prototype.getOn = function() {
+    if (this.remainingGas > 0) {
+        level.myVocabulary.addItem(this);
+        this.gasBar.visible = true;
+        this.getOnButton.visible = false;
+        level.player.onVehicle = true;
+        level.player.relocate(this.x, this.y - 100);
+        level.player.changeSpeed(this.speed, this.maxSpeed);
+        level.player.changeGravity(CAR_GRAVITY);
+        this.occupied = true;
+    }
+};
+
+/**
+ * Allows the player to get off the car.
+ * @method InteractiveCar.getOff
+ */
+InteractiveCar.prototype.getOff = function() {
+    this.stop();
+    level.player.onVehicle = false;
+    level.player.relocate(this.x + 100, this.y - 100);
+    level.player.resetSpeed();
+    level.player.resetGravity();
+    this.occupied = false;
+};
+
+/**
+ * Updates car current state, animations and traveled distance, to stop it when
+ * it has traveled the longest possible distance.
+ * @method InteractiveCar.update
+ */
+InteractiveCar.prototype.update = function() {
+    if (this.occupied) {
+        this.body.velocity.x = level.player.body.velocity.x;
+        if (this.body.velocity.x < 0) {
+            this.animations.play('left');
+            this.remainingGas --;
+        }else if (this.body.velocity.x > 0) {
+            this.animations.play('right');
+            this.remainingGas --;
+        }else if (level.direction > 0) {
+            this.frame = this.stopRightFrameIndex;
+        }else if (level.direction < 0) {
+            this.frame = this.stopLeftFrameIndex;
+        }
+        if (this.remainingGas <= 0) {
+            this.getOff();
+        }
+        this.gasBar.updateResourceBarLevel(this.remainingGas /
+            this.gasoline);
+    }
+};
+
+/**
+ * Determines whether the car is stopped or not.
+ * @method InteractiveCar.isStopped
+ * @returns {boolean} - True if car speed = 0, otherwise false.
+ */
+InteractiveCar.prototype.isStopped = function() {
+    return this.body.velocity.x === 0;
+};
+
+/**
+ * Stops the car, making speed = 0.
+ * @method InteractiveCar.stop
+ */
+InteractiveCar.prototype.stop = function() {
+    this.body.velocity.x = 0;
+};
+
+/**
+ * Allows the character to use this car.
+ * @method InteractiveCar.use
+ */
+InteractiveCar.prototype.use = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.x = level.player.x + 50;
+    this.y = level.GROUND_HEIGHT;
+    level.addCar(this);
+};
+
+module.exports = InteractiveCar;
+
+},{"../util/Button":49,"../util/ResourceBar":60,"./VocabularyItem":26}],23:[function(require,module,exports){
 /**
  * Bounce value for an Item
  * @constant
@@ -2022,7 +2325,7 @@ Item.prototype.setName = function(name) {
 
 module.exports = Item;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2034,7 +2337,7 @@ var Button = require('../util/Button');
  * @class ItemGroupView
  * @extends VerticalLayoutPanel
  * @constructor
- * @param {string} iconKey - Texture's key for the item icon.
+ * @param {string} iconKey - Item's icon
  * @param {string} buttonText - Text to show on the action button.
  * @param {ItemsPopUp} parentView - View on which the ItemGroupView will be
  * displayed.
@@ -2044,34 +2347,34 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
     var scale = 50 / this.icon.height;
+    this.icon.scale.x = scale;
     this.icon.scale.y = scale;
 
-    this.auxText = level.game.make.text(this.icon.width - 5, this.icon.height,
-        '');
-    this.auxText.font = 'Arial';
+    this.auxText = level.game.make.text(this.width - 20, this.height / 2, '');
+    this.auxText.font = level.font;
     this.auxText.fontSize = 20;
-    this.auxText.fill = '#FFFF99';
-    this.auxText.stroke = '#000000';
+    this.auxText.fill = '#FFF12B';
+    this.auxText.stroke = '#7d655f';
     this.auxText.strokeThickness = 2;
     this.auxText.setShadow(1, 1, 'rgba(0,0,0,0.5)', 5);
     this.auxText.anchor.set(1, 0.8);
 
-    this.icon.addChild(this.auxText);
-
     this.title = level.game.make.text(0, 0, 'Title');
-    this.title.font = 'Arial';
+    this.title.font = level.font;
     this.title.fontSize = 20;
-    this.title.fill = '#0040FF';
+    this.title.fill = '#473e2c';
 
     this.description = level.game.make.text(0, 0, 'Des 1 \n Des 2');
-    this.description.font = 'Arial';
+    this.description.font = level.font;
     this.description.fontSize = 12;
     this.description.fill = '#000000';
+    this.description.align = 'center';
 
     this.button = new Button(buttonText, this.buttonAction, this);
 
     this.addElement(this.title);
     this.addElement(this.icon);
+    this.addChild(this.auxText);
     this.addElement(this.description);
     this.addElement(this.button);
     this.parentView = parentView;
@@ -2118,7 +2421,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":48,"../util/VerticalLayoutPanel":61}],24:[function(require,module,exports){
+},{"../util/Button":49,"../util/VerticalLayoutPanel":63}],25:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/10/2015.
  */
@@ -2126,9 +2429,6 @@ module.exports = ItemGroupView;
 var PopUp = require('../util/PopUp');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
-var HealthPack = require('./HealthPack');
-var Revolver = require('./weapons/Revolver');
-var MachineGun = require('./weapons/MachineGun');
 
 /**
  * View that contains a menu of items, grouped by category.
@@ -2150,7 +2450,7 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
         tab = new Button(tabsLabels[i], this.showTab, this, 'tabBg');
         tab.category = categories[i];
         tab.x = x;
-        tab.y = 58;
+        tab.y = 60;
         x += tab.width + 2;
         this.addChild(tab);
         this.items[categories[i]] = [];
@@ -2160,7 +2460,6 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
     this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
     this.panel.x = 20;
     this.panel.y = 100;
-    this.createItemGroups();
     this.firstCategory = categories[0];
     this.addChild(this.panel);
 };
@@ -2198,21 +2497,6 @@ ItemsPopUp.prototype.fillPanel = function(category) {
 };
 
 /**
- * Creates all items views.
- * @method ItemsPopUp.createItemGroups
- */
-ItemsPopUp.prototype.createItemGroups = function() {
-    var revolverItem = new Revolver(0, 0, false);
-    this.addItem(revolverItem);
-    var machineGunItem = new MachineGun(0, 0, false);
-    this.addItem(machineGunItem);
-    var healthPackItem = new HealthPack(0, 0, 5);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 20);
-    this.addItem(healthPackItem);
-};
-
-/**
  * Opens the PopItem showing first tab.
  * @method ItemsPopUp.open
  */
@@ -2224,7 +2508,7 @@ ItemsPopUp.prototype.open = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":48,"../util/GridLayoutPanel":51,"../util/PopUp":57,"./HealthPack":21,"./weapons/MachineGun":34,"./weapons/Revolver":35}],25:[function(require,module,exports){
+},{"../util/Button":49,"../util/GridLayoutPanel":52,"../util/PopUp":59}],26:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 06/11/2015.
  */
@@ -2240,23 +2524,25 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * @param {number} y - VocabularyItem's y coordinate within the game world.
  * @param {string} key - VocabularyItem's texture
  * @param {string} name - VocabularyItem's name.
- * @param {string} description - VocabularyItem's name.
+ * @param {string} definition - VocabularyItem's description.
  * @param {number} categoryIndex - Index of the category to which this item
  * belongs.
  * @param {boolean} openImmediately - Indicates whether this vocabulary item
  * should display the message when the player picksItUp
+ * @param {number} [price = 0] - The price of this item
  */
 var VocabularyItem = function(x,
                               y,
                               key,
                               name,
-                              description,
+                              definition,
                               categoryIndex,
-                              openImmediately) {
-    Item.call(this, x, y, key, 0);
+                              openImmediately,
+                              price) {
+    Item.call(this, x, y, key, price || 0);
     this.categoryIndex = categoryIndex;
     this.name = name;
-    this.description = description;
+    this.definition = definition;
     this.makeDialog();
     this.openImmediately = openImmediately || false;
 };
@@ -2265,10 +2551,10 @@ VocabularyItem.prototype = Object.create(Item.prototype);
 VocabularyItem.prototype.constructor = VocabularyItem;
 
 /**
- * Add this VocabularyItem to the game so that the player can pick it up.
+ * Displays the definition of this VocabularyItem
  * @method VocabularyItem.use
  */
-VocabularyItem.prototype.use = function() {
+VocabularyItem.prototype.show = function() {
     this.popUp.open();
 };
 
@@ -2284,8 +2570,8 @@ VocabularyItem.prototype.makeDialog = function() {
         icon.scale.x = scale;
         icon.scale.y = scale;
     }
-    var dialogText = level.game.make.text(0, 0, this.description);
-    dialogText.font = 'Arial';
+    var dialogText = level.game.make.text(0, 0, this.definition);
+    dialogText.font = level.font;
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
     dialogText.align = 'center';
@@ -2297,7 +2583,7 @@ VocabularyItem.prototype.makeDialog = function() {
 module.exports = VocabularyItem;
 
 
-},{"../util/VerticalLayoutPopUp":62,"./Item":22}],26:[function(require,module,exports){
+},{"../util/VerticalLayoutPopUp":64,"./Item":23}],27:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/12/2015.
  */
@@ -2341,12 +2627,15 @@ WorldItem.prototype.pickUp = function() {
 
 module.exports = WorldItem;
 
-},{"./VocabularyItem":25}],27:[function(require,module,exports){
+},{"./VocabularyItem":26}],28:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
 var ItemsPopUp = require('../ItemsPopUp');
 var InventoryItem = require ('./InventoryItem');
+var HealthPack = require('../HealthPack');
+var Revolver = require('../weapons/Revolver');
+var MachineGun = require('../weapons/MachineGun');
 
 /**
  * Ui and control for the game Inventory.
@@ -2355,9 +2644,10 @@ var InventoryItem = require ('./InventoryItem');
  * @constructor
  */
 var Inventory = function() {
-    var tabsLabels = ['Weapons', 'Health Packs'];
-    var categories = ['weapons', 'healthPacks'];
+    var tabsLabels = ['Weapons', 'Health Packs', 'Vehicles'];
+    var categories = ['weapons', 'healthPacks', 'transport'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
+    this.loadInventory();
 };
 
 Inventory.prototype = Object.create(ItemsPopUp.prototype);
@@ -2374,11 +2664,60 @@ Inventory.prototype.addItem = function(item) {
     }
     this.items[item.category][item.key].amountAvailable ++;
     this.items[item.category][item.key].updateAmountAvailableText();
+    localStorage.setItem(item.key + 'Item',
+        this.items[item.category][item.key].amountAvailable);
+};
+
+/**
+ * Loads an item to the inventory to be displayed for the player.
+ * @method Inventory.loadItem
+ * @param {Item} item - Item to be added to the inventory.
+ */
+Inventory.prototype.loadItem = function(item) {
+    this.items[item.category][item.key] = new InventoryItem(item, this);
+    this.items[item.category][item.key].amountAvailable =
+        localStorage.getItem(item.key + 'Item');
+    this.items[item.category][item.key].updateAmountAvailableText();
+};
+
+/**
+ * Loads the player's inventory.
+ * @method Store.createItemGroups
+ */
+Inventory.prototype.loadInventory = function() {
+    var item;
+    if (localStorage.getItem('revolverItem') !== null) {
+        item = new Revolver(0, 0, false);
+        this.loadItem(item);
+    }
+    if (localStorage.getItem('machineGunItem') !== null) {
+        item = new MachineGun(0, 0, false);
+        this.loadItem(item);
+    }
+
+    var healthPackTypes = [5, 20, 50];
+    var i;
+    var healthPackKey;
+    for (i in healthPackTypes) {
+        healthPackKey = 'healthPack' + healthPackTypes[i] + 'Item';
+        if (localStorage.getItem(healthPackKey) !== null) {
+            item = new HealthPack(0, 0, 5);
+            this.loadItem(item);
+        }
+    }
+
+    var carsKey = ['car', 'jeep', 'bus', 'truck', 'taxi', 'ambulance'];
+    for (i in carsKey) {
+        if (localStorage.getItem(carsKey[i] + 'Item') !== null) {
+            item = level.createInteractiveCar(carsKey[i]);
+            this.loadItem(item);
+        }
+    }
 };
 
 module.exports = Inventory;
 
-},{"../ItemsPopUp":24,"./InventoryItem":28}],28:[function(require,module,exports){
+},{"../HealthPack":21,"../ItemsPopUp":25,"../weapons/MachineGun":35,"../weapons/Revolver":36,"./InventoryItem":29}],29:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2393,8 +2732,7 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var InventoryItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
-
+    ItemGroupView.call(this, item.key, 'Use', parentView);
     this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
@@ -2431,12 +2769,15 @@ InventoryItem.prototype.updateAmountAvailableText = function() {
 
 module.exports = InventoryItem;
 
-},{"../ItemGroupView":23}],29:[function(require,module,exports){
+},{"../ItemGroupView":24}],30:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
 var ItemsPopUp = require('../ItemsPopUp');
 var StoreItem = require ('./StoreItem');
+var HealthPack = require('../HealthPack');
+var Revolver = require('../weapons/Revolver');
+var MachineGun = require('../weapons/MachineGun');
 
 /**
  * View and control of the game store
@@ -2445,17 +2786,27 @@ var StoreItem = require ('./StoreItem');
  * @constructor
  */
 var Store = function() {
-    var tabsLabels = ['Weapons', 'Health Packs', 'Objects'];
-    var categories = ['weapons', 'healthPacks', 'objects'];
+    var tabsLabels = ['Weapons', 'Health Packs', 'Vehicles'];
+    var categories = ['weapons', 'healthPacks', 'transport'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Store');
 
-    this.cash = level.game.make.text(this.width - 20, 58,
-        'Cash: $ ' + level.player.score);
-    this.cash.font = 'Shojumaru';
+    var cashIcon = level.game.make.sprite(this.width - 190, 60, 'money');
+    var scale = 30 / cashIcon.height;
+    cashIcon.scale.x = scale;
+    cashIcon.scale.y = scale;
+    cashIcon.anchor.set(1, 0);
+    this.addChild(cashIcon);
+
+    this.cash = level.game.make.text(this.width - 70, 60,
+        'Money: $ ' + level.player.score);
+    this.cash.font = level.font;
     this.cash.fontSize = 20;
     this.cash.fill = '#FFFFFF';
+    this.cash.stroke = '#000';
+    this.cash.strokeThickness = 3;
     this.cash.anchor.set(1, 0);
     this.addChild(this.cash);
+    this.createItems();
 };
 
 Store.prototype = Object.create(ItemsPopUp.prototype);
@@ -2472,9 +2823,42 @@ Store.prototype.addItem = function(item) {
     }
 };
 
+/**
+ * Updates player score or money text on main GUI and on store
+ * @method Store.updateMoney
+ */
+Store.prototype.updateMoney = function() {
+    level.updateScoreText();
+    this.cash.text = 'Money: $ ' + level.player.score;
+};
+
+/**
+ * Creates all items views.
+ * @method Store.createItemGroups
+ */
+Store.prototype.createItems = function() {
+    var revolverItem = new Revolver(0, 0, false);
+    this.addItem(revolverItem);
+    var machineGunItem = new MachineGun(0, 0, false);
+    this.addItem(machineGunItem);
+
+    var healthPackItem = new HealthPack(0, 0, 5);
+    this.addItem(healthPackItem);
+    healthPackItem = new HealthPack(0, 0, 20);
+    this.addItem(healthPackItem);
+    healthPackItem = new HealthPack(0, 0, 50);
+    this.addItem(healthPackItem);
+
+    var carsKey = ['car', 'jeep', 'bus', 'truck', 'taxi', 'ambulance'];
+    var i;
+    for (i in carsKey) {
+        this.addItem(level.createInteractiveCar(carsKey[i]));
+    }
+};
+
 module.exports = Store;
 
-},{"../ItemsPopUp":24,"./StoreItem":30}],30:[function(require,module,exports){
+},{"../HealthPack":21,"../ItemsPopUp":25,"../weapons/MachineGun":35,"../weapons/Revolver":36,"./StoreItem":31}],31:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2489,7 +2873,7 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Store} parentView - View on which the item will be displayed.
  */
 var StoreItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Buy', parentView);
+    ItemGroupView.call(this, item.key, 'Buy', parentView);
     this.item = item;
     this.updatePriceText();
     this.setTitle(this.item.name);
@@ -2514,17 +2898,17 @@ StoreItem.prototype.updatePriceText = function() {
 StoreItem.prototype.buttonAction = function() {
     var successfulPurchase = level.player.buyItem(this.item);
     if (successfulPurchase) {
-        this.item.use();
-        level.updateScoreText();
+        level.inventory.addItem(this.item);
         level.showSuccessMessage('Successful Purchase!', this.parent);
+        this.parentView.updateMoney();
     }else {
-        level.showErrorMessage('Not enough money.', this.parent);
+        level.showErrorMessage('You do not have enough money.', this.parent);
     }
 };
 
 module.exports = StoreItem;
 
-},{"../ItemGroupView":23}],31:[function(require,module,exports){
+},{"../ItemGroupView":24}],32:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
@@ -2539,10 +2923,10 @@ var Utilities = require('../../util/Utilities');
  * @constructor
  */
 var MyVocabulary = function() {
-    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Others'];
-    this.categories = ['places', 'family', 'transport', 'others'];
+    this.categoriesLabels = ['Places', 'Family', 'Transport', 'Personal Items'];
+    this.categories = ['places', 'family', 'transport', 'personalItems'];
     ItemsPopUp.call(this, this.categoriesLabels, this.categories,
-        'My Vocabulary');
+        'Vocabulary');
 };
 
 MyVocabulary.prototype = Object.create(ItemsPopUp.prototype);
@@ -2605,7 +2989,7 @@ MyVocabulary.prototype.randomCategory = function(numberOfWords) {
 
 module.exports = MyVocabulary;
 
-},{"../../util/Utilities":59,"../ItemsPopUp":24,"./MyVocabularyItem":32}],32:[function(require,module,exports){
+},{"../../util/Utilities":61,"../ItemsPopUp":25,"./MyVocabularyItem":33}],33:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/11/2015.
  */
@@ -2621,16 +3005,16 @@ var Button = require('../../util/Button');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var MyVocabularyItem = function(item, parentView) {
-    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
+    VerticalLayoutPanel.call(this, 'myVocabularyItemBg', 4);
     this.item = item;
     this.icon = level.game.make.sprite(0, 0, this.item.key);
     var scale = 50 / this.icon.height;
     this.icon.scale.x = scale;
     this.icon.scale.y = scale;
     this.title = level.game.make.text(0, 0, this.item.name);
-    this.title.font = 'Arial';
+    this.title.font = level.font;
     this.title.fontSize = 20;
-    this.title.fill = '#0040FF';
+    this.title.fill = '#473e2c';
 
     this.button = new Button('Show', this.buttonAction, this);
 
@@ -2648,12 +3032,12 @@ MyVocabularyItem.prototype.constructor = MyVocabularyItem;
  * @method MyVocabularyItem.buttonAction
  */
 MyVocabularyItem.prototype.buttonAction = function() {
-    this.item.use();
+    this.item.show();
 };
 
 module.exports = MyVocabularyItem;
 
-},{"../../util/Button":48,"../../util/VerticalLayoutPanel":61}],33:[function(require,module,exports){
+},{"../../util/Button":49,"../../util/VerticalLayoutPanel":63}],34:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/07/2015.
  */
@@ -2682,7 +3066,7 @@ Bullet.prototype.constructor = Bullet;
 
 module.exports = Bullet;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2771,7 +3155,7 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":36}],35:[function(require,module,exports){
+},{"./Weapon":37}],36:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 23/07/2015.
  */
@@ -2860,7 +3244,7 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":36}],36:[function(require,module,exports){
+},{"./Weapon":37}],37:[function(require,module,exports){
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
@@ -2924,7 +3308,7 @@ var Weapon = function(x,
     this.fireRate = fireRate;
     this.infinite = infinite;
     this.description = 'Damage: ' + this.power +
-        '\nAmmo: ' + this.numberOfBullets;
+        '\nAmmunition: ' + this.numberOfBullets;
     this.category = 'weapons';
 };
 
@@ -3014,9 +3398,17 @@ Weapon.prototype.pointToLeft = function() {
     this.frame = LEFT_KEY;
 };
 
+/**
+ * Saves this weapon information.
+ * @method Weapon.saveWeapon
+ */
+Weapon.prototype.saveWeapon = function() {
+    localStorage.setItem(this.key, this.numberOfBullets);
+};
+
 module.exports = Weapon;
 
-},{"../Item":22,"./Bullet":33}],37:[function(require,module,exports){
+},{"../Item":23,"./Bullet":34}],38:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 07/07/2015.
  */
@@ -3052,7 +3444,7 @@ Boot.prototype.create = function() {
 
 module.exports = Boot;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -3086,12 +3478,12 @@ Menu.prototype.create = function() {
  * @method Menu.newGame
  */
 Menu.prototype.newGame = function() {
-    this.game.state.start('levelOneIntro');
+    this.game.state.start('intro');
 };
 
 module.exports = Menu;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 08/07/2015.
  */
@@ -3159,6 +3551,8 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/popUpBg.png');
     this.game.load.image('close', 'assets/images/close.png');
     this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
+    this.game.load.image('myVocabularyItemBg',
+        'assets/images/myVocabularyItemBg.png');
     this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
     this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
     this.game.load.image('successIcon', 'assets/images/successIcon.png');
@@ -3177,9 +3571,15 @@ Preloader.prototype.loadAssets = function() {
         'assets/sprites/strong_enemy.png', 64, 64);
     this.game.load.spritesheet('strongestEnemy',
         'assets/sprites/strongestEnemy.png', 80, 80);
+
     this.game.load.spritesheet('jeep', 'assets/sprites/jeep.png', 219.5, 150);
     this.game.load.spritesheet('bus', 'assets/sprites/bus.png', 400, 180);
     this.game.load.spritesheet('taxi', 'assets/sprites/taxi.png', 215, 100);
+    this.game.load.spritesheet('truck', 'assets/sprites/truck.png', 400, 239);
+    this.game.load.spritesheet('car', 'assets/sprites/car.png', 237, 100);
+    this.game.load.spritesheet('ambulance', 'assets/sprites/ambulance.png', 300,
+        144);
+
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
         30, 16);
     this.game.load.spritesheet('machineGun',
@@ -3201,6 +3601,9 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('myVocabularyButton',
         'assets/images/myVocabulary.png');
     this.game.load.image('button', 'assets/images/button.png');
+    this.game.load.image('iconButton', 'assets/images/iconButton.png');
+    this.game.load.image('toolsBar', 'assets/images/toolsBar.png');
+
     this.game.load.image('mother', 'assets/images/mother.png');
     this.game.load.image('father', 'assets/images/father.png');
     this.game.load.image('daughter', 'assets/images/daughter.png');
@@ -3234,7 +3637,6 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/popUpPanelBg.png');
     this.game.load.image('tabBg', 'assets/images/tabBg.png');
     this.game.load.image('contextBg', 'assets/images/contextBg.png');
-
     this.game.load.image('englishChallengePanelBg',
         'assets/images/englishChallengePanelBg.png');
     this.game.load.image('imageWordBg', 'assets/images/imageWordBg.png');
@@ -3276,11 +3678,14 @@ Preloader.prototype.loadAssets = function() {
         'assets/images/vocabulary/blueHouse.png');
     this.game.load.image('nameBoard',
         'assets/images/vocabulary/nameBoard.png');
-    this.game.load.image('necklace',
-        'assets/images/vocabulary/necklace.png');
-    this.game.load.image('necklaceBig',
-        'assets/images/vocabulary/necklaceBig.png');
-    this.game.load.image('necklaceIcon', 'assets/icons/necklaceIcon.png');
+    this.game.load.image('necklace', 'assets/images/vocabulary/necklace.png');
+    this.game.load.image('glasses', 'assets/images/vocabulary/glasses.png');
+    this.game.load.image('watch', 'assets/images/vocabulary/watch.png');
+    this.game.load.image('ring', 'assets/images/vocabulary/ring.png');
+    this.game.load.image('cap', 'assets/images/vocabulary/cap.png');
+    this.game.load.image('bracelet', 'assets/images/vocabulary/bracelet.png');
+    this.game.load.image('family', 'assets/images/vocabulary/family.png');
+
     this.game.load.image('sisterMom',
         'assets/images/vocabulary/sisterMom.png');
     this.game.load.image('sisterMomBig',
@@ -3333,9 +3738,9 @@ Preloader.prototype.onLoadComplete = function() {
 
 module.exports = Preloader;
 
-},{}],40:[function(require,module,exports){
-arguments[4][37][0].apply(exports,arguments)
-},{"dup":37}],41:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
+arguments[4][38][0].apply(exports,arguments)
+},{"dup":38}],42:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -3376,15 +3781,14 @@ Intro.prototype.create = function() {
     var centerX = this.game.camera.width / 2;
     var centerY = this.game.camera.height / 2;
 
-    this.background = this.game.add.sprite(centerX, centerY,
-        'comicBg');
+    this.background = this.game.add.sprite(centerX, centerY - 20, 'comicBg');
     this.background.anchor.set(0.5, 0.7);
 
     this.changeComicImage('intro1');
     this.currentImage = 1;
 
     var continueButton = new Button('Continue', this.continue, this);
-    continueButton.x = this.game.camera.width - 250;
+    continueButton.x = this.game.camera.width - 150;
     continueButton.y = this.game.camera.height - 60;
     this.game.add.existing(continueButton);
 
@@ -3392,16 +3796,17 @@ Intro.prototype.create = function() {
         NUMBER_OF_COMIC_IMAGES, this.updateComic, this);
 
     this.scripts = [
-        'Edwar gets home',
+        'Edward gets home',
         'He parks his car and gets into his house',
         'Now he wants to eat something',
-        'Edwar finds a piece of paper',
-        'Someone kidnapped his family und he is now angry',
-        'He needs a weapon to defend himself',
+        'Then he finds a piece of paper',
+        'Someone kidnapped his family and he is now worried and angry',
         'He will rescue his family, but that can be dangerous'
     ];
-    this.comicText = this.game.add.text(100, 450, '',
-        {font: '20px Arial', fill: '#FFFFFF'});
+    this.comicText = this.game.add.text(centerX, 430, '',
+        {font: '25px Arial', fill: '#FFF', align: 'center',
+            stroke: '#7d655f', strokeThickness: 2});
+    this.comicText.anchor.set(0.5, 0);
     this.game.add.existing(this.comicText);
     this.showScript(0);
 };
@@ -3472,7 +3877,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":48}],42:[function(require,module,exports){
+},{"../../util/Button":49}],43:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/06/2015.
  */
@@ -3488,7 +3893,7 @@ var StrongestEnemy = require('../../character/StrongestEnemy');
 var StrongEnemy = require('../../character/StrongEnemy');
 var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
-var InteractiveCar = require ('../../worldElements/InteractiveCar');
+var InteractiveCar = require ('../../items/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
@@ -3496,6 +3901,8 @@ var ResourceBar = require('../../util/ResourceBar');
 var NameBoard = require('../../worldElements/NameBoard');
 var WorldItem = require('../../items/WorldItem');
 var InteractionManager = require('../../util/InteractionManager');
+var IconButton = require('../../util/IconButton');
+var HorizontalLayoutPanel = require('../../util/HorizontalLayoutPanel');
 
 /**
  * Represents a game level.
@@ -3517,6 +3924,7 @@ Level.prototype.preload = function() {
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    this.font = level.font;
     level = this;
 };
 
@@ -3533,6 +3941,7 @@ Level.prototype.create = function() {
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
+    this.addPlatforms();
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
     this.createOtherItemsGroup();
@@ -3541,7 +3950,6 @@ Level.prototype.create = function() {
     this.createEnemiesGroup();
     this.addPlayer();
     this.createWeaponsGroup();
-    this.addPlatforms();
     this.addTexts();
     this.addHealthBar();
     this.addControls();
@@ -3551,6 +3959,7 @@ Level.prototype.create = function() {
     this.createEnglishChallengesMenu();
     this.createStore();
     this.updateHealthLevel();
+    this.createToolsBar();
 };
 
 /**
@@ -3662,7 +4071,7 @@ Level.prototype.update = function() {
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
         this.player.fireToXY(this.player.x + (100 * this.xDirection));
-        //  Add and update the score
+        this.player.currentWeapon.saveWeapon();
         this.updateAmmoText();
     }
 };
@@ -3672,8 +4081,8 @@ Level.prototype.update = function() {
  * @method Level.addHealthBar
  */
 Level.prototype.addHealthBar = function() {
-    this.healthBar = new ResourceBar(this.healthIcon.x +
-        this.healthIcon.width / 2 + 10,
+    this.healthBar = new ResourceBar(
+        this.healthIcon.x + this.healthIcon.width + 10,
         this.healthLevelText.y + 2);
     this.addObject(this.healthBar);
     this.healthBar.fixedToCamera = true;
@@ -3768,10 +4177,24 @@ Level.prototype.addNPC = function(x, key, messages, titles, imagesKeys) {
  * @method Level.addCar
  * @param {number} x - X coordinate within the world where the car should
  * appear.
+ * @param {string} name - Car name.
  * @param {string} key - Car texture key.
+ * @param {number} price - Car price
+ * @param {number} speed - Car speed
+ * @param {number} gasoline - Car max gasoline
+
+Level.prototype.addCar = function(x, name, key, price, speed,  gasoline) {
+    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, name, key, price,
+    speed, gasoline));
+};*/
+
+/**
+ * Adds a new InteractiveCar to enemies group.
+ * @method Level.addCar
+ * @param {InteractiveCar} car - car to be added.
  */
-Level.prototype.addCar = function(x, key) {
-    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, key));
+Level.prototype.addCar = function(car) {
+    this.cars.add(car);
 };
 
 /**
@@ -3815,7 +4238,7 @@ Level.prototype.addPlayer = function() {
     this.player = new Player(this);
     this.playerCharacters.add(this.player);
     this.gameObjects.push(this.playerCharacters);
-    this.player.useWeapon(new Revolver(700, 100, false));
+    this.player.loadPlayer();
 };
 
 /**
@@ -3833,54 +4256,55 @@ Level.prototype.addPlayerCharacter = function(character) {
  * @method Level.addTexts
  */
 Level.prototype.addTexts = function() {
+    var labelFontStyle = {fontSize: '16px', fill: '#fff', stroke: '#000',
+        strokeThickness: 4};
+    var textFontStyle = {fontSize: '35px', fill: '#fff', stroke: '#000',
+        strokeThickness: 4};
+    var y = 10;
+    var distanceBetewIconLabel = 80;
     //The score
-    this.scoreIcon = this.game.add.sprite(this.game.camera.width - 150, 10,
+    this.scoreIcon = this.game.add.sprite(this.game.camera.width - 190, y,
         'money');
     this.scoreIcon.fixedToCamera = true;
     this.scoreIcon.anchor.set(0.5, 0);
     this.scoreLabel = this.game.add.text(this.scoreIcon.x,
-        this.scoreIcon.y + this.scoreIcon.height,
-        'Money', {fontSize: '16px', fill: '#000'});
+        this.scoreIcon.y + this.scoreIcon.height, 'Money', labelFontStyle);
     this.scoreLabel.fixedToCamera = true;
     this.scoreLabel.anchor.set(0.5, 0);
-    this.scoreText = this.game.add.text(this.scoreIcon.x + 60, 10,
-        '' + this.player.score, {fontSize: '32px', fill: '#000'});
+    this.scoreText = this.game.add.text(
+        this.scoreIcon.x + distanceBetewIconLabel, y, '$ ' + this.player.score,
+        textFontStyle
+    );
     this.scoreText.fixedToCamera = true;
     this.scoreText.anchor.set(0.5, 0);
 
     //The ammo
-    this.ammoIcon = this.game.add.sprite(this.game.camera.width - 150,
-        this.game.camera.height - 70,
+    this.ammoIcon = this.game.add.sprite(this.game.camera.width - 400, 10,
         'ammo');
     this.ammoIcon.fixedToCamera = true;
     this.ammoIcon.anchor.set(0.5, 0);
     this.ammoLabel = this.game.add.text(this.ammoIcon.x,
-        this.ammoIcon.y + this.ammoIcon.height,
-        'Ammo', {fontSize: '16px', fill: '#000'});
+        this.ammoIcon.y + this.ammoIcon.height, 'Ammunition', labelFontStyle);
     this.ammoLabel.fixedToCamera = true;
     this.ammoLabel.anchor.set(0.5, 0);
-    this.ammoText = this.game.add.text(this.ammoIcon.x + 60,
-        this.game.camera.height - 60,
-        '' + this.player.currentWeapon.numberOfBullets,
-        {
-            fontSize: '32px',
-            fill: '#000'
-        });
+    this.ammoText = this.game.add.text(
+        this.ammoIcon.x + distanceBetewIconLabel, y,
+        'x' + this.player.currentWeapon.numberOfBullets, textFontStyle
+    );
     this.ammoText.fixedToCamera = true;
     this.ammoText.anchor.set(0.5, 0);
 
     //The health level
-    this.healthIcon = this.game.add.sprite(40, 10,
-        'health');
+    this.healthIcon = this.game.add.sprite(40, 10, 'health');
     this.healthIcon.fixedToCamera = true;
     this.healthIcon.anchor.set(0.5, 0);
     this.healthLabel = this.game.add.text(this.healthIcon.x,
-        this.healthIcon.y + this.healthIcon.height,
-        'Health', {fontSize: '16px', fill: '#000'});
+        this.healthIcon.y + this.healthIcon.height, 'Health', labelFontStyle);
     this.healthLabel.fixedToCamera = true;
     this.healthLabel.anchor.set(0.5, 0);
-    this.healthLevelText = this.game.add.text(this.healthIcon.x + 60, 16,
-        ' ', {fontSize: '32px', fill: '#000'});
+    this.healthLevelText = this.game.add.text(
+        this.healthIcon.x + distanceBetewIconLabel, y, ' ', textFontStyle
+    );
     this.healthLevelText.fixedToCamera = true;
     this.healthLevelText.anchor.set(0.5, 0);
 };
@@ -3938,18 +4362,6 @@ Level.prototype.createWeaponsGroup = function() {
 Level.prototype.createInventory = function() {
     this.inventory = new Inventory(this);
     this.game.add.existing(this.inventory);
-
-    this.inventoryButton = this.game.add.button(50,
-        this.game.camera.height - 70, 'inventory_button',
-        this.inventory.open, this.inventory);
-    this.inventoryButton.anchor.setTo(0.5, 0);
-    this.inventoryButton.fixedToCamera = true;
-    this.inventoryButton.input.priorityID = 1;
-    this.inventoryButtonLabel = this.game.add.text(this.inventoryButton.x,
-        this.inventoryButton.y + this.inventoryButton.height,
-        'Inventory', {fontSize: '16px', fill: '#000'});
-    this.inventoryButtonLabel.fixedToCamera = true;
-    this.inventoryButtonLabel.anchor.set(0.5, 0);
 };
 
 /**
@@ -3959,18 +4371,6 @@ Level.prototype.createInventory = function() {
 Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
-
-    this.storeButton = this.game.add.button(130,
-        this.game.camera.height - 70, 'storeButton',
-        this.store.open, this.store);
-    this.storeButton.anchor.setTo(0.5, 0);
-    this.storeButton.fixedToCamera = true;
-    this.storeButton.input.priorityID = 1;
-    this.storeButtonLabel = this.game.add.text(this.storeButton.x,
-        this.storeButton.y + this.storeButton.height,
-        'Store', {fontSize: '16px', fill: '#000'});
-    this.storeButtonLabel.fixedToCamera = true;
-    this.storeButtonLabel.anchor.set(0.5, 0);
 };
 
 /**
@@ -3980,19 +4380,6 @@ Level.prototype.createStore = function() {
 Level.prototype.createEnglishChallengesMenu = function() {
     this.englishChallengeMenu = new EnglishChallengesMenu();
     this.game.add.existing(this.englishChallengeMenu);
-
-    this.addCashButton = this.game.add.button(210,
-        this.game.camera.height - 70, 'addCashButton',
-        this.englishChallengeMenu.open, this.englishChallengeMenu);
-    this.addCashButton.anchor.setTo(0.5, 0);
-    this.addCashButton.fixedToCamera = true;
-    this.addCashButton.input.priorityID = 1;
-    this.addCashButtonLabel = this.game.add.text(this.addCashButton.x,
-        this.addCashButton.y + this.addCashButton.height,
-        'Add Money', {fontSize: '16px', fill: '#000'});
-    this.addCashButtonLabel.fixedToCamera = true;
-    this.addCashButtonLabel.anchor.set(0.5, 0);
-
 };
 
 /**
@@ -4002,18 +4389,50 @@ Level.prototype.createEnglishChallengesMenu = function() {
 Level.prototype.createMyVocabulary = function() {
     this.myVocabulary = new MyVocabulary(this);
     this.game.add.existing(this.myVocabulary);
+};
 
-    this.myVocabularyButton = this.game.add.button(320,
-        this.game.camera.height - 70, 'myVocabularyButton',
-        this.myVocabulary.open, this.myVocabulary);
-    this.myVocabularyButton.anchor.setTo(0.5, 0);
-    this.myVocabularyButton.fixedToCamera = true;
-    this.myVocabularyButton.input.priorityID = 1;
-    this.myVocabularyButtonLabel = this.game.add.text(this.myVocabularyButton.x,
-        this.myVocabularyButton.y + this.myVocabularyButton.height,
-        'My Vocabulary', {fontSize: '16px', fill: '#000'});
-    this.myVocabularyButtonLabel.fixedToCamera = true;
-    this.myVocabularyButtonLabel.anchor.set(0.5, 0);
+/**
+ * Creates the game vocabulary list and a button to access it.
+ * @method Level.createMyVocabulary
+ */
+Level.prototype.createToolsBar = function() {
+    this.toolsBar = new HorizontalLayoutPanel('toolsBar',
+        {x: 0, y: this.WORLD_HEIGHT - 80, margin: 5});
+    this.game.add.existing(this.toolsBar);
+    this.toolsBar.fixedToCamera = true;
+    this.toolsBar.visible = true;
+
+    this.inventoryButton = new IconButton(
+        'Inventory',
+        'inventory_button',
+        this.inventory.open,
+        this.inventory
+    );
+    this.toolsBar.addElement(this.inventoryButton);
+
+    this.storeButton = new IconButton(
+        'Store',
+        'storeButton',
+        this.store.open,
+        this.store
+    );
+    this.toolsBar.addElement(this.storeButton);
+
+    this.addCashButton = new IconButton(
+        'Add Money',
+        'addCashButton',
+        this.englishChallengeMenu.open,
+        this.englishChallengeMenu
+    );
+    this.toolsBar.addElement(this.addCashButton);
+
+    this.myVocabularyButton = new IconButton(
+        'Vocabulary',
+        'myVocabularyButton',
+        this.myVocabulary.open,
+        this.myVocabulary
+    );
+    this.toolsBar.addElement(this.myVocabularyButton);
 };
 
 /**
@@ -4094,7 +4513,7 @@ Level.prototype.collectVocabularyItem = function(player, vocabularyItem) {
  * @method Level.updateAmmoText
  */
 Level.prototype.updateAmmoText = function() {
-    this.ammoText.text = '' + this.player.currentWeapon.numberOfBullets;
+    this.ammoText.text = 'x' + this.player.currentWeapon.numberOfBullets;
 };
 
 /**
@@ -4102,7 +4521,8 @@ Level.prototype.updateAmmoText = function() {
  * @method Level.updateScoreText
  */
 Level.prototype.updateScoreText = function() {
-    this.scoreText.text = '' + this.player.score;
+    this.scoreText.text = '$ ' + this.player.score;
+    localStorage.setItem('score', this.player.score);
 };
 
 /**
@@ -4116,6 +4536,7 @@ Level.prototype.updateHealthLevel = function() {
     this.healthLevelText.text = '' + this.player.healthLevel;
     this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
+    localStorage.setItem('healthLevel', this.player.healthLevel);
 };
 
 /**
@@ -4368,9 +4789,51 @@ Level.prototype.playerWins = function() {
     return this.lastGoalAimed;
 };
 
+/**
+ * Creates a car according to its key.
+ * @method InteractiveCar.getOn
+ * @param {string} carKey - Car's key
+ * @return {InteractiveCar} - The created car
+ */
+Level.prototype.createInteractiveCar = function(carKey) {
+    switch (carKey) {
+        case 'car':
+            return new InteractiveCar(0, 0, 'Car', carKey, 60, 300, 200,
+                'A vehicle that has four wheels and an engine and ' +
+                '\nthat is used for carrying passengers on roads'
+            );
+        case 'jeep':
+            return new InteractiveCar(0, 0, 'Jeep', carKey, 100, 350, 400,
+                'Used for a small truck that can be driven over' +
+                '\nvery rough surfaces'
+            );
+        case 'bus':
+            return new InteractiveCar(0, 0, 'Bus', carKey, 300, 400, 450,
+                'A large vehicle that is used for carrying passengers ' +
+                '\nespecially along a particular route at particular times'
+            );
+        case 'truck':
+            return new InteractiveCar(0, 0, 'Truck', carKey, 200, 70, 90,
+                'A very large, heavy vehicle that is used to move ' +
+                '\mlarge or numerous objects'
+            );
+        case 'taxi':
+            return new InteractiveCar(0, 0, 'Taxi', carKey, 450, 200, 400,
+                'A car that carries passengers to a place for an ' +
+                '\namount of money that is based on the distance ' +
+                '\ntravelled'
+            );
+        case 'ambulance':
+            return new InteractiveCar(0, 0, 'Ambulance', carKey, 400, 150, 500,
+                'A vehicle used for taking hurt or sick people to' +
+                '\nthe hospital especially in emergencies'
+            );
+    }
+};
+
 module.exports = Level;
 
-},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/WorldItem":26,"../../items/inventory/Inventory":27,"../../items/store/Store":29,"../../items/vocabulary/MyVocabulary":31,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":49,"../../util/InteractionManager":56,"../../util/PopUp":57,"../../util/ResourceBar":58,"../../worldElements/InteractiveCar":63,"../../worldElements/NameBoard":65}],43:[function(require,module,exports){
+},{"../../character/NPC":6,"../../character/Player":7,"../../character/SimpleEnemy":8,"../../character/StrongEnemy":9,"../../character/StrongestEnemy":10,"../../englishChallenges/menu/EnglishChallengesMenu":18,"../../items/HealthPack":21,"../../items/InteractiveCar":22,"../../items/WorldItem":27,"../../items/inventory/Inventory":28,"../../items/store/Store":30,"../../items/vocabulary/MyVocabulary":32,"../../items/weapons/MachineGun":35,"../../items/weapons/Revolver":36,"../../util/Dialog":50,"../../util/HorizontalLayoutPanel":55,"../../util/IconButton":57,"../../util/InteractionManager":58,"../../util/PopUp":59,"../../util/ResourceBar":60,"../../worldElements/NameBoard":66}],44:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 22/07/2015.
  */
@@ -4381,6 +4844,7 @@ var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var InteractionManager = require('../../util/InteractionManager');
 var ClueItem = require('../../items/ClueItem');
+var VocabularyItem = require('../../items/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -4417,10 +4881,10 @@ LevelOne.prototype.create = function() {
     this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
     this.numberOfEnemies = 3;
     this.numberOfStrongEnemies = 0;
+    this.createPlaces();
     this.addNPCs();
     //this.addEnemies();
     this.addObjects();
-    this.createPlaces();
     this.addHealthPacks();
 };
 
@@ -4442,8 +4906,8 @@ LevelOne.prototype.addObjects = function() {
     var house = this.addStaticBuilding(500, 'whiteHouse');
     this.addNeighbors(house, 'greenHouse', 'yellowHouse');
 
-    var messages = ['Use the store to buy a weapon.'];
-    var titles = ['Buy weapons'];
+    var messages = ['You can buy a weapon using the store'];
+    var titles = ['Buying weapons'];
     var imagesKeys = ['store'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
@@ -4455,17 +4919,67 @@ LevelOne.prototype.addObjects = function() {
 
     messages = ['Your family is now somewhere else.',
         'Continue trying, because this game is just starting!'];
-    titles = ['Your family is not here', 'Your family is not here'];
+    titles = ['Continue trying', 'Continue trying'];
     imagesKeys = ['emptyRoom', 'emptyRoom'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0,
+        'family',
+        'Family',
+        'A group of people who are related to each other',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
     interactionManager = new InteractionManager(messages, titles,
-        imagesKeys);
+        imagesKeys, vocabularyItems);
     var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT, 'blueHouse', 'vocabulary name',
-        'vocabulary description', 3, interactionManager);
+        this.GROUND_HEIGHT, 'blueHouse', 'House',
+        'A building in which a family lives', 3, interactionManager);
     this.addVocabularyItem(friendsHouse);
     this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
 
-    this.addCar(3.7 * this.checkPointsDistance, 'jeep');
+    messages = ['Oh Great, those are my wife\'s glasses!'];
+    titles = ['My wife\'s glasses'];
+    imagesKeys = ['glasses'];
+
+    vocabularyItems = [];
+    vocabularyItem = new VocabularyItem(0, 0,
+        'wife',
+        'Wife',
+        'A married woman; the woman someone is married to',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
+
+    interactionManager = new InteractionManager(messages, titles, imagesKeys,
+        vocabularyItems);
+    var glasses = new ClueItem(300, this.GROUND_HEIGHT + 10,
+        'glasses',
+        'Glasses',
+        'A hard usually transparent material that is used ' +
+        '\nfor making windows and other products',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(glasses);
+
+    messages = ['Oh Great, that is my wife\'s watch!'];
+    titles = ['My wife\'s watch'];
+    imagesKeys = ['watch'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var watch = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
+        'watch',
+        'Watch',
+        'A pair of glass or plastic lenses set into a frame ' +
+        '\nand worn over the eyes to help a person see',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(watch);
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'Jeep', 'jeep', 100, 400, 250);
 };
 
 /**
@@ -4474,8 +4988,8 @@ LevelOne.prototype.addObjects = function() {
  */
 LevelOne.prototype.addNPCs = function() {
     var messages = [
-        'I know that you are looking for \nyour family.',
-        'Yor wife and children are in \nthe Big Blue House after the Zoo.'
+        'Are you looking for Carlos? \n Be careful, he is so dangerous',
+        'Your wife and children are in \nthe Big Blue House after the Zoo'
     ];
     var titles = ['I can help you', 'Go to Big Blue House'];
     var imagesKeys = ['npc', 'blueHouse'];
@@ -4494,7 +5008,7 @@ LevelOne.prototype.createPlaces = function() {
     this.placesNames = ['Bookstore', 'Playground', 'Gas Station', 'Zoo'];
     this.placesDescriptions = [
         'A store that sells books',
-        'An outdoor area where children can play.',
+        'An outdoor area where children can play',
         'A place where gasoline for vehicles is sold',
         'A place where many kinds of animals are ' +
         '\nkept so that people can see them'
@@ -4512,7 +5026,7 @@ LevelOne.prototype.playerWins = function() {
 
 module.exports = LevelOne;
 
-},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/InteractionManager":56,"../../util/VerticalLayoutPopUp":62,"../../worldElements/InteractiveHouse":64,"./Level":42}],44:[function(require,module,exports){
+},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../items/VocabularyItem":26,"../../util/Dialog":50,"../../util/InteractionManager":58,"../../util/VerticalLayoutPopUp":64,"../../worldElements/InteractiveHouse":65,"./Level":43}],45:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 19/11/2015.
  */
@@ -4524,6 +5038,7 @@ var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
 var Wife = require('../../character/Wife');
 var Friend = require('../../character/Friend');
+var VocabularyItem = require('../../items/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -4606,14 +5121,36 @@ LevelThree.prototype.createPlaces = function() {
  * @method LevelThree.addObjects
  */
 LevelThree.prototype.addObjects = function() {
-    var systerMomDrawing = new ClueItem(300, this.GROUND_HEIGHT,
-        'sisterMom',
-        'We are closer to our children!',
-        'My Family',
-        'Daughter\'s drawing.',
-        0);
-    this.addVocabularyItem(systerMomDrawing);
-    this.addCar(3.7 * this.checkPointsDistance, 'taxi');
+    var messages = ['Oh Great, that is our son\'s cap!'];
+    var titles = ['Our son\'s cap'];
+    var imagesKeys = ['cap'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var cap = new ClueItem(300, this.GROUND_HEIGHT,
+        'cap',
+        'Cap',
+        'A small, soft hat that often has a hard curved part' +
+        '\n(called a visor) that extends out over your eyes',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(cap);
+
+    messages = ['Oh Great, that is our daughtere\'s bracelet!'];
+    titles = ['My wife\'s bracelet'];
+    imagesKeys = ['bracelet'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var bracelet = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
+        'bracelet',
+        'Bracelet',
+        'A piece of jewelry worn on the wrist',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(bracelet);
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'Taxi1', 'taxi', 200, 500, 100);
 };
 
 /**
@@ -4646,7 +5183,7 @@ LevelThree.prototype.addFriend = function(x) {
 
 module.exports = LevelThree;
 
-},{"../../character/Friend":4,"../../character/Wife":11,"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/VerticalLayoutPopUp":62,"../../worldElements/InteractiveHouse":64,"./Level":42}],45:[function(require,module,exports){
+},{"../../character/Friend":4,"../../character/Wife":11,"../../items/ClueItem":20,"../../items/HealthPack":21,"../../items/VocabularyItem":26,"../../util/Dialog":50,"../../util/VerticalLayoutPopUp":64,"../../worldElements/InteractiveHouse":65,"./Level":43}],46:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 05/11/2015.
  */
@@ -4655,6 +5192,8 @@ var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var ClueItem = require('../../items/ClueItem');
+var InteractionManager = require('../../util/InteractionManager');
+var VocabularyItem = require('../../items/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -4716,7 +5255,7 @@ LevelTwo.prototype.createWeapons = function() {
  * @method LevelTwo.addObjects
  */
 LevelTwo.prototype.addObjects = function() {
-    var messages = ['That is my wife\'s necklace!'];
+    var messages = ['Oh Great, that is my wife\'s necklace!'];
     var titles = ['My wife\'s necklace'];
     var imagesKeys = ['necklace'];
     var interactionManager = new InteractionManager(messages, titles,
@@ -4725,9 +5264,26 @@ LevelTwo.prototype.addObjects = function() {
         'necklace',
         'Necklace',
         'A piece of jewelry that is worn around your neck',
-        3);
+        3,
+        interactionManager
+    );
     this.addVocabularyItem(necklace);
-    this.addCar(3.7 * this.checkPointsDistance, 'bus');
+
+    messages = ['Oh Great, that is my wife\'s ring!'];
+    titles = ['My wife\'s ring'];
+    imagesKeys = ['ring'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var ring = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
+        'ring',
+        'Ring',
+        'A piece of jewelry that is worn usually on a finger',
+        3,
+        interactionManager
+    );
+    this.addVocabularyItem(ring);
+
+    //this.addCar(3.7 * this.checkPointsDistance, 'Bus', 'bus', 300, 350, 200);
 };
 
 /**
@@ -4735,9 +5291,27 @@ LevelTwo.prototype.addObjects = function() {
  * @method LevelTwo.addWife
  */
 LevelTwo.prototype.addWife = function() {
-    var message = 'Hello. I am so happy to see you again.' +
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0,
+        'child',
+        'Child',
+        'A young person; a son or daughter',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
+    vocabularyItem = new VocabularyItem(0, 0,
+        'child',
+        'Child',
+        'A young person; a son or daughter',
+        1,
+        false
+    );
+    vocabularyItems.push(vocabularyItem);
+
+    var message = 'Hello my husband. I am so happy to see you again.' +
         '\nBut our children are not here.' +
-        '\nYor friend has our daughter and \nour son.';
+        '\nYor friend has kidnapped \n our daughter and our son.';
     this.wife = this.addNPC(this.checkPointsDistance *
         (NUMBER_OF_FIGHTING_POINTS), 'wife', message);
 };
@@ -4768,11 +5342,11 @@ LevelTwo.prototype.createPlaces = function() {
 
 module.exports = LevelTwo;
 
-},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../util/Dialog":49,"../../util/VerticalLayoutPopUp":62,"./Level":42}],46:[function(require,module,exports){
-arguments[4][38][0].apply(exports,arguments)
-},{"dup":38}],47:[function(require,module,exports){
+},{"../../items/ClueItem":20,"../../items/HealthPack":21,"../../items/VocabularyItem":26,"../../util/Dialog":50,"../../util/InteractionManager":58,"../../util/VerticalLayoutPopUp":64,"./Level":43}],47:[function(require,module,exports){
 arguments[4][39][0].apply(exports,arguments)
 },{"dup":39}],48:[function(require,module,exports){
+arguments[4][40][0].apply(exports,arguments)
+},{"dup":40}],49:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 10/10/2015.
  */
@@ -4793,14 +5367,16 @@ var Button = function(text, action, parent, buttonKey) {
 
     this.text = level.game.make.text(this.width / 2, this.height / 2, text);
     this.text.anchor.set(0.5, 0.5);
-    this.text.font = 'Shojumaru';
-    this.text.fontSize = 18;
+    this.text.font = level.font;
+    this.text.fontSize = 20;
     this.text.fill = '#FFFFFF';
+    this.text.stroke = '#000000';
+    this.text.strokeThickness = 3;
 
     this.inputEnabled = true;
     this.events.onInputDown.add(action, parent);
 
-    var scale = (this.text.width + 20) / this.width;
+    scale = (this.text.width + 20) / this.width;
     this.scale.x = scale;
     this.addChild(this.text);
     this.text.scale.x = 1 / scale;
@@ -4811,7 +5387,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -4839,7 +5415,7 @@ var Dialog = function(iconKey, text, parent) {
     this.icon.scale.setTo(scale, scale);
 
     this.message = level.game.make.text(0, 0, '');
-    this.message.font = 'Arial';
+    this.message.font = level.font;
     this.message.fontSize = 20;
     this.message.fill = '#000000';
     this.message.text = text;
@@ -4862,7 +5438,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":55}],50:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":56}],51:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -4945,7 +5521,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5015,7 +5591,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":50}],52:[function(require,module,exports){
+},{"./GridLayout":51}],53:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5083,7 +5659,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":50,"./PopUp":57}],53:[function(require,module,exports){
+},{"./GridLayout":51,"./PopUp":59}],54:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5122,7 +5698,6 @@ HorizontalLayout.prototype.addElement = function(element) {
     element.x = this.currentX;
     this.currentX += element.width + this.margin ;
     element.y = this.parent.height / 2 - element.height / 2;
-
     this.parent.addChild(element);
 };
 
@@ -5137,7 +5712,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -5158,8 +5733,9 @@ var HorizontalLayoutPanel = function(backgroundKey, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;
+    var margin = ops.margin || 0;
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.layout = new HorizontalLayout(this);
+    this.layout = new HorizontalLayout(this, margin);
 };
 
 HorizontalLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);
@@ -5176,7 +5752,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":53}],55:[function(require,module,exports){
+},{"./HorizontalLayout":54}],56:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5222,7 +5798,46 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":53,"./PopUp":57}],56:[function(require,module,exports){
+},{"./HorizontalLayout":54,"./PopUp":59}],57:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 10/01/2016.
+ */
+var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
+/**
+ * Represents a Button with an Icon for the views.
+ * @class IconButton
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {string} text - Buttons label.
+ * @param {string} iconKey - Buttons icon texture.
+ * @param {function} action - Action to be carried out when button is clicked.
+ * @param {Phaser.Sprite} parent - View that contains this button.
+ * @param {string} buttonKey - Button's texture key.
+ */
+var IconButton = function(text, iconKey, action, parent, buttonKey) {
+    var key = buttonKey || 'iconButton';
+    VerticalLayoutPanel.call(this, key, 5);
+
+    this.icon = level.game.make.sprite(0, 0, iconKey);
+    this.text = level.game.make.text(0, 0, text);
+    this.text.font = level.font;
+    this.text.fontSize = 14;
+    this.text.fill = '#FFFFFF';
+    this.text.stroke = '#000000';
+    this.text.strokeThickness = 3;
+
+    this.inputEnabled = true;
+    this.events.onInputDown.add(action, parent);
+    this.addElement(this.icon);
+    this.addElement(this.text);
+};
+
+IconButton.prototype = Object.create(VerticalLayoutPanel.prototype);
+IconButton.prototype.constructor = IconButton;
+
+module.exports = IconButton;
+
+},{"../util/VerticalLayoutPanel":63}],58:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 20/12/2015.
  */
@@ -5236,8 +5851,11 @@ var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
  * @param {Array} messages - Messages that should be delivered the player.
  * @param {Array} titles - Title associated to each message.
  * @param {Array} imagesKeys - Icon associated to each message.
+ * @param {Array} vocabularyItems - Vocabulary that is delivered to the player
+ * with the messages
  */
-var InteractionManager = function(messages, titles, imagesKeys) {
+var InteractionManager = function(messages, titles, imagesKeys,
+                                  vocabularyItems) {
     this.dialogs = [];
     var i;
     var tempDialog;
@@ -5245,7 +5863,7 @@ var InteractionManager = function(messages, titles, imagesKeys) {
         tempDialog =  new VerticalLayoutPopUp('mediumPopUpBg', null, titles[i]);
         var dialogImage = level.game.make.sprite(0, 0, imagesKeys[i]);
         var dialogText = level.game.make.text(0, 0, messages[i]);
-        dialogText.font = 'Arial';
+        dialogText.font = level.font;
         dialogText.fontSize = 20;
         dialogText.fill = '#000000';
         dialogText.align = 'center';
@@ -5254,6 +5872,7 @@ var InteractionManager = function(messages, titles, imagesKeys) {
         this.dialogs.push(tempDialog);
         level.game.add.existing(tempDialog);
     }
+    this.vocabuaryItems = vocabularyItems || [];
 };
 
 /**
@@ -5265,11 +5884,14 @@ InteractionManager.prototype.openDialogs = function() {
     for (i = this.dialogs.length - 1; i >= 0; i--) {
         this.dialogs[i].open();
     }
+    for (i = 0; i < this.vocabuaryItems.length; i++) {
+        level.myVocabulary.addItem(this.vocabuaryItems[i]);
+    }
 };
 
 module.exports = InteractionManager;
 
-},{"../util/VerticalLayoutPopUp":62}],57:[function(require,module,exports){
+},{"../util/VerticalLayoutPopUp":64}],59:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 16/07/2015.
  */
@@ -5298,10 +5920,12 @@ var PopUp = function(backgroundKey, parent, title) {
     this.closeButton.events.onInputDown.add(this.close, this);
 
     if (title !== undefined) {
-        this.title = level.game.make.text(this.xCenter, 10, title);
-        this.title.font = 'Shojumaru';
-        this.title.fontSize = 30;
-        this.title.fill = '#FFFFFF';
+        this.title = level.game.make.text(this.xCenter, 5, title);
+        this.title.font = level.font;
+        this.title.fontSize = 40;
+        this.title.fill = '#feec69';
+        this.title.stroke = '#000000';
+        this.title.strokeThickness = 3;
         this.title.anchor.set(0.5, 0);
         this.addChild(this.title);
     }
@@ -5364,7 +5988,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 15/10/2015.
  */
@@ -5405,7 +6029,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5442,7 +6066,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5495,7 +6119,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 13/10/2015.
  */
@@ -5549,7 +6173,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":60}],62:[function(require,module,exports){
+},{"./VerticalLayout":62}],64:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 21/10/2015.
  */
@@ -5564,11 +6188,12 @@ var VerticalLayout = require('./VerticalLayout');
  * @param {string} backgroundKey - Background texture's key.
  * @param {PopUp} [parent] - View that creates this PopUp.
  * @param {string} title - Title for this PopUp.
+ * @param {number} margin - Margin or space between elements, optional.
  */
-var VerticalLayoutPopUP = function(backgroundKey, parent, title) {
+var VerticalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
     var yOrigin = this.title.y + this.title.height || 0;
-    this.layout = new VerticalLayout(this, null, yOrigin);
+    this.layout = new VerticalLayout(this, margin, yOrigin);
 };
 
 VerticalLayoutPopUP.prototype = Object.create(PopUp.prototype);
@@ -5594,162 +6219,7 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":57,"./VerticalLayout":60}],63:[function(require,module,exports){
-/**
- * Created by Edwin Gamboa on 29/08/2015.
- */
-var PopUp = require('../util/PopUp');
-var ResourceBar = require('../util/ResourceBar');
-var Button = require('../util/Button');
-
-/**
- * Default car speed.
- * @constant
- * @type {number}
- */
-var DEFAULT_CAR_SPEED = 400;
-/**
- * Default greatest car speed.
- * @constant
- * @type {number}
- */
-var DEFAULT_CAR_MAX_SPEED = 500;
-/**
- * Car gravity.
- * @constant
- * @type {number}
- */
-var CAR_GRAVITY = 30000;
-/**
- * Longest distance that car can go.
- * @constant
- * @type {number}
- */
-var MAX_DISTANCE = 400;
-/**
- * Fuel bar width.
- * @constant
- * @type {number}
- */
-var BAR_WIDTH = 100;
-/**
- * Fuel bar height.
- * @constant
- * @type {number}
- */
-var BAR_HEIGHT = 10;
-
-/**
- * Represents a car, which player can interact with.
- * @class InteractiveCar
- * @extends Phaser.Sprite
- * @constructor
- * @param {number} x - Car x coordinate within the world.
- * @param {number} y - Car y coordinate within the world.
- * @param {string} backgroundKey - Car texture key.
- */
-var InteractiveCar = function(x, y, backgroundKey) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-
-    level.game.physics.arcade.enable(this);
-    this.body.collideWorldBounds = true;
-    this.anchor.set(0.5, 1);
-    this.animations.add('left', [0], 10, true);
-    this.animations.add('right', [1], 10, true);
-    this.occupied = false;
-    this.stopLeftFrameIndex = 0;
-    this.stopRightFrameIndex = 1;
-    this.remainingGas = MAX_DISTANCE;
-    this.maxDistance = MAX_DISTANCE;
-
-    this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
-        -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
-    this.gasBar.visible = false;
-    this.addChild(this.gasBar);
-
-    this.getOnButton = new Button ('Get on', this.getOn, this);
-    this.getOnButton.x = -(this.width - this.getOnButton.width) / 2;
-    this.getOnButton.y = -this.height;
-    this.addChild(this.getOnButton);
-};
-
-InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
-InteractiveCar.prototype.constructor = InteractiveCar;
-
-/**
- * Allows the player to get on the car.
- * @method InteractiveCar.getOn
- */
-InteractiveCar.prototype.getOn = function() {
-    this.gasBar.visible = true;
-    this.getOnButton.visible = false;
-    level.player.onVehicle = true;
-    level.player.relocate(this.x, this.y - 100);
-    level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
-    level.player.changeGravity(CAR_GRAVITY);
-    this.occupied = true;
-};
-
-/**
- * Allows the player to get off the car.
- * @method InteractiveCar.getOff
- */
-InteractiveCar.prototype.getOff = function() {
-    this.stop();
-    level.player.onVehicle = false;
-    level.player.relocate(this.x + 100, this.y - 100);
-    level.player.resetSpeed();
-    level.player.resetGravity();
-    this.occupied = false;
-};
-
-/**
- * Updates car current state, animations and traveled distance, to stop it when
- * it has traveled the longest possible distance.
- * @method InteractiveCar.update
- */
-InteractiveCar.prototype.update = function() {
-    if (this.occupied) {
-        this.body.velocity.x = level.player.body.velocity.x;
-        if (this.body.velocity.x < 0) {
-            this.animations.play('left');
-            this.remainingGas --;
-        }else if (this.body.velocity.x > 0) {
-            this.animations.play('right');
-            this.remainingGas --;
-        }else if (level.direction > 0) {
-            this.frame = this.stopRightFrameIndex;
-        }else if (level.direction < 0) {
-            this.frame = this.stopLeftFrameIndex;
-        }
-        if (this.remainingGas <= 0) {
-            this.getOff();
-        }
-        this.gasBar.updateResourceBarLevel(this.remainingGas /
-            this.maxDistance);
-    }
-};
-
-/**
- * Determines whether the car is stopped or not.
- * @method InteractiveCar.isStopped
- * @returns {boolean} - True if car speed = 0, otherwise false.
- */
-InteractiveCar.prototype.isStopped = function() {
-    return this.body.velocity.x === 0;
-};
-
-/**
- * Stops the car, making speed = 0.
- * @method InteractiveCar.stop
- */
-InteractiveCar.prototype.stop = function() {
-    this.body.velocity.x = 0;
-};
-
-module.exports = InteractiveCar;
-
-},{"../util/Button":48,"../util/PopUp":57,"../util/ResourceBar":58}],64:[function(require,module,exports){
+},{"./PopUp":59,"./VerticalLayout":62}],65:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
@@ -5804,7 +6274,7 @@ InteractiveHouse.prototype.pickUp = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/VocabularyItem":25,"../util/Button":48}],65:[function(require,module,exports){
+},{"../items/VocabularyItem":26,"../util/Button":49}],66:[function(require,module,exports){
 /**
  * Created by Edwin Gamboa on 25/10/2015.
  */
@@ -5823,7 +6293,7 @@ var NameBoard = function(x, y, name) {
     this.anchor.set(0.5, 1);
 
     this.message = level.game.make.text(0, -this.height + 10, name);
-    this.message.font = 'Arial';
+    this.message.font = level.font;
     this.message.fontSize = 16;
     this.message.fill = '#FFFFFF';
     this.message.anchor.set(0.5, 0);
@@ -5836,4 +6306,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66]);

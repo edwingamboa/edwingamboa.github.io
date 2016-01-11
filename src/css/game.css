@@ -1,8 +1,7 @@
 body {
     background: #333;
-    margin: 0;
-    padding: 0;
 }
-#game canvas {
-    margin: 5% auto;
+
+canvas {
+    margin: 0 auto;
 }

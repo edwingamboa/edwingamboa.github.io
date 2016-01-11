@@ -251,7 +251,7 @@ Character.prototype.updateCurrentWeapon = function(weaponKey) {
 };
 
 /**
- * Changes player's current weapon, to the next one in the weapons array.
+ * Changes character's current weapon, to the next one in the weapons array.
  * Updates currentWeaponIndex property.
  * @method Character.nextWeapon
  */
@@ -325,6 +325,5 @@ Character.prototype.useWeapon = function(weapon) {
 Character.prototype.jump = function() {
     this.body.velocity.y = -350;
 };
-
 
 module.exports = Character;

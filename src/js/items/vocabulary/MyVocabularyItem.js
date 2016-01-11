@@ -13,16 +13,16 @@ var Button = require('../../util/Button');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var MyVocabularyItem = function(item, parentView) {
-    VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
+    VerticalLayoutPanel.call(this, 'myVocabularyItemBg', 4);
     this.item = item;
     this.icon = level.game.make.sprite(0, 0, this.item.key);
     var scale = 50 / this.icon.height;
     this.icon.scale.x = scale;
     this.icon.scale.y = scale;
     this.title = level.game.make.text(0, 0, this.item.name);
-    this.title.font = 'Arial';
+    this.title.font = level.font;
     this.title.fontSize = 20;
-    this.title.fill = '#0040FF';
+    this.title.fill = '#473e2c';
 
     this.button = new Button('Show', this.buttonAction, this);
 
@@ -40,7 +40,7 @@ MyVocabularyItem.prototype.constructor = MyVocabularyItem;
  * @method MyVocabularyItem.buttonAction
  */
 MyVocabularyItem.prototype.buttonAction = function() {
-    this.item.use();
+    this.item.show();
 };
 
 module.exports = MyVocabularyItem;

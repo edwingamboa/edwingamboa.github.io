@@ -36,7 +36,6 @@ HorizontalLayout.prototype.addElement = function(element) {
     element.x = this.currentX;
     this.currentX += element.width + this.margin ;
     element.y = this.parent.height / 2 - element.height / 2;
-
     this.parent.addChild(element);
 };
 

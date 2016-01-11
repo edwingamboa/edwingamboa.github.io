@@ -38,15 +38,14 @@ Intro.prototype.create = function() {
     var centerX = this.game.camera.width / 2;
     var centerY = this.game.camera.height / 2;
 
-    this.background = this.game.add.sprite(centerX, centerY,
-        'comicBg');
+    this.background = this.game.add.sprite(centerX, centerY - 20, 'comicBg');
     this.background.anchor.set(0.5, 0.7);
 
     this.changeComicImage('intro1');
     this.currentImage = 1;
 
     var continueButton = new Button('Continue', this.continue, this);
-    continueButton.x = this.game.camera.width - 250;
+    continueButton.x = this.game.camera.width - 150;
     continueButton.y = this.game.camera.height - 60;
     this.game.add.existing(continueButton);
 
@@ -54,16 +53,17 @@ Intro.prototype.create = function() {
         NUMBER_OF_COMIC_IMAGES, this.updateComic, this);
 
     this.scripts = [
-        'Edwar gets home',
+        'Edward gets home',
         'He parks his car and gets into his house',
         'Now he wants to eat something',
-        'Edwar finds a piece of paper',
-        'Someone kidnapped his family und he is now angry',
-        'He needs a weapon to defend himself',
+        'Then he finds a piece of paper',
+        'Someone kidnapped his family and he is now worried and angry',
         'He will rescue his family, but that can be dangerous'
     ];
-    this.comicText = this.game.add.text(100, 450, '',
-        {font: '20px Arial', fill: '#FFFFFF'});
+    this.comicText = this.game.add.text(centerX, 430, '',
+        {font: '25px Arial', fill: '#FFF', align: 'center',
+            stroke: '#7d655f', strokeThickness: 2});
+    this.comicText.anchor.set(0.5, 0);
     this.game.add.existing(this.comicText);
     this.showScript(0);
 };

@@ -13,23 +13,25 @@ var VerticalLayoutPopUp = require ('../util/VerticalLayoutPopUp');
  * @param {number} y - VocabularyItem's y coordinate within the game world.
  * @param {string} key - VocabularyItem's texture
  * @param {string} name - VocabularyItem's name.
- * @param {string} description - VocabularyItem's name.
+ * @param {string} definition - VocabularyItem's description.
  * @param {number} categoryIndex - Index of the category to which this item
  * belongs.
  * @param {boolean} openImmediately - Indicates whether this vocabulary item
  * should display the message when the player picksItUp
+ * @param {number} [price = 0] - The price of this item
  */
 var VocabularyItem = function(x,
                               y,
                               key,
                               name,
-                              description,
+                              definition,
                               categoryIndex,
-                              openImmediately) {
-    Item.call(this, x, y, key, 0);
+                              openImmediately,
+                              price) {
+    Item.call(this, x, y, key, price || 0);
     this.categoryIndex = categoryIndex;
     this.name = name;
-    this.description = description;
+    this.definition = definition;
     this.makeDialog();
     this.openImmediately = openImmediately || false;
 };
@@ -38,10 +40,10 @@ VocabularyItem.prototype = Object.create(Item.prototype);
 VocabularyItem.prototype.constructor = VocabularyItem;
 
 /**
- * Add this VocabularyItem to the game so that the player can pick it up.
+ * Displays the definition of this VocabularyItem
  * @method VocabularyItem.use
  */
-VocabularyItem.prototype.use = function() {
+VocabularyItem.prototype.show = function() {
     this.popUp.open();
 };
 
@@ -57,8 +59,8 @@ VocabularyItem.prototype.makeDialog = function() {
         icon.scale.x = scale;
         icon.scale.y = scale;
     }
-    var dialogText = level.game.make.text(0, 0, this.description);
-    dialogText.font = 'Arial';
+    var dialogText = level.game.make.text(0, 0, this.definition);
+    dialogText.font = level.font;
     dialogText.fontSize = 20;
     dialogText.fill = '#000000';
     dialogText.align = 'center';

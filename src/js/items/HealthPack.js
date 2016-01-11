@@ -30,7 +30,7 @@ var HealthPack = function(x, y, maxIncreasing) {
     this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
     this.name = 'Health Pack';
-    this.description = '+ ' + maxIncreasing + ' Health Level';
+    this.description = 'Increasing: + ' + maxIncreasing + '\n Health Level';
     this.category = 'healthPacks';
 };
 

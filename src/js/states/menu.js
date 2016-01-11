@@ -31,7 +31,7 @@ Menu.prototype.create = function() {
  * @method Menu.newGame
  */
 Menu.prototype.newGame = function() {
-    this.game.state.start('levelOneIntro');
+    this.game.state.start('intro');
 };
 
 module.exports = Menu;

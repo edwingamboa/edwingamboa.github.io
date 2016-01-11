@@ -1,34 +1,16 @@
 /**
  * Created by Edwin Gamboa on 29/08/2015.
  */
-var PopUp = require('../util/PopUp');
+var VocabularyItem = require('./VocabularyItem');
 var ResourceBar = require('../util/ResourceBar');
 var Button = require('../util/Button');
 
-/**
- * Default car speed.
- * @constant
- * @type {number}
- */
-var DEFAULT_CAR_SPEED = 400;
-/**
- * Default greatest car speed.
- * @constant
- * @type {number}
- */
-var DEFAULT_CAR_MAX_SPEED = 500;
 /**
  * Car gravity.
  * @constant
  * @type {number}
  */
 var CAR_GRAVITY = 30000;
-/**
- * Longest distance that car can go.
- * @constant
- * @type {number}
- */
-var MAX_DISTANCE = 400;
 /**
  * Fuel bar width.
  * @constant
@@ -49,10 +31,22 @@ var BAR_HEIGHT = 10;
  * @constructor
  * @param {number} x - Car x coordinate within the world.
  * @param {number} y - Car y coordinate within the world.
+ * @param {string} name - Car name.
  * @param {string} backgroundKey - Car texture key.
+ * @param {number} price - Car price
+ * @param {number} speed - Car speed
+ * @param {number} gasoline - Car max gasoline
  */
-var InteractiveCar = function(x, y, backgroundKey) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+var InteractiveCar = function(x,
+                              y,
+                              name,
+                              backgroundKey,
+                              price,
+                              speed,
+                              gasoline,
+                              definition) {
+    VocabularyItem.call(this, x, y, backgroundKey, name, definition, 2, false,
+        price);
 
     level.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
@@ -62,8 +56,15 @@ var InteractiveCar = function(x, y, backgroundKey) {
     this.occupied = false;
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 1;
-    this.remainingGas = MAX_DISTANCE;
-    this.maxDistance = MAX_DISTANCE;
+    this.remainingGas = gasoline;
+    this.gasoline = gasoline;
+    this.speed = speed;
+    this.maxSpeed = speed * 1.5;
+
+    this.name = name;
+    this.description = 'Speed: ' + this.speed +
+        '\nGasoline: ' + this.gasoline;
+    this.category = 'transport';
 
     this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
         -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
@@ -76,7 +77,7 @@ var InteractiveCar = function(x, y, backgroundKey) {
     this.addChild(this.getOnButton);
 };
 
-InteractiveCar.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveCar.prototype = Object.create(VocabularyItem.prototype);
 InteractiveCar.prototype.constructor = InteractiveCar;
 
 /**
@@ -84,13 +85,16 @@ InteractiveCar.prototype.constructor = InteractiveCar;
  * @method InteractiveCar.getOn
  */
 InteractiveCar.prototype.getOn = function() {
-    this.gasBar.visible = true;
-    this.getOnButton.visible = false;
-    level.player.onVehicle = true;
-    level.player.relocate(this.x, this.y - 100);
-    level.player.changeSpeed(DEFAULT_CAR_SPEED, DEFAULT_CAR_MAX_SPEED);
-    level.player.changeGravity(CAR_GRAVITY);
-    this.occupied = true;
+    if (this.remainingGas > 0) {
+        level.myVocabulary.addItem(this);
+        this.gasBar.visible = true;
+        this.getOnButton.visible = false;
+        level.player.onVehicle = true;
+        level.player.relocate(this.x, this.y - 100);
+        level.player.changeSpeed(this.speed, this.maxSpeed);
+        level.player.changeGravity(CAR_GRAVITY);
+        this.occupied = true;
+    }
 };
 
 /**
@@ -129,7 +133,7 @@ InteractiveCar.prototype.update = function() {
             this.getOff();
         }
         this.gasBar.updateResourceBarLevel(this.remainingGas /
-            this.maxDistance);
+            this.gasoline);
     }
 };
 
@@ -148,6 +152,19 @@ InteractiveCar.prototype.isStopped = function() {
  */
 InteractiveCar.prototype.stop = function() {
     this.body.velocity.x = 0;
+};
+
+/**
+ * Allows the character to use this car.
+ * @method InteractiveCar.use
+ */
+InteractiveCar.prototype.use = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.x = level.player.x + 50;
+    this.y = level.GROUND_HEIGHT;
+    level.addCar(this);
 };
 
 module.exports = InteractiveCar;

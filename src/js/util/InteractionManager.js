@@ -11,8 +11,11 @@ var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
  * @param {Array} messages - Messages that should be delivered the player.
  * @param {Array} titles - Title associated to each message.
  * @param {Array} imagesKeys - Icon associated to each message.
+ * @param {Array} vocabularyItems - Vocabulary that is delivered to the player
+ * with the messages
  */
-var InteractionManager = function(messages, titles, imagesKeys) {
+var InteractionManager = function(messages, titles, imagesKeys,
+                                  vocabularyItems) {
     this.dialogs = [];
     var i;
     var tempDialog;
@@ -20,7 +23,7 @@ var InteractionManager = function(messages, titles, imagesKeys) {
         tempDialog =  new VerticalLayoutPopUp('mediumPopUpBg', null, titles[i]);
         var dialogImage = level.game.make.sprite(0, 0, imagesKeys[i]);
         var dialogText = level.game.make.text(0, 0, messages[i]);
-        dialogText.font = 'Arial';
+        dialogText.font = level.font;
         dialogText.fontSize = 20;
         dialogText.fill = '#000000';
         dialogText.align = 'center';
@@ -29,6 +32,7 @@ var InteractionManager = function(messages, titles, imagesKeys) {
         this.dialogs.push(tempDialog);
         level.game.add.existing(tempDialog);
     }
+    this.vocabuaryItems = vocabularyItems || [];
 };
 
 /**
@@ -39,6 +43,9 @@ InteractionManager.prototype.openDialogs = function() {
     var i;
     for (i = this.dialogs.length - 1; i >= 0; i--) {
         this.dialogs[i].open();
+    }
+    for (i = 0; i < this.vocabuaryItems.length; i++) {
+        level.myVocabulary.addItem(this.vocabuaryItems[i]);
     }
 };
 

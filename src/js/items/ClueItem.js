@@ -11,25 +11,23 @@ var VocabularyItem = require('./VocabularyItem');
  * @param {number} x - ClueItem's x coordinate within the game world.
  * @param {number} y - ClueItem's y coordinate within the game world.
  * @param {string} key - ClueItem's texture
- * @param {string} dialogMessage - Message to be displayed on this item's
- * dialog.
  * @param {string} name - ClueItem's name.
- * @param {string} description - ClueItem's name.
+ * @param {string} definition - ClueItem's definition.
  * @param {number} categoryIndex - Index of the category to which this item.
+ * @param {InteractionManager} interactionManager - Object that allows
+ * displaying player's messages
  */
 var ClueItem = function(x,
                         y,
                         key,
                         name,
-                        description,
+                        definition,
                         categoryIndex,
-                        dialogMessage,
                         interactionManager) {
-    VocabularyItem.call(this, x, y, key, name, dialogMessage, categoryIndex);
-    var scale = 50 / this.height;
+    VocabularyItem.call(this, x, y, key, name, definition, categoryIndex);
+    var scale = 30 / this.height;
     this.scale.y = scale;
     this.scale.x = scale;
-    this.descriptionTemp = description;
     this.interactionManager = interactionManager;
 };
 
