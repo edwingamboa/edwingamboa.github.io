@@ -2772,6 +2772,7 @@ InteractiveCar.prototype.use = function() {
 module.exports = InteractiveCar;
 
 },{"../../util/Button":51,"../../util/ResourceBar":62,"./VocabularyItem":29}],29:[function(require,module,exports){
+
 /**
  * @ignore Created by Edwin Gamboa on 06/11/2015.
  */
@@ -2988,7 +2989,7 @@ VocabularyItem.prototype.setProperties = function(key) {
         //Transport
         case 'car':
             this.name = 'Car';
-            this.definition = 'A vehicle that has four wheels and an engine' +
+            this.definition = 'A vehicle that has four wheels and an engine ' +
                 'and \nthat is used for carrying passengers on roads';
             this.categoryIndex = 2;
             break;
@@ -3000,7 +3001,7 @@ VocabularyItem.prototype.setProperties = function(key) {
             break;
         case 'bus':
             this.name = 'Bus';
-            this.definition = 'A large vehicle that is used for carrying' +
+            this.definition = 'A large vehicle that is used for carrying ' +
                 'passengers \nespecially along a particular route at ' +
                 'particular times';
             this.categoryIndex = 2;
@@ -3051,14 +3052,14 @@ VocabularyItem.prototype.setProperties = function(key) {
             break;
         case 'watch':
             this.name = 'Watch';
-            this.definition = 'A pair of glass or plastic lenses set into a ' +
-                '\nframe and worn over the eyes to help a person see';
+            this.definition = 'A device that shows what time it is and that ' +
+                '\nyou wear on your wrist or carry in a pocket';
             this.categoryIndex = 3;
             break;
         case 'glasses':
             this.name = 'Glasses';
-            this.definition = 'A hard usually transparent material that is ' +
-                '\nused for making windows and other products';
+            this.definition = 'A pair of glass or plastic lenses set into a ' +
+                '\nframe and worn over the eyes to help a person see';
             this.categoryIndex = 3;
             break;
     }
@@ -5343,6 +5344,7 @@ LevelThree.prototype.create = function() {
     this.addEnemies();
     this.addWife();
     this.addFriend(this.WORLD_WIDTH - 100);
+    this.addLevelCar('taxi', 3 * this.checkPointsDistance);
     this.addClueItems();
     this.createWeapons();
     this.addHealthPacks();
@@ -5383,7 +5385,7 @@ LevelThree.prototype.addClueItems = function() {
     vocabularyItems.push(vocabularyItem);
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys, vocabularyItems);
-    this.addClueItem(300, 'family', interactionManager);
+    this.addClueItem(400, 'family', interactionManager);
 
     messages = ['Oh Great, that is our son\'s cap!'];
     titles = ['Our son\'s cap'];
@@ -5397,7 +5399,7 @@ LevelThree.prototype.addClueItems = function() {
         interactionManager);
 
     messages = ['Oh Great, that is our daughter\'s bracelet!'];
-    titles = ['My wife\'s bracelet'];
+    titles = ['My daughter\'s bracelet'];
     imagesKeys = ['bracelet'];
     vocabularyItems = [];
     vocabularyItem = new VocabularyItem(0, 0, 'daughter', false);
@@ -5530,7 +5532,7 @@ LevelTwo.prototype.create = function() {
     this.addEnemies();
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     this.addClueItems();
-    this.addLevelCar('bus', 3.4 * this.checkPointsDistance);
+    this.addLevelCar('bus', 4.3 * this.checkPointsDistance);
     this.addHealthPacks();
     this.createWeapons();
 };
@@ -5557,14 +5559,14 @@ LevelTwo.prototype.addClueItems = function() {
     var imagesKeys = ['necklace'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(300, 'necklace', interactionManager);
+    this.addClueItem(400, 'necklace', interactionManager);
 
     messages = ['Oh Great, that is my wife\'s ring!'];
     titles = ['My wife\'s ring'];
     imagesKeys = ['ring'];
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(this.WORLD_WIDTH / 2, 'ring', interactionManager);
+    this.addClueItem(this.WORLD_WIDTH / 2 - 500, 'ring', interactionManager);
 };
 
 /**

@@ -51,7 +51,7 @@ LevelTwo.prototype.create = function() {
     this.addEnemies();
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     this.addClueItems();
-    this.addLevelCar('bus', 3.4 * this.checkPointsDistance);
+    this.addLevelCar('bus', 4.3 * this.checkPointsDistance);
     this.addHealthPacks();
     this.createWeapons();
 };
@@ -78,14 +78,14 @@ LevelTwo.prototype.addClueItems = function() {
     var imagesKeys = ['necklace'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(300, 'necklace', interactionManager);
+    this.addClueItem(400, 'necklace', interactionManager);
 
     messages = ['Oh Great, that is my wife\'s ring!'];
     titles = ['My wife\'s ring'];
     imagesKeys = ['ring'];
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(this.WORLD_WIDTH / 2, 'ring', interactionManager);
+    this.addClueItem(this.WORLD_WIDTH / 2 - 500, 'ring', interactionManager);
 };
 
 /**

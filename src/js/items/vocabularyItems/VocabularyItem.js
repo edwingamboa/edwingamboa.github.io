@@ -1,3 +1,4 @@
+
 /**
  * @ignore Created by Edwin Gamboa on 06/11/2015.
  */
@@ -214,7 +215,7 @@ VocabularyItem.prototype.setProperties = function(key) {
         //Transport
         case 'car':
             this.name = 'Car';
-            this.definition = 'A vehicle that has four wheels and an engine' +
+            this.definition = 'A vehicle that has four wheels and an engine ' +
                 'and \nthat is used for carrying passengers on roads';
             this.categoryIndex = 2;
             break;
@@ -226,7 +227,7 @@ VocabularyItem.prototype.setProperties = function(key) {
             break;
         case 'bus':
             this.name = 'Bus';
-            this.definition = 'A large vehicle that is used for carrying' +
+            this.definition = 'A large vehicle that is used for carrying ' +
                 'passengers \nespecially along a particular route at ' +
                 'particular times';
             this.categoryIndex = 2;
@@ -277,14 +278,14 @@ VocabularyItem.prototype.setProperties = function(key) {
             break;
         case 'watch':
             this.name = 'Watch';
-            this.definition = 'A pair of glass or plastic lenses set into a ' +
-                '\nframe and worn over the eyes to help a person see';
+            this.definition = 'A device that shows what time it is and that ' +
+                '\nyou wear on your wrist or carry in a pocket';
             this.categoryIndex = 3;
             break;
         case 'glasses':
             this.name = 'Glasses';
-            this.definition = 'A hard usually transparent material that is ' +
-                '\nused for making windows and other products';
+            this.definition = 'A pair of glass or plastic lenses set into a ' +
+                '\nframe and worn over the eyes to help a person see';
             this.categoryIndex = 3;
             break;
     }

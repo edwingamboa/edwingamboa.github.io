@@ -53,6 +53,7 @@ LevelThree.prototype.create = function() {
     this.addEnemies();
     this.addWife();
     this.addFriend(this.WORLD_WIDTH - 100);
+    this.addLevelCar('taxi', 3 * this.checkPointsDistance);
     this.addClueItems();
     this.createWeapons();
     this.addHealthPacks();
@@ -93,7 +94,7 @@ LevelThree.prototype.addClueItems = function() {
     vocabularyItems.push(vocabularyItem);
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys, vocabularyItems);
-    this.addClueItem(300, 'family', interactionManager);
+    this.addClueItem(400, 'family', interactionManager);
 
     messages = ['Oh Great, that is our son\'s cap!'];
     titles = ['Our son\'s cap'];
@@ -107,7 +108,7 @@ LevelThree.prototype.addClueItems = function() {
         interactionManager);
 
     messages = ['Oh Great, that is our daughter\'s bracelet!'];
-    titles = ['My wife\'s bracelet'];
+    titles = ['My daughter\'s bracelet'];
     imagesKeys = ['bracelet'];
     vocabularyItems = [];
     vocabularyItem = new VocabularyItem(0, 0, 'daughter', false);
