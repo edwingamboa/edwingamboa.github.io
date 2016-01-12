@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 15/10/2015.
+ * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
 
 var HorizontalLayout = require('./HorizontalLayout');
@@ -18,8 +18,9 @@ var HorizontalLayoutPanel = function(backgroundKey, optionals) {
     var ops = optionals || [];
     var x = ops.x || 0;
     var y = ops.y || 0;
+    var margin = ops.margin || 0;
     Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.layout = new HorizontalLayout(this);
+    this.layout = new HorizontalLayout(this, margin);
 };
 
 HorizontalLayoutPanel.prototype = Object.create(Phaser.Sprite.prototype);

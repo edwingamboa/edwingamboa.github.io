@@ -1,3 +1,7 @@
+/**
+ * @ignore Created by Edwin Gamboa
+ */
+
 var Item = require('./Item');
 
 /**
@@ -30,7 +34,7 @@ var HealthPack = function(x, y, maxIncreasing) {
     this.body.gravity.y = GRAVITY;
     this.maxIncreasing = maxIncreasing;
     this.name = 'Health Pack';
-    this.description = '+ ' + maxIncreasing + ' Health Level';
+    this.description = 'Increasing: + ' + maxIncreasing + '\n Health Level';
     this.category = 'healthPacks';
 };
 
@@ -54,7 +58,7 @@ HealthPack.prototype.use = function() {
         this.revive();
     }
     this.x = level.player.x;
-    this.y = 50;
+    this.y = 10;
     level.addHealthPack(this);
 };
 

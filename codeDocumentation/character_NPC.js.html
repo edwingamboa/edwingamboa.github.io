@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: character/NPC.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: character/NPC.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @ignore Created by Edwin Gamboa on 16/07/2015.
+ */
+var Character = require('./Character');
+var Dialog = require('../util/Dialog');
+
+/**
+ * Represents a non player character within the game, whom player will interact
+ * with.
+ * @class NPC
+ * @extends Character
+ * @constructor
+ * @param {number} x - NPC's x coordinate within game world.
+ * @param {number} y - NPC's y coordinate within game world.
+ * @param {string} key - NPC's texture key.
+ * shoot the player.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player
+ * @return {NPC}
+ */
+var NPC = function(x, y, key, interactionManager) {
+    Character.call(this, x, y, key);
+    this.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.animations.add('right', [5, 6, 7, 8], 10, true);
+    this.stopLeftFrameIndex = 0;
+    this.stopRightFrameIndex = 5;
+    this.frame = this.stopLeftFrameIndex;
+    this.hadContactWithPlayer = false;
+    this.interactionManager = interactionManager;
+    return this;
+};
+
+NPC.prototype = Object.create(Character.prototype);
+NPC.prototype.constructor = NPC;
+
+/**
+ * Lets the NPC to show the messages he has for the player. (Interaction)
+ * @method NPC.openDialogs
+ */
+NPC.prototype.openDialogs = function() {
+    this.interactionManager.openDialogs();
+};
+
+module.exports = NPC;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Boot.html">Boot</a></li><li><a href="Bullet.html">Bullet</a></li><li><a href="Button.html">Button</a></li><li><a href="Character.html">Character</a></li><li><a href="ClueItem.html">ClueItem</a></li><li><a href="ContextGroups.html">ContextGroups</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DragAndDropChallenge.html">DragAndDropChallenge</a></li><li><a href="DragAndDropController.html">DragAndDropController</a></li><li><a href="Enemy.html">Enemy</a></li><li><a href="EnglishChallenge.html">EnglishChallenge</a></li><li><a href="EnglishChallengesMenu.html">EnglishChallengesMenu</a></li><li><a href="Friend.html">Friend</a></li><li><a href="GridLayout.html">GridLayout</a></li><li><a href="GridLayoutPanel.html">GridLayoutPanel</a></li><li><a href="GridLayoutPopUp.html">GridLayoutPopUp</a></li><li><a href="HealthPack.html">HealthPack</a></li><li><a href="HorizontalLayout.html">HorizontalLayout</a></li><li><a href="HorizontalLayoutPanel.html">HorizontalLayoutPanel</a></li><li><a href="HorizontalLayoutPopUP.html">HorizontalLayoutPopUP</a></li><li><a href="IconButton.html">IconButton</a></li><li><a href="ImageWordMatch.html">ImageWordMatch</a></li><li><a href="InteractionEnemy.html">InteractionEnemy</a></li><li><a href="InteractionManager.html">InteractionManager</a></li><li><a href="InteractiveCar.html">InteractiveCar</a></li><li><a href="InteractiveHouse.html">InteractiveHouse</a></li><li><a href="Intro.html">Intro</a></li><li><a href="Inventory.html">Inventory</a></li><li><a href="InventoryItem.html">InventoryItem</a></li><li><a href="Item.html">Item</a></li><li><a href="ItemGroupView.html">ItemGroupView</a></li><li><a href="ItemsPopUp.html">ItemsPopUp</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelOne.html">LevelOne</a></li><li><a href="LevelThree.html">LevelThree</a></li><li><a href="LevelTwo.html">LevelTwo</a></li><li><a href="MachineGun.html">MachineGun</a></li><li><a href="Menu.html">Menu</a></li><li><a href="MenuItem.html">MenuItem</a></li><li><a href="MyVocabulary.html">MyVocabulary</a></li><li><a href="MyVocabularyItem.html">MyVocabularyItem</a></li><li><a href="NameBoard.html">NameBoard</a></li><li><a href="NPC.html">NPC</a></li><li><a href="Player.html">Player</a></li><li><a href="PopUp.html">PopUp</a></li><li><a href="Preloader.html">Preloader</a></li><li><a href="ResourceBar.html">ResourceBar</a></li><li><a href="Revolver.html">Revolver</a></li><li><a href="SimpleEnemy.html">SimpleEnemy</a></li><li><a href="Store.html">Store</a></li><li><a href="StoreItem.html">StoreItem</a></li><li><a href="StrongEnemy.html">StrongEnemy</a></li><li><a href="StrongestEnemy.html">StrongestEnemy</a></li><li><a href="Utilities.html">Utilities</a></li><li><a href="VerticalLayout.html">VerticalLayout</a></li><li><a href="VerticalLayoutPanel.html">VerticalLayoutPanel</a></li><li><a href="VerticalLayoutPopUP.html">VerticalLayoutPopUP</a></li><li><a href="VocabularyItem.html">VocabularyItem</a></li><li><a href="Weapon.html">Weapon</a></li><li><a href="Wife.html">Wife</a></li><li><a href="WordUnscramble.html">WordUnscramble</a></li><li><a href="WorldItem.html">WorldItem</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BAR_HEIGHT">BAR_HEIGHT</a></li><li><a href="global.html#BAR_WIDTH">BAR_WIDTH</a></li><li><a href="global.html#BOUNCE">BOUNCE</a></li><li><a href="global.html#CAR_GRAVITY">CAR_GRAVITY</a></li><li><a href="global.html#game">game</a></li><li><a href="global.html#GRAVITY">GRAVITY</a></li><li><a href="global.html#INITIAL_HEALTH_LEVEL">INITIAL_HEALTH_LEVEL</a></li><li><a href="global.html#LEFT_DIRECTION">LEFT_DIRECTION</a></li><li><a href="global.html#LEFT_KEY">LEFT_KEY</a></li><li><a href="global.html#MACHINE_GUN_BULLET_KEY">MACHINE_GUN_BULLET_KEY</a></li><li><a href="global.html#MACHINE_GUN_BULLET_POWER">MACHINE_GUN_BULLET_POWER</a></li><li><a href="global.html#MACHINE_GUN_BULLET_SPEED">MACHINE_GUN_BULLET_SPEED</a></li><li><a href="global.html#MACHINE_GUN_FIRE_RATE">MACHINE_GUN_FIRE_RATE</a></li><li><a href="global.html#MACHINE_GUN_KEY">MACHINE_GUN_KEY</a></li><li><a href="global.html#MACHINE_GUN_NEXT_FIRE">MACHINE_GUN_NEXT_FIRE</a></li><li><a href="global.html#MACHINE_GUN_NUMBER_OF_BULLETS">MACHINE_GUN_NUMBER_OF_BULLETS</a></li><li><a href="global.html#MARGIN">MARGIN</a></li><li><a href="global.html#MAX_HEALTH_LEVEL">MAX_HEALTH_LEVEL</a></li><li><a href="global.html#MAX_RANGE_ATTACK">MAX_RANGE_ATTACK</a></li><li><a href="global.html#MAX_RANGE_DETECTION">MAX_RANGE_DETECTION</a></li><li><a href="global.html#MAX_SPEED">MAX_SPEED</a></li><li><a href="global.html#MIN_NUMBER_OF_COLUMNS">MIN_NUMBER_OF_COLUMNS</a></li><li><a href="global.html#MIN_NUMBER_OF_ROWS">MIN_NUMBER_OF_ROWS</a></li><li><a href="global.html#MIN_RANGE_ATTACK">MIN_RANGE_ATTACK</a></li><li><a href="global.html#MIN_RANGE_DETECTION">MIN_RANGE_DETECTION</a></li><li><a href="global.html#MINIMUM_SCORE">MINIMUM_SCORE</a></li><li><a href="global.html#NUMBER_OF_COLUMNS">NUMBER_OF_COLUMNS</a></li><li><a href="global.html#NUMBER_OF_COMIC_IMAGES">NUMBER_OF_COMIC_IMAGES</a></li><li><a href="global.html#NUMBER_OF_CONTEXTS">NUMBER_OF_CONTEXTS</a></li><li><a href="global.html#NUMBER_OF_FIGHTING_POINTS">NUMBER_OF_FIGHTING_POINTS</a></li><li><a href="global.html#NUMBER_OF_ROWS">NUMBER_OF_ROWS</a></li><li><a href="global.html#PRICE">PRICE</a></li><li><a href="global.html#PRICE_INCREASE_RATE">PRICE_INCREASE_RATE</a></li><li><a href="global.html#REVOLVER_BULLET_KEY">REVOLVER_BULLET_KEY</a></li><li><a href="global.html#REVOLVER_BULLET_POWER">REVOLVER_BULLET_POWER</a></li><li><a href="global.html#REVOLVER_BULLET_SPEED">REVOLVER_BULLET_SPEED</a></li><li><a href="global.html#REVOLVER_FIRE_RATE">REVOLVER_FIRE_RATE</a></li><li><a href="global.html#REVOLVER_KEY">REVOLVER_KEY</a></li><li><a href="global.html#REVOLVER_NEXT_FIRE">REVOLVER_NEXT_FIRE</a></li><li><a href="global.html#REVOLVER_NUMBER_OF_BULLETS">REVOLVER_NUMBER_OF_BULLETS</a></li><li><a href="global.html#RIGHT_DIRECTION">RIGHT_DIRECTION</a></li><li><a href="global.html#RIGHT_KEY">RIGHT_KEY</a></li><li><a href="global.html#SECONDS_BETWEEN_FRAMES">SECONDS_BETWEEN_FRAMES</a></li><li><a href="global.html#SPEED">SPEED</a></li><li><a href="global.html#SPRITE_KEY">SPRITE_KEY</a></li><li><a href="global.html#WORD_DELAY">WORD_DELAY</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jan 12 2016 02:08:35 GMT+0100 (Hora estándar centroeuropea)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

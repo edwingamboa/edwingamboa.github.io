@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 16/07/2015.
+ * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
 /**
  * Represents a pop up window.
@@ -26,10 +26,12 @@ var PopUp = function(backgroundKey, parent, title) {
     this.closeButton.events.onInputDown.add(this.close, this);
 
     if (title !== undefined) {
-        this.title = level.game.make.text(this.xCenter, 10, title);
-        this.title.font = 'Shojumaru';
-        this.title.fontSize = 30;
-        this.title.fill = '#FFFFFF';
+        this.title = level.game.make.text(this.xCenter, 5, title);
+        this.title.font = level.font;
+        this.title.fontSize = 40;
+        this.title.fill = '#feec69';
+        this.title.stroke = '#000000';
+        this.title.strokeThickness = 3;
         this.title.anchor.set(0.5, 0);
         this.addChild(this.title);
     }

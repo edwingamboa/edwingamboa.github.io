@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 13/10/2015.
+ * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
 
 /**
@@ -9,12 +9,14 @@
  * @constructor
  * @param iconKey {string} - Texture's key for the icon of the challenge
  * @param name {string} - Name of the challenge
+ * @param description {string} - Description of the challenge.
  * @param score {number} - Score to be increased in case of success.
  */
-var EnglishChallenge = function(iconKey, name, score) {
+var EnglishChallenge = function(iconKey, name, description, score) {
     this.iconKey = iconKey;
     this.name = name;
     this.score = score;
+    this.description = description;
 };
 
 EnglishChallenge.prototype.constructor = EnglishChallenge;

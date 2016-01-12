@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 13/10/2015.
+ * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
 
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -17,14 +17,18 @@ var Button = require('../../util/Button');
  * @param {string} iconKey - Texture key of the Challenge icon
  * @param {string} challengeName - Challenge name to show in UI.
  * @param {number} score - Score to be increased in case of success.
+ * @param {string} description - Description of the challenge.
  */
-var DragAndDropChallenge = function(iconKey, challengeName, score) {
-    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName);
+var DragAndDropChallenge = function(iconKey, challengeName, description,
+                                    score) {
+    VerticalLayoutPopUp.call(this, 'popUpBg', null, challengeName, 5);
     this.englishChallenge = new EnglishChallenge(
         iconKey,
         challengeName,
+        description,
         score
     );
+    this.vocabularyItems = [];
     this.destinations = [];
     this.elements = [];
     this.dragAndDropControl = new DragAndDropController(this);
@@ -52,13 +56,17 @@ DragAndDropChallenge.prototype.confirm = function() {
         return;
     }
     this.englishChallenge.success();
+    var i;
+    for (i in this.vocabularyItems) {
+        level.myVocabulary.markAsLearned(this.vocabularyItems[i]);
+    }
     this.close();
 };
 
 /**
  * Clear all the containers and elements of the challenge, so that a new
  * challenge can be created.
- * @method DragAndDropChallenge.
+ * @method DragAndDropChallenge.clearChallenge
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
     if (this.mainPanel.children.length > 0) {

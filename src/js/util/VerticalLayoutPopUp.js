@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 21/10/2015.
+ * @ignore Created by Edwin Gamboa on 21/10/2015.
  */
 var PopUp = require('./PopUp');
 var VerticalLayout = require('./VerticalLayout');
@@ -12,11 +12,12 @@ var VerticalLayout = require('./VerticalLayout');
  * @param {string} backgroundKey - Background texture's key.
  * @param {PopUp} [parent] - View that creates this PopUp.
  * @param {string} title - Title for this PopUp.
+ * @param {number} margin - Margin or space between elements, optional.
  */
-var VerticalLayoutPopUP = function(backgroundKey, parent, title) {
+var VerticalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
     var yOrigin = this.title.y + this.title.height || 0;
-    this.layout = new VerticalLayout(this, null, yOrigin);
+    this.layout = new VerticalLayout(this, margin, yOrigin);
 };
 
 VerticalLayoutPopUP.prototype = Object.create(PopUp.prototype);

@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 16/07/2015.
+ * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
 var HorizontalLayoutPopUp = require('./HorizontalLayoutPopUp');
 
@@ -25,7 +25,7 @@ var Dialog = function(iconKey, text, parent) {
     this.icon.scale.setTo(scale, scale);
 
     this.message = level.game.make.text(0, 0, '');
-    this.message.font = 'Arial';
+    this.message.font = level.font;
     this.message.fontSize = 20;
     this.message.fill = '#000000';
     this.message.text = text;

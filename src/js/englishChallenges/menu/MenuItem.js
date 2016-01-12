@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 15/10/2015.
+ * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
 
 var ItemGroupView = require('../../items/ItemGroupView');
@@ -20,7 +20,7 @@ var MenuItem = function(challenge, parentView) {
     this.challenge = challenge;
     this.updateScoreText();
     this.setTitle(challenge.englishChallenge.name);
-    //this.setDescription(challenge.englishChallenge.description);
+    this.setDescription(challenge.englishChallenge.description);
 };
 
 MenuItem.prototype = Object.create(ItemGroupView.prototype);

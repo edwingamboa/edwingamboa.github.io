@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/10/2015.
+ * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
@@ -14,8 +14,13 @@ var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
  */
 var WordUnscramble = function() {
     var dimensions = {numberOfRows: 4};
-    DragAndDropChallenge.call(this, 'unscramble', 'Unscrambler', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'unscramble',
+        'Unscramble',
+        'Form the word \nusing the letters',
+        10,
+        dimensions
+    );
 };
 
 WordUnscramble.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -27,34 +32,52 @@ WordUnscramble.prototype.constructor = WordUnscramble;
  */
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
-    var word = 'mother';
-    var wordImage = level.game.make.sprite(0, 0, 'mother');
+    var word = level.myVocabulary.randomVocabularyItems(1)[0];
+    this.vocabularyItems.push(word);
+    var wordImage = level.game.make.sprite(0, 0, word.key);
+    if (wordImage.height > 120) {
+        var scale = 120 / wordImage.height;
+        wordImage.scale.x = scale;
+        wordImage.scale.y = scale;
+    }
 
-    var optionals = {numberOfColumns: word.length, margin: 5};
+    var optionals = {numberOfColumns: word.name.length, margin: 5};
     var wordFieldAnswer = new GridLayoutPanel('lettersBg', optionals);
 
     this.source = new GridLayoutPanel('lettersBg', optionals);
     var i;
     var letter;
+    var letterText;
     var letterShade;
-    for (i = 0; i < word.length; i++) {
-        letterShade = new VerticalLayoutPanel('letterBg', 2);
-        letterShade.code = '' + i;
+    var code;
+    for (i = 0; i < word.name.length; i++) {
+        letter = word.name.charAt(i);
+        code = letter.toLowerCase().charCodeAt(0);
+
+        letterText = level.game.make.text(0, 0, letter);
+        letterText.code = code;
+        if (letter === ' ') {
+            letterShade = new VerticalLayoutPanel('spaceBg', 2);
+            letterShade.addElement(letterText);
+        }else {
+            letterShade = new VerticalLayoutPanel('letterBg', 2);
+            //Font style
+            letterText.font = level.font;
+            letterText.fontSize = 30;
+            letterText.fill = '#473e2c';
+            letterText.stroke = '#fff';
+            letterText.strokeThickness = 2;
+            letterText.inputEnabled = true;
+            letterText.input.enableDrag(true, true);
+            letterText.events.onDragStop.add(
+                this.dragAndDropControl.fixLocation,
+                this.dragAndDropControl
+            );
+            this.elements.push(letterText);
+        }
+        letterShade.code = code;
         this.destinations.push(letterShade);
-
         wordFieldAnswer.addElement(letterShade);
-
-        letter = level.game.make.text(0, 0, word.charAt(i));
-        //Font style
-        letter.font = 'Shojumaru';
-        letter.fontSize = 20;
-        letter.fill = '#0040FF';
-        letter.inputEnabled = true;
-        letter.input.enableDrag(true, true);
-        letter.events.onDragStop.add(this.dragAndDropControl.fixLocation,
-            this.dragAndDropControl);
-        letter.code = '' + i;
-        this.elements.push(letter);
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();

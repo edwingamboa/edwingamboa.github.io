@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 25/10/2015.
+ * @ignore Created by Edwin Gamboa on 25/10/2015.
  */
 
 /**
@@ -16,7 +16,7 @@ var NameBoard = function(x, y, name) {
     this.anchor.set(0.5, 1);
 
     this.message = level.game.make.text(0, -this.height + 10, name);
-    this.message.font = 'Arial';
+    this.message.font = level.font;
     this.message.fontSize = 16;
     this.message.fill = '#FFFFFF';
     this.message.anchor.set(0.5, 0);

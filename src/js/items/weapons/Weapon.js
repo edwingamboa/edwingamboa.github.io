@@ -1,3 +1,7 @@
+/**
+ * @ignore Created by Edwin Gamboa
+ */
+
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 
@@ -61,7 +65,7 @@ var Weapon = function(x,
     this.fireRate = fireRate;
     this.infinite = infinite;
     this.description = 'Damage: ' + this.power +
-        '\nAmmo: ' + this.numberOfBullets;
+        '\nAmmunition: ' + this.numberOfBullets;
     this.category = 'weapons';
 };
 
@@ -149,6 +153,14 @@ Weapon.prototype.pointToRight = function() {
  */
 Weapon.prototype.pointToLeft = function() {
     this.frame = LEFT_KEY;
+};
+
+/**
+ * Saves this weapon information.
+ * @method Weapon.saveWeapon
+ */
+Weapon.prototype.saveWeapon = function() {
+    localStorage.setItem(this.key, this.numberOfBullets);
 };
 
 module.exports = Weapon;

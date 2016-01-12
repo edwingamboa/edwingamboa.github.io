@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 17/07/2015.
+ * @ignore Created by Edwin Gamboa on 17/07/2015.
  */
 var ItemGroupView = require('../ItemGroupView');
 
@@ -12,8 +12,7 @@ var ItemGroupView = require('../ItemGroupView');
  * @param {Inventory} parentView - View on which the item will be displayed.
  */
 var InventoryItem = function(item, parentView) {
-    ItemGroupView.call(this, item.key + 'Icon', 'Use', parentView);
-
+    ItemGroupView.call(this, item.key, 'Use', parentView);
     this.item = item;
     this.amountAvailable = 0;
     this.updateAmountAvailableText();
@@ -32,6 +31,7 @@ InventoryItem.prototype.buttonAction = function() {
     if (this.amountAvailable > 0) {
         this.item.use();
         this.amountAvailable --;
+        localStorage.setItem(this.item.key + 'Item', this.amountAvailable);
         this.updateAmountAvailableText();
         this.parentView.close();
     }else {

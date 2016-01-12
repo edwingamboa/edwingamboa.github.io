@@ -1,13 +1,10 @@
 /**
- * Created by Edwin Gamboa on 19/10/2015.
+ * @ignore Created by Edwin Gamboa on 19/10/2015.
  */
 
 var PopUp = require('../util/PopUp');
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var Button = require('../util/Button');
-var HealthPack = require('./HealthPack');
-var Revolver = require('./weapons/Revolver');
-var MachineGun = require('./weapons/MachineGun');
 
 /**
  * View that contains a menu of items, grouped by category.
@@ -17,8 +14,15 @@ var MachineGun = require('./weapons/MachineGun');
  * @param {Object[]} tabsLabels - Items categories names.
  * @param {Object[]} categories - Items categories (code Names).
  * @param {string} title - This view's title.
+ * @param {numner} columns - Number of columns for the main panel
+ * @param {numner} rows - number of rows for the main panel
  */
-var ItemsPopUp = function(tabsLabels, categories, title) {
+var ItemsPopUp = function(tabsLabels,
+                          categories,
+                          title,
+                          columns,
+                          rows
+) {
     PopUp.call(this, 'popUpBg', null, title);
 
     this.items = [];
@@ -29,18 +33,17 @@ var ItemsPopUp = function(tabsLabels, categories, title) {
         tab = new Button(tabsLabels[i], this.showTab, this, 'tabBg');
         tab.category = categories[i];
         tab.x = x;
-        tab.y = 58;
+        tab.y = 60;
         x += tab.width + 2;
         this.addChild(tab);
         this.items[categories[i]] = [];
     }
 
-    var dimensions = {numberOfColumns: 4, numberOfRows: 2};
+    var dimensions = {numberOfColumns: columns || 4, numberOfRows: rows || 2};
     this.panel = new GridLayoutPanel('popUpPanelBg', dimensions);
     this.panel.x = 20;
     this.panel.y = 100;
-    this.createItemGroups();
-    this.fillPanel(categories[0]);
+    this.firstCategory = categories[0];
     this.addChild(this.panel);
 };
 
@@ -77,18 +80,13 @@ ItemsPopUp.prototype.fillPanel = function(category) {
 };
 
 /**
- * Creates all items views.
- * @method ItemsPopUp.createItemGroups
+ * Opens the PopItem showing first tab.
+ * @method ItemsPopUp.open
  */
-ItemsPopUp.prototype.createItemGroups = function() {
-    var revolverItem = new Revolver(0, 0, false);
-    this.addItem(revolverItem);
-    var machineGunItem = new MachineGun(0, 0, false);
-    this.addItem(machineGunItem);
-    var healthPackItem = new HealthPack(0, 0, 5);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 20);
-    this.addItem(healthPackItem);
+ItemsPopUp.prototype.open = function() {
+    this.panel.removeAllElements();
+    this.fillPanel(this.firstCategory);
+    PopUp.prototype.open.call(this);
 };
 
 module.exports = ItemsPopUp;

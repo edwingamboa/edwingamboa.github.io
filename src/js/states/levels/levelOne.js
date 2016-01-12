@@ -1,22 +1,20 @@
 /**
- * Created by Edwin Gamboa on 22/07/2015.
+ * @ignore Created by Edwin Gamboa on 22/07/2015.
  */
-var Level = require ('../levels/Level');
+var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var InteractionManager = require('../../util/InteractionManager');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
+var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
  * @type {number}
  */
 var NUMBER_OF_FIGHTING_POINTS = 5;
-/**
- * Number of houses player should visit during this level.
- * @type {number}
- */
-var NUMBER_OF_HOUSES = 2;
 
 /**
  * Manages LevelOne.
@@ -38,56 +36,92 @@ LevelOne.prototype.constructor = LevelOne;
  */
 LevelOne.prototype.create = function() {
     Level.prototype.create.call(this);
+    localStorage.setItem('level', 'levelOne');
+    this.nextState = 'levelTwo';
+    this.game.stage.backgroundColor = '#C7D2FC';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
         (NUMBER_OF_FIGHTING_POINTS + 1);
+    this.lastGoalAimed = false;
+    this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
+    this.numberOfEnemies = 3;
+    this.numberOfStrongEnemies = 0;
+    this.createPlaces();
+    this.addInteractiveBuildings();
+    this.addStaticBuildings();
     this.addNPCs();
     this.addEnemies();
-    this.addObjects();
-    this.addPlaces();
-    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
-    this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
-    var heathPacksDistance = this.WORLD_WIDTH / 4;
-    this.addHealthPack(new HealthPack(heathPacksDistance, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 2, 10, 5, this));
-    this.addHealthPack(new HealthPack(heathPacksDistance * 3, 10, 5, this));
+    this.createWeapons();
+    this.addClueItems();
+    this.addLevelCar('jeep', 3.7 * this.checkPointsDistance);
+    this.addHealthPacks();
 };
 
 /**
- * Add InteractiveCar and InteractiveHouses for this level.
- * @method LevelOne.addObjects
+ * Creates the needed arrays to add level weapons
  */
-LevelOne.prototype.addObjects = function() {
-    var playerHouse = this.addStaticBuilding(5, 'orangeHouse');
+LevelOne.prototype.createWeapons = function() {
+    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
+};
 
+/**
+ * Add ClueItems for this level.
+ * @method LevelOne.createWeapons
+ */
+LevelOne.prototype.addClueItems = function() {
+    var messages = ['Oh Great, those are my wife\'s glasses!'];
+    var titles = ['My wife\'s glasses'];
+    var imagesKeys = ['glasses'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'wife', false);
+    vocabularyItems.push(vocabularyItem);
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys, vocabularyItems);
+    this.addClueItem(300, 'glasses', interactionManager);
+
+    messages = ['Oh Great, that is my wife\'s watch!'];
+    titles = ['My wife\'s watch'];
+    imagesKeys = ['watch'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    this.addClueItem(this.WORLD_WIDTH / 2, 'watch', interactionManager);
+};
+
+/**
+ * Adds interactive buildings to this level.
+ * @method LevelOne.addInteractiveBuildings
+ */
+LevelOne.prototype.addInteractiveBuildings = function() {
+    var messages = ['You can buy a weapon using the store'];
+    var titles = ['Buying weapons'];
+    var imagesKeys = ['store'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    this.addInteractiveHouse(this.firstCheckPointX * 1.55, 'store',
+        interactionManager);
+
+    messages = ['Your family is now somewhere else.',
+        'Continue trying, because this game is just starting!'];
+    titles = ['Continue trying', 'Continue trying'];
+    imagesKeys = ['emptyRoom', 'emptyRoom'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'family', false);
+    vocabularyItems.push(vocabularyItem);
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys, vocabularyItems);
+    this.addInteractiveHouse(5.5 * this.checkPointsDistance, 'blueHouse',
+        interactionManager);
+};
+
+/**
+ * Adds static buildings to this level.
+ * @method LevelOne.addInteractiveBuildings
+ */
+LevelOne.prototype.addStaticBuildings = function() {
+    this.addStaticBuilding(5, 'orangeHouse');
     var house = this.addStaticBuilding(500, 'whiteHouse');
     this.addNeighbors(house, 'greenHouse', 'yellowHouse');
-
-    var dialog = new Dialog('storeButton', 'Use the store to buy a weapon.');
-    var gunsStore = new InteractiveHouse(this.firstCheckPointX * 1.4,
-        this.GROUND_HEIGHT, 'redHouse', dialog);
-    gunsStore.anchor.set(0, 1);
-    this.addObject(gunsStore);
-
-    dialog = new VerticalLayoutPopUp('mediumPopUpBg', null, 'So late!');
-    var emptyRoom = level.game.make.sprite(0, 0, 'emptyRoom');
-    var finishMessage = 'Your family is now somewhere else.' +
-        '\nContinue trying, because this game is just starting!';
-    var dialogText = level.game.make.text(0, 0, finishMessage);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    dialog.addElement(emptyRoom);
-    dialog.addElement(dialogText);
-
-    var friendsHouse = new InteractiveHouse(5 * this.checkPointsDistance,
-        this.GROUND_HEIGHT, 'blueHouse', dialog);
-    friendsHouse.anchor.set(0, 1);
-    this.addObject(friendsHouse);
-    this.addNeighbors(friendsHouse, 'orangeHouse', 'yellowHouse');
-
-    this.addCar(3.7 * this.checkPointsDistance, 'jeep');
 };
 
 /**
@@ -95,75 +129,25 @@ LevelOne.prototype.addObjects = function() {
  * @method LevelOne.addNPCs
  */
 LevelOne.prototype.addNPCs = function() {
-    var message = 'I know that you are looking for \nyour family.' +
-        '\nI can help you.' +
-        '\n\nGo to the blue house after the Zoo,' +
-        '\nmaybe your family is there.';
-    this.addNPC(this.game.camera.width / 2, 'npc', message);
-    message = 'Hi my friend!.' +
-        '\n\nGo to the red House before the' +
-        '\nPlayground, \nthere you can buy a new weapon.';
-    this.addNPC(this.firstCheckPointX * 1.2, 'friend', message);
+    var messages = [
+        'Are you looking for Carlos? \n Be careful, he is so dangerous',
+        'Your wife and children are in \nthe Big Blue House after the Zoo'
+    ];
+    var titles = ['I can help you', 'Go to Big Blue House'];
+    var imagesKeys = ['npc', 'blueHouse'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
+    this.addNPC(this.game.camera.width / 2, 'npc', intManager);
 };
 
 /**
- * Adds this level enemies.
- * @method LevelOne.addEnemies
+ * Creates the needed arrays to add this level places
+ * @method LevelOne.createPlaces
  */
-LevelOne.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
-    var numberOfEnemies = 3;
-    for (var i = 0; i < NUMBER_OF_FIGHTING_POINTS; i++) {
-        for (var j = 0; j < numberOfEnemies; j++) {
-            x += 50;
-            this.addSimpleEnemy(x);
-        }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
-    }
-};
-
-/**
- * Adds city places from vocabulary that corresponds to this level.
- * @method LevelOne.addPlaces
- */
-LevelOne.prototype.addPlaces = function() {
-    var housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse', 'orangeHouse'];
-    var placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
-    var placesNames = ['Book Store', 'Playground', 'Gas Station', 'Zoo'];
-    var x = level.WORLD_WIDTH / (placesKeys.length + 2);
-    var i;
-    var houseIndex = 0;
-    var place;
-    var leftHouse;
-    for (i = 0; i < placesKeys.length; i++) {
-        if (houseIndex >= housesKeys.length) {
-            houseIndex = 0;
-        }
-        place = this.addStaticBuilding(x * (i + 1), placesKeys[i]);
-        this.addNeighbors(place, housesKeys[houseIndex],
-            housesKeys[houseIndex + 1]);
-
-        houseIndex += 2;
-        this.addNameBoard(place.x - 60, placesNames[i] + ' Street');
-    }
-};
-
-/**
- * Lets the player to play second level.
- * @method LevelOne.nextLevel
- */
-LevelOne.prototype.nextLevel = function() {
-    this.game.state.start('levelTwo');
-    level = this.game.state.states.levelTwo;
-};
-
-/**
- * Determines whether the player has won
- * @returns {boolean}
- */
-LevelOne.prototype.playerWins = function() {
-    return this.player.x >= (this.WORLD_WIDTH - this.player.width);
+LevelOne.prototype.createPlaces = function() {
+    this.housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse',
+        'orangeHouse'];
+    this.placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    this.addPlaces();
 };
 
 module.exports = LevelOne;

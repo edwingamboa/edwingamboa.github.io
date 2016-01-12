@@ -1,9 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * @ignore Created by Edwin Gamboa
  */
 var Character = require('./Character');
+var Revolver = require('../items/weapons/Revolver');
+var MachineGun = require('../items/weapons/MachineGun');
+
 /**
  * Default player speed
  * @constant
@@ -28,6 +29,13 @@ var GRAVITY = 300;
  * @type {number}
  */
 var MINIMUM_SCORE = 20;
+/**
+ * Default initial health level for any character
+ * @constant
+ * @type {number}
+ * @default
+ */
+var INITIAL_HEALTH_LEVEL = 100;
 
 /**
  * Represents player's character within the game.
@@ -37,14 +45,14 @@ var MINIMUM_SCORE = 20;
  */
 var Player = function() {
     var options = {speed : SPEED, maxSpeed : MAX_SPEED};
-    Character.call(this, 200, level.game.world.height - 150,
+    Character.call(this, 200, level.GROUND_HEIGHT - 50,
         'character', options);
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
-    this.score = MINIMUM_SCORE;
     this.frame = this.stopRightFrameIndex;
+    this.score = MINIMUM_SCORE;
 };
 
 Player.prototype = Object.create(Character.prototype);
@@ -146,6 +154,102 @@ Player.prototype.buyItem = function(item) {
         return true;
     }else {
         return false;
+    }
+};
+
+/**
+ * Updates player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
+ */
+Player.prototype.updateCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+    localStorage.setItem('currentWeapon', weaponKey);
+};
+
+/**
+ * Loads player's current weapon
+ * @method Player.weaponKey
+ * @param {string} weaponKey - new current weapon's key
+ */
+Player.prototype.loadCurrentWeapon = function(weaponKey) {
+    Character.prototype.updateCurrentWeapon.call(this, weaponKey);
+};
+
+/**
+ * Add a new weapon to character's weapons.
+ * @method Player.addWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.addWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+    newWeapon.saveWeapon();
+};
+
+/**
+ * Loads a weapon that player has acquired.
+ * @method Player.loadWeapon
+ * @param newWeapon {object} The weapon to be added.
+ */
+Player.prototype.loadWeapon = function(newWeapon) {
+    Character.prototype.addWeapon.call(this, newWeapon);
+};
+
+/**
+ * Changes player's current weapon, to the next one in the weapons array.
+ * Updates currentWeaponIndex property.
+ * @method Player.nextWeapon
+ */
+Player.prototype.nextWeapon = function() {
+    Character.prototype.nextWeapon.call(this);
+    level.updateAmmoText();
+};
+
+/**
+ * Loads the player's information from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadPlayer = function() {
+    if (localStorage.getItem('score') !== null) {
+        this.score = parseInt(localStorage.getItem('score'));
+    }
+    if (localStorage.getItem('healthLevel') !== null) {
+        var health = parseInt(localStorage.getItem('healthLevel'));
+        if (health > 0) {
+            this.healthLevel = health;
+        }else {
+            this.healthLevel = 100;
+            if (this.score > 5) {
+                this.score -= 5;
+            }else {
+                this.score = 0;
+            }
+            localStorage.setItem('score', this.score);
+        }
+    }
+    this.loadWeapons();
+    if (localStorage.getItem('currentWeapon') !== null) {
+        this.loadCurrentWeapon(localStorage.getItem('currentWeapon'));
+    }else {
+        this.useWeapon(new Revolver(700, 100, false));
+    }
+};
+
+/**
+ * Loads the player's weapons from the local store.
+ * @method Player.loadPlayer
+ */
+Player.prototype.loadWeapons = function() {
+    var weapon;
+    if (localStorage.getItem('revolver') !== null) {
+        weapon = new Revolver(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('revolver'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('machineGun') !== null) {
+        weapon = new MachineGun(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('machineGun'));
+        this.loadWeapon(weapon);
     }
 };
 

@@ -1,8 +1,9 @@
 /**
- * Created by Edwin Gamboa on 22/06/2015.
+ * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
 var Inventory = require('../../items/inventory/Inventory');
 var Store = require('../../items/store/Store');
+var MyVocabulary = require('../../items/vocabulary/MyVocabulary');
 var HealthPack = require('../../items/HealthPack');
 var Player = require('../../character/Player');
 var Revolver = require('../../items/weapons/Revolver');
@@ -12,12 +13,18 @@ var StrongestEnemy = require('../../character/StrongestEnemy');
 var StrongEnemy = require('../../character/StrongEnemy');
 var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
-var InteractiveCar = require ('../../worldElements/InteractiveCar');
+var InteractiveCar = require ('../../items/vocabularyItems/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
 var NameBoard = require('../../worldElements/NameBoard');
+var WorldItem = require('../../items/vocabularyItems/WorldItem');
+var InteractionManager = require('../../util/InteractionManager');
+var IconButton = require('../../util/IconButton');
+var HorizontalLayoutPanel = require('../../util/HorizontalLayoutPanel');
+var InteractiveHouse = require('../../worldElements/InteractiveHouse');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
 
 /**
  * Represents a game level.
@@ -36,11 +43,11 @@ Level.prototype.constructor = Level;
  * @method Level.preload
  */
 Level.prototype.preload = function() {
-    this.game.stage.backgroundColor = '#C7D2FC';
-
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    this.font = level.font;
+    level = this;
 };
 
 /**
@@ -56,6 +63,7 @@ Level.prototype.create = function() {
     this.gameObjects = [];
     this.activePopUps = 0;
     this.xDirection = 1;
+    this.addPlatforms();
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
     this.createOtherItemsGroup();
@@ -64,15 +72,16 @@ Level.prototype.create = function() {
     this.createEnemiesGroup();
     this.addPlayer();
     this.createWeaponsGroup();
-    this.addPlatforms();
     this.addTexts();
     this.addHealthBar();
     this.addControls();
     this.addCamera();
-    this.createInventory();
-    this.createEnglishChallengesMenu();
     this.createStore();
+    this.createInventory();
+    this.createMyVocabulary ();
+    this.createEnglishChallengesMenu();
     this.updateHealthLevel();
+    this.createToolsBar();
 };
 
 /**
@@ -85,7 +94,7 @@ Level.prototype.updateEnemies = function() {
         var enemy = this.enemies.children[i];
         for (var enemyWeaponKey in enemy.weapons) {
             this.game.physics.arcade.overlap(
-                this.player,
+                this.playerCharacters,
                 enemy.weapons[enemyWeaponKey].bullets,
                 this.bulletHitCharacter,
                 null,
@@ -117,7 +126,7 @@ Level.prototype.updateNpcs = function() {
         var distanceNpcPlayer = this.game.physics.arcade.distanceBetween(
             this.player, npc);
         if (distanceNpcPlayer <= npc.width) {
-            npc.showMessage();
+            npc.openDialogs();
             if (this.player.x < npc.x) {
                 this.player.x += 2 * npc.width;
             } else {
@@ -135,6 +144,7 @@ Level.prototype.updateNpcs = function() {
  */
 Level.prototype.update = function() {
     if (this.playerWins()) {
+        this.increaseScore(50);
         this.nextLevel();
     }
     this.updateEnemies();
@@ -148,8 +158,8 @@ Level.prototype.update = function() {
         this.collectWeapon, null, this);
     this.game.physics.arcade.overlap(this.cars, this.enemies,
         this.crashEnemy, null, this);
-    this.game.physics.arcade.overlap(this.player, this.otherItems,
-        this.collectItem, null, this);
+    this.game.physics.arcade.overlap(this.player, this.vocabularyItems,
+        this.collectVocabularyItem, null, this);
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
             this.enemies,
@@ -159,10 +169,6 @@ Level.prototype.update = function() {
             this
         );
     }
-
-    this.game.physics.arcade.overlap(this.player, this.healthPacks,
-        this.collectHealthPack, null, this);
-
     if (this.cursors.left.isDown) {
         this.xDirection = -1;
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.X)) {
@@ -188,7 +194,7 @@ Level.prototype.update = function() {
     }
     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
         this.player.fireToXY(this.player.x + (100 * this.xDirection));
-        //  Add and update the score
+        this.player.currentWeapon.saveWeapon();
         this.updateAmmoText();
     }
 };
@@ -198,8 +204,8 @@ Level.prototype.update = function() {
  * @method Level.addHealthBar
  */
 Level.prototype.addHealthBar = function() {
-    this.healthBar = new ResourceBar(this.healthIcon.x +
-        this.healthIcon.width / 2 + 10,
+    this.healthBar = new ResourceBar(
+        this.healthIcon.x + this.healthIcon.width + 10,
         this.healthLevelText.y + 2);
     this.addObject(this.healthBar);
     this.healthBar.fixedToCamera = true;
@@ -276,25 +282,66 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {number} x - X coordinate within the world where the character should
  * appear.
  * @param {string} key - NPC texture key.
- * @param {string} comicKey - Texture key of the comic that represents the
- * interaction between this NPC and the player.
+ * @param {InteractionManager} interactionManager - Interaction manager that
  * @return {NPC} - Added NPC;
  */
-Level.prototype.addNPC = function(x, key, comicKey) {
-    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, comicKey);
+Level.prototype.addNPC = function(x, key, interactionManager) {
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, interactionManager);
     this.npcs.add(npc);
     return npc;
 };
 
 /**
- * Adds a new InteractiveCar to enemies group.
+ * Adds a new InteractiveCar to cars group.
  * @method Level.addCar
+ * @param {InteractiveCar} car - car to be added.
+ */
+Level.prototype.addCar = function(car) {
+    this.cars.add(car);
+};
+
+/**
+ * Adds the car that corresponds to this level.
+ * @method Level.addLevelCar
+ * @param {string} key - Car texture key.
  * @param {number} x - X coordinate within the world where the car should
  * appear.
- * @param {string} key - Car texture key.
  */
-Level.prototype.addCar = function(x, key) {
-    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, key));
+Level.prototype.addLevelCar = function(key, x) {
+    var car = this.createInteractiveCar(key);
+    car.x = x;
+    car.y = this.GROUND_HEIGHT;
+    this.cars.add(car);
+};
+
+/**
+ * Adds a new InteractiveHouse to the level.
+ * @method Level.addInteractiveHouse
+ * @param {number} x - X coordinate within the world where the house should
+ * appear.
+ * @param {string} key - House texture key.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player.
+ */
+Level.prototype.addInteractiveHouse = function(x, key, interactionManager) {
+    var house = new InteractiveHouse(x, this.GROUND_HEIGHT, key,
+        interactionManager);
+    this.addVocabularyItem(house);
+    this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+};
+
+/**
+ * Adds a new ClueItem to the level.
+ * @method Level.addClueItem
+ * @param {number} x - X coordinate within the world where the item should
+ * appear.
+ * @param {string} key - Item's texture key.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player.
+ */
+Level.prototype.addClueItem = function(x, key, interactionManager) {
+    this.addVocabularyItem(new ClueItem (x, this.GROUND_HEIGHT + 5, key,
+        interactionManager));
 };
 
 /**
@@ -329,14 +376,26 @@ Level.prototype.addObject = function(object) {
 };
 
 /**
- * Adds the player to the game world.
+ * Adds the player to the game world and a Phaser group for characters
+ * controlled by player (When he has to protect i.e. his wife.)
  * @method Level.addPlayer
  */
 Level.prototype.addPlayer = function() {
+    this.playerCharacters = this.game.add.group();
     this.player = new Player(this);
-    this.game.add.existing(this.player);
-    this.gameObjects.push(this.player);
-    this.player.useWeapon(new Revolver(700, 100, false));
+    this.playerCharacters.add(this.player);
+    this.gameObjects.push(this.playerCharacters);
+    this.player.loadPlayer();
+};
+
+/**
+ * Adds a character that will be controlled by player
+ * (When he has to protect i.e. his wife.)
+ * @method Level.addPlayerCharacter
+ * @param {Character} character - Character to be protected by player.
+ */
+Level.prototype.addPlayerCharacter = function(character) {
+    this.playerCharacters.add(character);
 };
 
 /**
@@ -344,54 +403,55 @@ Level.prototype.addPlayer = function() {
  * @method Level.addTexts
  */
 Level.prototype.addTexts = function() {
+    var labelFontStyle = {fontSize: '16px', fill: '#fff', stroke: '#000',
+        strokeThickness: 4};
+    var textFontStyle = {fontSize: '35px', fill: '#fff', stroke: '#000',
+        strokeThickness: 4};
+    var y = 10;
+    var distanceBetewIconLabel = 80;
     //The score
-    this.scoreIcon = this.game.add.sprite(this.game.camera.width - 150, 10,
+    this.scoreIcon = this.game.add.sprite(this.game.camera.width - 190, y,
         'money');
     this.scoreIcon.fixedToCamera = true;
     this.scoreIcon.anchor.set(0.5, 0);
     this.scoreLabel = this.game.add.text(this.scoreIcon.x,
-        this.scoreIcon.y + this.scoreIcon.height,
-        'Money', {fontSize: '16px', fill: '#000'});
+        this.scoreIcon.y + this.scoreIcon.height, 'Money', labelFontStyle);
     this.scoreLabel.fixedToCamera = true;
     this.scoreLabel.anchor.set(0.5, 0);
-    this.scoreText = this.game.add.text(this.scoreIcon.x + 60, 10,
-        '' + this.player.score, {fontSize: '32px', fill: '#000'});
+    this.scoreText = this.game.add.text(
+        this.scoreIcon.x + distanceBetewIconLabel, y, '$ ' + this.player.score,
+        textFontStyle
+    );
     this.scoreText.fixedToCamera = true;
     this.scoreText.anchor.set(0.5, 0);
 
     //The ammo
-    this.ammoIcon = this.game.add.sprite(this.game.camera.width - 150,
-        this.game.camera.height - 70,
+    this.ammoIcon = this.game.add.sprite(this.game.camera.width - 400, 10,
         'ammo');
     this.ammoIcon.fixedToCamera = true;
     this.ammoIcon.anchor.set(0.5, 0);
     this.ammoLabel = this.game.add.text(this.ammoIcon.x,
-        this.ammoIcon.y + this.ammoIcon.height,
-        'Ammo', {fontSize: '16px', fill: '#000'});
+        this.ammoIcon.y + this.ammoIcon.height, 'Ammunition', labelFontStyle);
     this.ammoLabel.fixedToCamera = true;
     this.ammoLabel.anchor.set(0.5, 0);
-    this.ammoText = this.game.add.text(this.ammoIcon.x + 60,
-        this.game.camera.height - 60,
-        '' + this.player.currentWeapon.numberOfBullets,
-        {
-            fontSize: '32px',
-            fill: '#000'
-        });
+    this.ammoText = this.game.add.text(
+        this.ammoIcon.x + distanceBetewIconLabel, y,
+        'x' + this.player.currentWeapon.numberOfBullets, textFontStyle
+    );
     this.ammoText.fixedToCamera = true;
     this.ammoText.anchor.set(0.5, 0);
 
     //The health level
-    this.healthIcon = this.game.add.sprite(40, 10,
-        'health');
+    this.healthIcon = this.game.add.sprite(40, 10, 'health');
     this.healthIcon.fixedToCamera = true;
     this.healthIcon.anchor.set(0.5, 0);
     this.healthLabel = this.game.add.text(this.healthIcon.x,
-        this.healthIcon.y + this.healthIcon.height,
-        'Health', {fontSize: '16px', fill: '#000'});
+        this.healthIcon.y + this.healthIcon.height, 'Health', labelFontStyle);
     this.healthLabel.fixedToCamera = true;
     this.healthLabel.anchor.set(0.5, 0);
-    this.healthLevelText = this.game.add.text(this.healthIcon.x + 60, 16,
-        ' ', {fontSize: '32px', fill: '#000'});
+    this.healthLevelText = this.game.add.text(
+        this.healthIcon.x + distanceBetewIconLabel, y, ' ', textFontStyle
+    );
     this.healthLevelText.fixedToCamera = true;
     this.healthLevelText.anchor.set(0.5, 0);
 };
@@ -429,8 +489,8 @@ Level.prototype.createHealthPacksGroup = function() {
  * @method Level.createOtherItemsGroup
  */
 Level.prototype.createOtherItemsGroup = function() {
-    this.otherItems = this.game.add.group();
-    this.gameObjects.push(this.otherItems);
+    this.vocabularyItems = this.game.add.group();
+    this.gameObjects.push(this.vocabularyItems);
 };
 
 /**
@@ -449,18 +509,6 @@ Level.prototype.createWeaponsGroup = function() {
 Level.prototype.createInventory = function() {
     this.inventory = new Inventory(this);
     this.game.add.existing(this.inventory);
-
-    this.inventoryButton = this.game.add.button(50,
-        this.game.camera.height - 70, 'inventory_button',
-        this.inventory.open, this.inventory);
-    this.inventoryButton.anchor.setTo(0.5, 0);
-    this.inventoryButton.fixedToCamera = true;
-    this.inventoryButton.input.priorityID = 1;
-    this.inventoryButtonLabel = this.game.add.text(this.inventoryButton.x,
-        this.inventoryButton.y + this.inventoryButton.height,
-        'Inventory', {fontSize: '16px', fill: '#000'});
-    this.inventoryButtonLabel.fixedToCamera = true;
-    this.inventoryButtonLabel.anchor.set(0.5, 0);
 };
 
 /**
@@ -470,18 +518,6 @@ Level.prototype.createInventory = function() {
 Level.prototype.createStore = function() {
     this.store = new Store(this);
     this.game.add.existing(this.store);
-
-    this.storeButton = this.game.add.button(130,
-        this.game.camera.height - 70, 'storeButton',
-        this.store.open, this.store);
-    this.storeButton.anchor.setTo(0.5, 0);
-    this.storeButton.fixedToCamera = true;
-    this.storeButton.input.priorityID = 1;
-    this.storeButtonLabel = this.game.add.text(this.storeButton.x,
-        this.storeButton.y + this.storeButton.height,
-        'Store', {fontSize: '16px', fill: '#000'});
-    this.storeButtonLabel.fixedToCamera = true;
-    this.storeButtonLabel.anchor.set(0.5, 0);
 };
 
 /**
@@ -491,19 +527,59 @@ Level.prototype.createStore = function() {
 Level.prototype.createEnglishChallengesMenu = function() {
     this.englishChallengeMenu = new EnglishChallengesMenu();
     this.game.add.existing(this.englishChallengeMenu);
+};
 
-    this.addCashButton = this.game.add.button(210,
-        this.game.camera.height - 70, 'addCashButton',
-        this.englishChallengeMenu.open, this.englishChallengeMenu);
-    this.addCashButton.anchor.setTo(0.5, 0);
-    this.addCashButton.fixedToCamera = true;
-    this.addCashButton.input.priorityID = 1;
-    this.addCashButtonLabel = this.game.add.text(this.addCashButton.x,
-        this.addCashButton.y + this.addCashButton.height,
-        'Add Money', {fontSize: '16px', fill: '#000'});
-    this.addCashButtonLabel.fixedToCamera = true;
-    this.addCashButtonLabel.anchor.set(0.5, 0);
+/**
+ * Creates the game vocabulary list and a button to access it.
+ * @method Level.createMyVocabulary
+ */
+Level.prototype.createMyVocabulary = function() {
+    this.myVocabulary = new MyVocabulary(this);
+    this.game.add.existing(this.myVocabulary);
+};
 
+/**
+ * Creates the game vocabulary list and a button to access it.
+ * @method Level.createMyVocabulary
+ */
+Level.prototype.createToolsBar = function() {
+    this.toolsBar = new HorizontalLayoutPanel('toolsBar',
+        {x: 0, y: this.WORLD_HEIGHT - 80, margin: 5});
+    this.game.add.existing(this.toolsBar);
+    this.toolsBar.fixedToCamera = true;
+    this.toolsBar.visible = true;
+
+    this.inventoryButton = new IconButton(
+        'Inventory',
+        'inventory_button',
+        this.inventory.open,
+        this.inventory
+    );
+    this.toolsBar.addElement(this.inventoryButton);
+
+    this.storeButton = new IconButton(
+        'Store',
+        'storeButton',
+        this.store.open,
+        this.store
+    );
+    this.toolsBar.addElement(this.storeButton);
+
+    this.addCashButton = new IconButton(
+        'Add Money',
+        'addCashButton',
+        this.englishChallengeMenu.open,
+        this.englishChallengeMenu
+    );
+    this.toolsBar.addElement(this.addCashButton);
+
+    this.myVocabularyButton = new IconButton(
+        'Vocabulary',
+        'myVocabularyButton',
+        this.myVocabulary.open,
+        this.myVocabulary
+    );
+    this.toolsBar.addElement(this.myVocabularyButton);
 };
 
 /**
@@ -569,11 +645,22 @@ Level.prototype.collectItem = function(player, item) {
 };
 
 /**
+ * Allows the player to pick up an ItemVocabulary.
+ * @method Level.collectVocabularyItem
+ * @param {Player} player - Game main player.
+ * @param {Item} vocabularyItem - Item to be picked up.
+ */
+Level.prototype.collectVocabularyItem = function(player, vocabularyItem) {
+    this.myVocabulary.addItem(vocabularyItem);
+    vocabularyItem.pickUp();
+};
+
+/**
  * Updates current player's avialbele ammo text.
  * @method Level.updateAmmoText
  */
 Level.prototype.updateAmmoText = function() {
-    this.ammoText.text = '' + this.player.currentWeapon.numberOfBullets;
+    this.ammoText.text = 'x' + this.player.currentWeapon.numberOfBullets;
 };
 
 /**
@@ -581,7 +668,8 @@ Level.prototype.updateAmmoText = function() {
  * @method Level.updateScoreText
  */
 Level.prototype.updateScoreText = function() {
-    this.scoreText.text = '' + this.player.score;
+    this.scoreText.text = '$ ' + this.player.score;
+    localStorage.setItem('score', this.player.score);
 };
 
 /**
@@ -590,11 +678,20 @@ Level.prototype.updateScoreText = function() {
  */
 Level.prototype.updateHealthLevel = function() {
     if (this.player.healthLevel <= 0) {
-        this.game.state.start('menu');
+        this.gameOver();
     }
     this.healthLevelText.text = '' + this.player.healthLevel;
     this.healthBar.updateResourceBarLevel(this.player.healthLevel /
         this.player.maxHealthLevel);
+    localStorage.setItem('healthLevel', this.player.healthLevel);
+};
+
+/**
+ * Called when player loses.
+ * @method Level.gameOver
+ */
+Level.prototype.gameOver = function() {
+    this.game.state.start('menu');
 };
 
 /**
@@ -627,12 +724,12 @@ Level.prototype.addHealthPack = function(healthPack) {
 };
 
 /**
- * Adds a Item to healthPacks group.
- * @method Level.otherItems
- * @param {Item} healthPack - Item to be added.
+ * Adds a Item to vocabularyItems group.
+ * @method Level.addVocabularyItem
+ * @param {Item} item - Vocabulary item to be added.
  */
-Level.prototype.addOtherItem = function(healthPack) {
-    this.otherItems.add(healthPack);
+Level.prototype.addVocabularyItem = function(item) {
+    this.vocabularyItems.add(item);
 };
 
 /**
@@ -748,9 +845,104 @@ Level.prototype.addNameBoard = function(x, text) {
 };
 
 /**
+ * Adds this level enemies.
+ * @method Level.addEnemies
+ */
+Level.prototype.addEnemies = function() {
+    var x = this.firstCheckPointX * 0.75;
+    var i;
+    var j;
+    for (i = 0; i < this.numberOfFightingPoints; i++) {
+        for (j = 0; j < this.numberOfEnemies; j++) {
+            x += 50;
+            this.addSimpleEnemy(x);
+        }
+        for (j = 0; j < this.numberOfStrongEnemies; j++) {
+            x += 50;
+            this.addStrongEnemy(x);
+        }
+        x += this.checkPointsDistance - 200;
+    }
+};
+
+/**
+ * Adds city places from vocabulary that corresponds to this level.
+ * @method LevelT.addPlaces
+ */
+Level.prototype.addPlaces = function() {
+    var x = this.WORLD_WIDTH / (this.placesKeys.length + 1);
+    var i;
+    var houseIndex = 0;
+    var place;
+    var leftHouse;
+    for (i = 0; i < this.placesKeys.length; i++) {
+        if (houseIndex >= this.housesKeys.length) {
+            houseIndex = 0;
+        }
+        place = new WorldItem(
+            x * (i + 1),
+            this.GROUND_HEIGHT,
+            this.placesKeys[i]
+        );
+        this.addVocabularyItem(place);
+        this.addNeighbors(place, this.housesKeys[houseIndex],
+            this.housesKeys[houseIndex + 1]);
+        houseIndex += 2;
+        this.addNameBoard(place.x - 70, place.name + ' Street');
+    }
+};
+
+/**
+ * Adds the health packs for this level
+ * @method Level.addHealthPacks
+ */
+Level.prototype.addHealthPacks = function() {
+    var heathPacksDistance = this.WORLD_WIDTH / this.numberOfFightingPoints;
+    var i;
+    for (i = 1; i <= this.numberOfFightingPoints; i++) {
+        this.addHealthPack(new HealthPack(heathPacksDistance * i - 200, 10, 5,
+            this));
+    }
+};
+
+/**
+ * Lets the player to play next level.
+ * @method Level.nextLevel
+ */
+Level.prototype.nextLevel = function() {
+    this.game.state.start(this.nextState);
+};
+
+/**
+ * Creates a car according to its key.
+ * @method InteractiveCar.getOn
+ * @param {string} carKey - Car's key
+ * @return {InteractiveCar} - The created car
+ */
+Level.prototype.createInteractiveCar = function(carKey) {
+    switch (carKey) {
+        case 'car':
+            return new InteractiveCar(0, 0, carKey, 60, 300, 200);
+        case 'jeep':
+            return new InteractiveCar(0, 0, carKey, 100, 350, 400);
+        case 'bus':
+            return new InteractiveCar(0, 0, carKey, 300, 400, 450);
+        case 'truck':
+            return new InteractiveCar(0, 0, carKey, 200, 70, 90);
+        case 'taxi':
+            return new InteractiveCar(0, 0, carKey, 450, 200, 400);
+        case 'ambulance':
+            return new InteractiveCar(0, 0, carKey, 400, 150, 500);
+    }
+};
+
+/**
  * Determines whether the player has won
  * @returns {boolean}
  */
-Level.prototype.playerWins = function() {};
+Level.prototype.playerWins = function() {
+    return (this.player.x >= (this.WORLD_WIDTH - this.player.width - 5) &&
+    this.enemies.children.length <= 0);
+};
 
 module.exports = Level;

@@ -1,7 +1,7 @@
 /**
- * Created by Edwin Gamboa on 29/08/2015.
+ * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
-var Store = require('../items/store/Store');
+var VocabularyItem = require('../items/vocabularyItems/VocabularyItem');
 var Button = require('../util/Button');
 
 /**
@@ -12,22 +12,15 @@ var Button = require('../util/Button');
  * @param {number} x - House x coordinate within the world.
  * @param {number} y - House y coordinate within the world.
  * @param {string} backgroundKey - House texture key.
- * @param {PopUp} dialog - Dialog to be displayed when player interact with
- * the house.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player.
  */
-var InteractiveHouse = function(x, y, backgroundKey, dialog) {
-    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
-    this.getOnButton = new Button ('Get in', this.openActivity, this);
-    this.getOnButton.x = (this.width - this.getOnButton.width) / 2;
-    this.getOnButton.y = -this.height + 50;
-
-    this.dialog = dialog;
-    level.game.add.existing(this.dialog);
-
-    this.addChild(this.getOnButton);
+var InteractiveHouse = function(x, y, backgroundKey, interactionManager) {
+    VocabularyItem.call(this, x, y, backgroundKey, true);
+    this.interactionManager = interactionManager;
 };
 
-InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
+InteractiveHouse.prototype = Object.create(VocabularyItem.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
@@ -35,7 +28,17 @@ InteractiveHouse.prototype.constructor = InteractiveHouse;
  * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
-    this.dialog.open();
+    this.interactionManager.openDialogs();
+};
+
+/**
+ * Kills this item when player picks it up.
+ * @method WorldItem.pickUp
+ */
+InteractiveHouse.prototype.pickUp = function() {
+    this.openActivity();
+    level.vocabularyItems.remove(this);
+    level.addObject(this);
 };
 
 module.exports = InteractiveHouse;

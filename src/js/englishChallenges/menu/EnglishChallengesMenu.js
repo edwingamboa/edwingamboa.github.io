@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 10/10/2015.
+ * @ignore Created by Edwin Gamboa on 10/10/2015.
  */
 var PopUp = require('../../util/PopUp');
 var GridLayoutPanel = require('../../util/GridLayoutPanel');
@@ -35,8 +35,13 @@ EnglishChallengesMenu.prototype.constructor = EnglishChallengesMenu;
 EnglishChallengesMenu.prototype.createGames = function() {
     var challenges = [];
     challenges.push(new WordUnscramble());
-    challenges.push(new ContextGroups());
-    challenges.push(new ImageWordMatch());
+    if (localStorage.getItem('level') === 'levelTwo') {
+        challenges.push(new ImageWordMatch());
+    }
+    if (localStorage.getItem('level') === 'levelThree') {
+        challenges.push(new ImageWordMatch());
+        challenges.push(new ContextGroups());
+    }
     var i;
     for (i in challenges) {
         this.panel.addElement(new MenuItem(challenges[i], this));

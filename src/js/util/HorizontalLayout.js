@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 11/10/2015.
+ * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
 
 /**
@@ -36,7 +36,6 @@ HorizontalLayout.prototype.addElement = function(element) {
     element.x = this.currentX;
     this.currentX += element.width + this.margin ;
     element.y = this.parent.height / 2 - element.height / 2;
-
     this.parent.addChild(element);
 };
 

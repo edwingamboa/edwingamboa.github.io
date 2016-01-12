@@ -1,12 +1,11 @@
 /**
- * Created by Edwin Gamboa on 11/11/2015.
+ * @ignore Created by Edwin Gamboa on 11/11/2015.
  */
-/**
- * Created by Edwin Gamboa on 23/07/2015.
- */
-var Enemy = require('./Enemy');
+
+var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');
+var InteractionManager = require('../util/InteractionManager');
 
 /**
  * Texture key for a strong  enemy
@@ -54,7 +53,14 @@ var MAX_RANGE_ATTACK = 600;
  * @constructor
  */
 var StrongestEnemy = function(x, y) {
-    Enemy.call(
+    var messages = ['Forgive me please! \nI can liberate your wife.',
+		'But your children are not here. \nThey are somewhere else,' +
+		'\nbut I do not know where',
+        'I am not the boss, \nI work for someone else'];
+    var titles = ['Forgive me', 'Look for your children', 'I am not the boss'];
+    var imagesKeys = ['forgive', 'mother', 'forgive'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
+    InteractionEnemy.call(
         this,
         SPRITE_KEY,
         MAX_HEALTH_LEVEL,
@@ -63,61 +69,14 @@ var StrongestEnemy = function(x, y) {
         MIN_RANGE_DETECTION,
         MAX_RANGE_DETECTION,
         MIN_RANGE_ATTACK,
-        MAX_RANGE_ATTACK
+        MAX_RANGE_ATTACK,
+        intManager
     );
     this.useWeapon(new MachineGun(this, x, y, true));
-
-    this.makeDialogs();
 };
 
-StrongestEnemy.prototype = Object.create(Enemy.prototype);
+StrongestEnemy.prototype = Object.create(InteractionEnemy.prototype);
 StrongestEnemy.prototype.constructor = StrongestEnemy;
-
-/**
- * Decrease the character health level. If after the decreasing, the healthLevel
- * is less than or equal to 10, then character will stop fighting and will ask
- * for pardon.
- * @method StrongestEnemy.decreaseHealthLevel
- * @param {number} decrease - the amount to decrease.
- */
-StrongestEnemy.prototype.decreaseHealthLevel = function(decrease) {
-    this.healthLevel -= decrease;
-    if (this.healthLevel <= 10 && !level.lastGoalAimed) {
-        this.killWeapons();
-        this.canFire = false;
-        this.dialogFriend.open();
-        this.dialogForgive.open();
-        level.lastGoalAimed = true;
-    }
-};
-
-/**
- * Makes the dialogs that allows this character interact with the player.
- * @method StrongestEnemy.makeDialogs
- */
-StrongestEnemy.prototype.makeDialogs = function() {
-    this.dialogForgive = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Forgive me');
-    var forgiveImage = level.game.make.sprite(0, 0, 'forgive');
-    var forgiveMessage = 'Forgive me please!' +
-        '\nI can liberate your wife.';
-    var dialogText = level.game.make.text(0, 0, forgiveMessage);
-    dialogText.font = 'Arial';
-    dialogText.fontSize = 20;
-    dialogText.fill = '#000000';
-    dialogText.align = 'center';
-    this.dialogForgive.addElement(forgiveImage);
-    this.dialogForgive.addElement(dialogText);
-    level.game.add.existing(this.dialogForgive);
-
-    this.dialogFriend = new VerticalLayoutPopUp('mediumPopUpBg', null,
-        'Your Wife');
-    var friendImage = level.game.make.sprite(0, 0, 'mother');
-    dialogText.text = 'I can liberate your wife.';
-    this.dialogFriend.addElement(friendImage);
-    this.dialogFriend.addElement(dialogText);
-    level.game.add.existing(this.dialogFriend);
-};
 
 module.exports = StrongestEnemy;
 

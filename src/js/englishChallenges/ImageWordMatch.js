@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/10/2015.
+ * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
@@ -15,8 +15,13 @@ var GridLayoutPanel = require('../util/GridLayoutPanel');
  */
 var ImageWordMatch = function() {
     var dimensions = {numberOfRows: 3};
-    DragAndDropChallenge.call(this, 'imageWord', 'Image Match', 10,
-        dimensions);
+    DragAndDropChallenge.call(this,
+        'imageWord',
+        'Image Match',
+        'Match the words \nwith their images',
+        10,
+        dimensions
+    );
 };
 
 ImageWordMatch.prototype = Object.create(DragAndDropChallenge.prototype);
@@ -28,32 +33,48 @@ ImageWordMatch.prototype.constructor = ImageWordMatch;
  */
 ImageWordMatch.prototype.newChallenge = function() {
     this.clearChallenge();
-    var familyKeys = ['mother', 'son', 'daughter'];
-    var familyMembersCells = [];
+    var words = level.myVocabulary.randomVocabularyItems(3);
+    var wordCells = [];
 
-    for (var key in familyKeys) {
+    for (var i in words) {
+        this.vocabularyItems.push(words[i]);
         var cell = new VerticalLayoutPanel('imageWordBg');
-        var familyMember = level.game.make.sprite(0, 0, familyKeys[key]);
+        var image = level.game.make.sprite(0, 0, words[i].key);
+        var scaleX;
+        var scaleY;
+        if (image.height > 120 || image.width > 180) {
+            scaleY = 120 / image.height;
+            scaleX = 180 / image.width;
+            if (scaleX > scaleY) {
+                image.scale.x = scaleY;
+                image.scale.y = scaleY;
+            }else {
+                image.scale.x = scaleX;
+                image.scale.y = scaleX;
+            }
+        }
         var shade = new VerticalLayoutPanel('wordBg', 2);
-        shade.code = key;
+        shade.code = i;
 
         this.destinations.push(shade);
-        cell.addElement(familyMember);
+        cell.addElement(image);
         cell.addElement(shade);
 
-        var label = level.game.make.text(0, 0, familyKeys[key]);
+        var label = level.game.make.text(0, 0, words[i].name);
         //Font style
-        label.font = 'Shojumaru';
+        label.font = level.font;
         label.fontSize = 20;
-        label.fill = '#0040FF';
+        label.fill = '#473e2c';
+        label.stroke = '#fff';
+        label.strokeThickness = 2;
         label.inputEnabled = true;
         label.input.enableDrag(true, true);
         //label.events.onDragStart.add(this.bringItemToTop, this);
         label.events.onDragStop.add(this.dragAndDropControl.fixLocation,
             this.dragAndDropControl);
-        label.code = key;
+        label.code = i;
 
-        familyMembersCells.push(cell);
+        wordCells.push(cell);
         this.elements.push(label);
     }
 
@@ -63,8 +84,8 @@ ImageWordMatch.prototype.newChallenge = function() {
     var images = new GridLayoutPanel('englishChallengePanelBg', optionals);
 
     var familyMemberCell;
-    for (familyMemberCell in familyMembersCells) {
-        images.addElement(familyMembersCells[familyMemberCell]);
+    for (familyMemberCell in wordCells) {
+        images.addElement(wordCells[familyMemberCell]);
     }
 
     this.dragAndDropControl.addElementsToSourceRandomly();

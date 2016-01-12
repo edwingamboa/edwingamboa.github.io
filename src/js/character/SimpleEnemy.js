@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 23/07/2015.
+ * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('./Enemy');
 var Revolver = require('../items/weapons/Revolver');
