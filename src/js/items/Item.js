@@ -1,4 +1,8 @@
 /**
+ * @ignore Created by Edwin Gamboa
+ */
+
+/**
  * Bounce value for an Item
  * @constant
  * @type {number}

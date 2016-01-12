@@ -1,3 +1,7 @@
+/**
+ * @ignore Created by Edwin Gamboa
+ */
+
 var Item = require('./Item');
 
 /**
@@ -54,7 +58,7 @@ HealthPack.prototype.use = function() {
         this.revive();
     }
     this.x = level.player.x;
-    this.y = 50;
+    this.y = 10;
     level.addHealthPack(this);
 };
 

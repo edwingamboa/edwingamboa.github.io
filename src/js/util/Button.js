@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 10/10/2015.
+ * @ignore Created by Edwin Gamboa on 10/10/2015.
  */
 
 /**

@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 15/10/2015.
+ * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
 
 var HorizontalLayout = require('./HorizontalLayout');

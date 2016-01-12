@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 16/07/2015.
+ * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
 var Character = require('./Character');
 var Dialog = require('../util/Dialog');
@@ -24,7 +24,7 @@ var NPC = function(x, y, key, interactionManager) {
     this.animations.add('right', [5, 6, 7, 8], 10, true);
     this.stopLeftFrameIndex = 0;
     this.stopRightFrameIndex = 5;
-    this.frame = this.stopRightFrameIndex;
+    this.frame = this.stopLeftFrameIndex;
     this.hadContactWithPlayer = false;
     this.interactionManager = interactionManager;
     return this;

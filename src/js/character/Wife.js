@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 13/11/2015.
+ * @ignore Created by Edwin Gamboa on 13/11/2015.
  */
 var Character  = require('./Character');
 var ResourceBar = require('./../util/ResourceBar');

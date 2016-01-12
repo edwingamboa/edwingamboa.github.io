@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 11/10/2015.
+ * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
 var PopUp = require('./PopUp');
 var GridLayout = require('./GridLayout');

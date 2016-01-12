@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/10/2015.
+ * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
@@ -37,6 +37,7 @@ ImageWordMatch.prototype.newChallenge = function() {
     var wordCells = [];
 
     for (var i in words) {
+        this.vocabularyItems.push(words[i]);
         var cell = new VerticalLayoutPanel('imageWordBg');
         var image = level.game.make.sprite(0, 0, words[i].key);
         var scaleX;

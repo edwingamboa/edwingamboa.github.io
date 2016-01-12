@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/10/2015.
+ * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
 var GridLayoutPanel = require('../util/GridLayoutPanel');
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
@@ -33,6 +33,7 @@ WordUnscramble.prototype.constructor = WordUnscramble;
 WordUnscramble.prototype.newChallenge = function() {
     this.clearChallenge();
     var word = level.myVocabulary.randomVocabularyItems(1)[0];
+    this.vocabularyItems.push(word);
     var wordImage = level.game.make.sprite(0, 0, word.key);
     if (wordImage.height > 120) {
         var scale = 120 / wordImage.height;

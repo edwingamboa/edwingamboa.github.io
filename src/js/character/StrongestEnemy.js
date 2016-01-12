@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 11/11/2015.
+ * @ignore Created by Edwin Gamboa on 11/11/2015.
  */
 
 var InteractionEnemy = require('./InteractionEnemy');
@@ -58,7 +58,7 @@ var StrongestEnemy = function(x, y) {
 		'\nbut I do not know where',
         'I am not the boss, \nI work for someone else'];
     var titles = ['Forgive me', 'Look for your children', 'I am not the boss'];
-    var imagesKeys = ['forgive', 'mother'];
+    var imagesKeys = ['forgive', 'mother', 'forgive'];
     var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
         this,

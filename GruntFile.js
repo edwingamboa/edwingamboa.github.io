@@ -158,17 +158,6 @@
                 dest: '<%= dir.deploy.js %>/<%= pkg.name %>.js'
             }
         },
-
-        /*texturepacker: {
-            misc: {
-                targetdir: '<%= dir.deploy.atlas %>',
-                dirs: [
-                    '<%= dir.assets.atlas %>boxes',
-                    '<%= dir.assets.atlas %>hud'
-                ]
-            }
-        },*/
-
         watch: {
             source: {
                 files: '<%= dir.src.js %>',
@@ -230,6 +219,15 @@
 
         jshint: {
             src: ['src/js/*.js', 'src/js/**/*.js']
+        },
+
+        jsdoc : {
+            dist : {
+                src: ['src/js/*.js', 'src/js/**/*.js'],
+                options: {
+                    destination: 'codeDocumentation'
+                }
+            }
         }
     });
 
@@ -247,6 +245,7 @@
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify'),
     grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadTasks('./tasks');
 
     grunt.registerTask('default', [
@@ -271,4 +270,4 @@
 
     grunt.registerTask('init', ['mkdir']);
     grunt.registerTask('test', ['qunit']);
-}
+};;

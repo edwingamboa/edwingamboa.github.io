@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 23/07/2015.
+ * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
 var Enemy = require('./Enemy');
 var MachineGun = require('../items/weapons/MachineGun');
@@ -57,7 +57,9 @@ InteractionEnemy.prototype.decreaseHealthLevel = function(decrease) {
         this.killWeapons();
         this.canFire = false;
         this.openDialogs();
-        level.lastGoalAimed = true;
+        level.liberateFamilyMember();
+        level.enemies.removeChild(this);
+        level.game.add.existing(this);
     }
 };
 

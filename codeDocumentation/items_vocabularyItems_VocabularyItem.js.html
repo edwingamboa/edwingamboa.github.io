@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: items/vocabularyItems/VocabularyItem.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: items/vocabularyItems/VocabularyItem.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @ignore Created by Edwin Gamboa on 06/11/2015.
+ */
+var Item = require('./../Item');
+var VerticalLayoutPopUp = require ('../../util/VerticalLayoutPopUp');
+
+/**
+ * Item that represents a clue for the player.
+ * @class VocabularyItem
+ * @extends Item
+ * @constructor
+ * @param {number} x - VocabularyItem's x coordinate within the game world.
+ * @param {number} y - VocabularyItem's y coordinate within the game world.
+ * @param {string} key - VocabularyItem's texture
+ * belongs.
+ * @param {boolean} [openImmediately = flase] - Indicates whether this
+ * vocabulary item should display the message when the player picksItUp
+ * @param {number} [price = 0] - The price of this item
+ */
+var VocabularyItem = function(x,
+                              y,
+                              key,
+                              openImmediately,
+                              price) {
+    Item.call(this, x, y, key, price || 0);
+    this.setProperties(key);
+    this.makeDialog();
+    this.openImmediately = openImmediately || false;
+};
+
+VocabularyItem.prototype = Object.create(Item.prototype);
+VocabularyItem.prototype.constructor = VocabularyItem;
+
+/**
+ * Displays the definition of this VocabularyItem
+ * @method VocabularyItem.use
+ */
+VocabularyItem.prototype.show = function() {
+    this.popUp.open();
+};
+
+/**
+ * Makes the dialog that is delivered to the player when he checks a vocabulary.
+ * @method VocabularyItem.makeDialog
+ */
+VocabularyItem.prototype.makeDialog = function() {
+    this.popUp = new VerticalLayoutPopUp('mediumPopUpBg', null, this.name);
+    var icon = level.game.make.sprite(0, 0, this.key);
+    if (icon.height > 200) {
+        var scale = 200 / icon.height;
+        icon.scale.x = scale;
+        icon.scale.y = scale;
+    }
+    var dialogText = level.game.make.text(0, 0, this.definition);
+    dialogText.font = level.font;
+    dialogText.fontSize = 20;
+    dialogText.fill = '#000000';
+    dialogText.align = 'center';
+    this.popUp.addElement(icon);
+    this.popUp.addElement(dialogText);
+    level.game.add.existing(this.popUp);
+};
+
+/**
+ * Creates a car according to its key.
+ * @method InteractiveCar.getOn
+ * @param {string} key - VocabularyItem's key
+ */
+VocabularyItem.prototype.setProperties = function(key) {
+    switch (key) {
+        //Places
+        case 'factory':
+            this.name = 'Old Factory';
+            this.definition = 'A building or group of buildings' +
+                '\nwhere products are made';
+            this.categoryIndex = 0;
+            break;
+        case 'school':
+            this.name = 'School';
+            this.definition = 'A place for education; a place where' +
+                '\npeople go to learn';
+            this.categoryIndex = 0;
+            break;
+        case 'hospital':
+            this.name = 'Hospital';
+            this.definition = 'A place where sick or injured people' +
+                '\nare given medical care';
+            this.categoryIndex = 0;
+            break;
+        case 'coffeeShop':
+            this.name = 'Coffee Shop';
+            this.definition = 'A small restaurant that serves coffee and' +
+                '\nother drinks as well as simple foods';
+            this.categoryIndex = 0;
+            break;
+        case 'bank':
+            this.name = 'Bank';
+            this.definition = 'An organization that keeps and lends money';
+            this.categoryIndex = 0;
+            break;
+        case 'zoo':
+            this.name = 'Zoo';
+            this.definition = 'A place where many kinds of animals are ' +
+                '\nkept so that people can see them';
+            this.categoryIndex = 0;
+            break;
+        case 'gasStation':
+            this.name = 'Gas Station';
+            this.definition = 'A place where gasoline for vehicles is sold';
+            this.categoryIndex = 0;
+            break;
+        case 'playground':
+            this.name = 'Playground';
+            this.definition = 'An outdoor area where children can play';
+            this.categoryIndex = 0;
+            break;
+        case 'bookStore':
+            this.name = 'Bookstore';
+            this.definition = 'A store that sells books';
+            this.categoryIndex = 0;
+            break;
+        case 'hotel':
+            this.name = 'Hotel';
+            this.definition = 'A place that has rooms in which people' +
+                '\ncan stay especially when they are traveling';
+            this.categoryIndex = 0;
+            break;
+        case 'superMarket':
+            this.name = 'Super Market';
+            this.definition = 'A store where customers can buy a variety' +
+                '\nof foods and usually household items';
+            this.categoryIndex = 0;
+            break;
+        case 'fireStation':
+            this.name = 'Fire Station';
+            this.definition = 'A building in which the members of a fire' +
+                '\n department and the equipment used to' +
+                '\nput out fires are located';
+            this.categoryIndex = 0;
+            break;
+        case 'policeStation':
+            this.name = 'Police Station';
+            this.definition = 'A place where local \n police officers work';
+            this.categoryIndex = 0;
+            break;
+        case 'blueHouse':
+            this.name = 'House';
+            this.definition = 'A building in which a family lives';
+            this.categoryIndex = 0;
+            break;
+        case 'store':
+            this.name = 'Store';
+            this.definition = 'A building or room where things are sold';
+            this.categoryIndex = 0;
+            break;
+        //Family
+        case 'child':
+            this.name = 'Child';
+            this.definition = 'A young person; a son or daughter';
+            this.categoryIndex = 1;
+            break;
+        case 'daughter':
+            this.name = 'Daughter';
+            this.definition = 'A female child';
+            this.categoryIndex = 1;
+            break;
+        case 'family':
+            this.name = 'Family';
+            this.definition = 'A group of people who are related to each other';
+            this.categoryIndex = 1;
+            break;
+        case 'father':
+            this.name = 'Father';
+            this.definition = 'A male parent';
+            this.categoryIndex = 1;
+            break;
+        case 'friend':
+            this.name = 'Friend';
+            this.definition = 'A person who you like and enjoy being with';
+            this.categoryIndex = 1;
+            break;
+        case 'husband':
+            this.name = 'Husband';
+            this.definition = 'A married man; the man someone is married to';
+            this.categoryIndex = 1;
+            break;
+        case 'kid':
+            this.name = 'Kid';
+            this.definition = 'A son or daughter; a young person';
+            this.categoryIndex = 1;
+            break;
+        case 'mother':
+            this.name = 'Mother';
+            this.definition = 'A female parent';
+            this.categoryIndex = 1;
+            break;
+        case 'parent':
+            this.name = 'Parent';
+            this.definition = 'A person who is a father or mother; ' +
+                '\na person who has a child';
+            this.categoryIndex = 1;
+            break;
+        case 'son':
+            this.name = 'Son';
+            this.definition = 'A male child';
+            this.categoryIndex = 1;
+            break;
+        case 'wife':
+            this.name = 'Wife';
+            this.definition = 'A married woman; the woman someone is ' +
+                'married to';
+            this.categoryIndex = 1;
+            break;
+        //Transport
+        case 'car':
+            this.name = 'Car';
+            this.definition = 'A vehicle that has four wheels and an engine' +
+                'and \nthat is used for carrying passengers on roads';
+            this.categoryIndex = 2;
+            break;
+        case 'jeep':
+            this.name = 'Jeep';
+            this.definition = 'Used for a small truck that can be driven over' +
+                '\nvery rough surfaces';
+            this.categoryIndex = 2;
+            break;
+        case 'bus':
+            this.name = 'Bus';
+            this.definition = 'A large vehicle that is used for carrying' +
+                'passengers \nespecially along a particular route at ' +
+                'particular times';
+            this.categoryIndex = 2;
+            break;
+        case 'truck':
+            this.name = 'Truck';
+            this.definition = 'A very large, heavy vehicle that is used to ' +
+                'move \mlarge or numerous objects';
+            this.categoryIndex = 2;
+            break;
+        case 'taxi':
+            this.name = 'Taxi';
+            this.definition = 'A car that carries passengers to a place for ' +
+                'an \namount of money that is based on the distance ' +
+                '\ntravelled';
+            this.categoryIndex = 2;
+            break;
+        case 'ambulance':
+            this.name = 'Ambulance';
+            this.definition = 'A vehicle used for taking hurt or sick ' +
+                'people to \nthe hospital especially in emergencies';
+            this.categoryIndex = 2;
+            break;
+        //Personal Items
+        case 'bracelet':
+            this.name = 'Bracelet';
+            this.definition = 'A piece of jewelry worn on the wrist';
+            this.categoryIndex = 3;
+            break;
+        case 'cap':
+            this.name = 'Cap';
+            this.definition = 'A small, soft hat that often has a hard ' +
+                'curved part \n(called a visor) that extends out over your ' +
+                'eyes';
+            this.categoryIndex = 3;
+            break;
+        case 'ring':
+            this.name = 'Ring';
+            this.definition = 'A piece of jewelry that is worn usually on a ' +
+                'finger';
+            this.categoryIndex = 3;
+            break;
+        case 'necklace':
+            this.name = 'Necklace';
+            this.definition = 'A piece of jewelry that is worn around your ' +
+                'neck';
+            this.categoryIndex = 3;
+            break;
+        case 'watch':
+            this.name = 'Watch';
+            this.definition = 'A pair of glass or plastic lenses set into a ' +
+                '\nframe and worn over the eyes to help a person see';
+            this.categoryIndex = 3;
+            break;
+        case 'glasses':
+            this.name = 'Glasses';
+            this.definition = 'A hard usually transparent material that is ' +
+                '\nused for making windows and other products';
+            this.categoryIndex = 3;
+            break;
+    }
+};
+
+module.exports = VocabularyItem;
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Boot.html">Boot</a></li><li><a href="Bullet.html">Bullet</a></li><li><a href="Button.html">Button</a></li><li><a href="Character.html">Character</a></li><li><a href="ClueItem.html">ClueItem</a></li><li><a href="ContextGroups.html">ContextGroups</a></li><li><a href="Dialog.html">Dialog</a></li><li><a href="DragAndDropChallenge.html">DragAndDropChallenge</a></li><li><a href="DragAndDropController.html">DragAndDropController</a></li><li><a href="Enemy.html">Enemy</a></li><li><a href="EnglishChallenge.html">EnglishChallenge</a></li><li><a href="EnglishChallengesMenu.html">EnglishChallengesMenu</a></li><li><a href="Friend.html">Friend</a></li><li><a href="GridLayout.html">GridLayout</a></li><li><a href="GridLayoutPanel.html">GridLayoutPanel</a></li><li><a href="GridLayoutPopUp.html">GridLayoutPopUp</a></li><li><a href="HealthPack.html">HealthPack</a></li><li><a href="HorizontalLayout.html">HorizontalLayout</a></li><li><a href="HorizontalLayoutPanel.html">HorizontalLayoutPanel</a></li><li><a href="HorizontalLayoutPopUP.html">HorizontalLayoutPopUP</a></li><li><a href="IconButton.html">IconButton</a></li><li><a href="ImageWordMatch.html">ImageWordMatch</a></li><li><a href="InteractionEnemy.html">InteractionEnemy</a></li><li><a href="InteractionManager.html">InteractionManager</a></li><li><a href="InteractiveCar.html">InteractiveCar</a></li><li><a href="InteractiveHouse.html">InteractiveHouse</a></li><li><a href="Intro.html">Intro</a></li><li><a href="Inventory.html">Inventory</a></li><li><a href="InventoryItem.html">InventoryItem</a></li><li><a href="Item.html">Item</a></li><li><a href="ItemGroupView.html">ItemGroupView</a></li><li><a href="ItemsPopUp.html">ItemsPopUp</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelOne.html">LevelOne</a></li><li><a href="LevelThree.html">LevelThree</a></li><li><a href="LevelTwo.html">LevelTwo</a></li><li><a href="MachineGun.html">MachineGun</a></li><li><a href="Menu.html">Menu</a></li><li><a href="MenuItem.html">MenuItem</a></li><li><a href="MyVocabulary.html">MyVocabulary</a></li><li><a href="MyVocabularyItem.html">MyVocabularyItem</a></li><li><a href="NameBoard.html">NameBoard</a></li><li><a href="NPC.html">NPC</a></li><li><a href="Player.html">Player</a></li><li><a href="PopUp.html">PopUp</a></li><li><a href="Preloader.html">Preloader</a></li><li><a href="ResourceBar.html">ResourceBar</a></li><li><a href="Revolver.html">Revolver</a></li><li><a href="SimpleEnemy.html">SimpleEnemy</a></li><li><a href="Store.html">Store</a></li><li><a href="StoreItem.html">StoreItem</a></li><li><a href="StrongEnemy.html">StrongEnemy</a></li><li><a href="StrongestEnemy.html">StrongestEnemy</a></li><li><a href="Utilities.html">Utilities</a></li><li><a href="VerticalLayout.html">VerticalLayout</a></li><li><a href="VerticalLayoutPanel.html">VerticalLayoutPanel</a></li><li><a href="VerticalLayoutPopUP.html">VerticalLayoutPopUP</a></li><li><a href="VocabularyItem.html">VocabularyItem</a></li><li><a href="Weapon.html">Weapon</a></li><li><a href="Wife.html">Wife</a></li><li><a href="WordUnscramble.html">WordUnscramble</a></li><li><a href="WorldItem.html">WorldItem</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BAR_HEIGHT">BAR_HEIGHT</a></li><li><a href="global.html#BAR_WIDTH">BAR_WIDTH</a></li><li><a href="global.html#BOUNCE">BOUNCE</a></li><li><a href="global.html#CAR_GRAVITY">CAR_GRAVITY</a></li><li><a href="global.html#game">game</a></li><li><a href="global.html#GRAVITY">GRAVITY</a></li><li><a href="global.html#INITIAL_HEALTH_LEVEL">INITIAL_HEALTH_LEVEL</a></li><li><a href="global.html#LEFT_DIRECTION">LEFT_DIRECTION</a></li><li><a href="global.html#LEFT_KEY">LEFT_KEY</a></li><li><a href="global.html#MACHINE_GUN_BULLET_KEY">MACHINE_GUN_BULLET_KEY</a></li><li><a href="global.html#MACHINE_GUN_BULLET_POWER">MACHINE_GUN_BULLET_POWER</a></li><li><a href="global.html#MACHINE_GUN_BULLET_SPEED">MACHINE_GUN_BULLET_SPEED</a></li><li><a href="global.html#MACHINE_GUN_FIRE_RATE">MACHINE_GUN_FIRE_RATE</a></li><li><a href="global.html#MACHINE_GUN_KEY">MACHINE_GUN_KEY</a></li><li><a href="global.html#MACHINE_GUN_NEXT_FIRE">MACHINE_GUN_NEXT_FIRE</a></li><li><a href="global.html#MACHINE_GUN_NUMBER_OF_BULLETS">MACHINE_GUN_NUMBER_OF_BULLETS</a></li><li><a href="global.html#MARGIN">MARGIN</a></li><li><a href="global.html#MAX_HEALTH_LEVEL">MAX_HEALTH_LEVEL</a></li><li><a href="global.html#MAX_RANGE_ATTACK">MAX_RANGE_ATTACK</a></li><li><a href="global.html#MAX_RANGE_DETECTION">MAX_RANGE_DETECTION</a></li><li><a href="global.html#MAX_SPEED">MAX_SPEED</a></li><li><a href="global.html#MIN_NUMBER_OF_COLUMNS">MIN_NUMBER_OF_COLUMNS</a></li><li><a href="global.html#MIN_NUMBER_OF_ROWS">MIN_NUMBER_OF_ROWS</a></li><li><a href="global.html#MIN_RANGE_ATTACK">MIN_RANGE_ATTACK</a></li><li><a href="global.html#MIN_RANGE_DETECTION">MIN_RANGE_DETECTION</a></li><li><a href="global.html#MINIMUM_SCORE">MINIMUM_SCORE</a></li><li><a href="global.html#NUMBER_OF_COLUMNS">NUMBER_OF_COLUMNS</a></li><li><a href="global.html#NUMBER_OF_COMIC_IMAGES">NUMBER_OF_COMIC_IMAGES</a></li><li><a href="global.html#NUMBER_OF_CONTEXTS">NUMBER_OF_CONTEXTS</a></li><li><a href="global.html#NUMBER_OF_FIGHTING_POINTS">NUMBER_OF_FIGHTING_POINTS</a></li><li><a href="global.html#NUMBER_OF_ROWS">NUMBER_OF_ROWS</a></li><li><a href="global.html#PRICE">PRICE</a></li><li><a href="global.html#PRICE_INCREASE_RATE">PRICE_INCREASE_RATE</a></li><li><a href="global.html#REVOLVER_BULLET_KEY">REVOLVER_BULLET_KEY</a></li><li><a href="global.html#REVOLVER_BULLET_POWER">REVOLVER_BULLET_POWER</a></li><li><a href="global.html#REVOLVER_BULLET_SPEED">REVOLVER_BULLET_SPEED</a></li><li><a href="global.html#REVOLVER_FIRE_RATE">REVOLVER_FIRE_RATE</a></li><li><a href="global.html#REVOLVER_KEY">REVOLVER_KEY</a></li><li><a href="global.html#REVOLVER_NEXT_FIRE">REVOLVER_NEXT_FIRE</a></li><li><a href="global.html#REVOLVER_NUMBER_OF_BULLETS">REVOLVER_NUMBER_OF_BULLETS</a></li><li><a href="global.html#RIGHT_DIRECTION">RIGHT_DIRECTION</a></li><li><a href="global.html#RIGHT_KEY">RIGHT_KEY</a></li><li><a href="global.html#SECONDS_BETWEEN_FRAMES">SECONDS_BETWEEN_FRAMES</a></li><li><a href="global.html#SPEED">SPEED</a></li><li><a href="global.html#SPRITE_KEY">SPRITE_KEY</a></li><li><a href="global.html#WORD_DELAY">WORD_DELAY</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jan 12 2016 02:08:35 GMT+0100 (Hora estándar centroeuropea)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

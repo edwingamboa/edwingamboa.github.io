@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 17/07/2015.
+ * @ignore Created by Edwin Gamboa on 17/07/2015.
  */
 var ItemGroupView = require('../ItemGroupView');
 
@@ -31,6 +31,7 @@ InventoryItem.prototype.buttonAction = function() {
     if (this.amountAvailable > 0) {
         this.item.use();
         this.amountAvailable --;
+        localStorage.setItem(this.item.key + 'Item', this.amountAvailable);
         this.updateAmountAvailableText();
         this.parentView.close();
     }else {

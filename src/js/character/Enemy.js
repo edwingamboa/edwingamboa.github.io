@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/07/2015.
+ * @ignore Created by Edwin Gamboa on 08/07/2015.
  */
 var Character = require('./Character');
 var ResourceBar = require('./../util/ResourceBar');
@@ -99,6 +99,7 @@ Enemy.prototype.killCharacter = function() {
     this.healthLevel = 0;
     level.player.increaseScore(this.maxHealthLevel * 0.5);
     Character.prototype.killCharacter.call(this);
+    level.enemies.removeChild(this);
 };
 
 /**

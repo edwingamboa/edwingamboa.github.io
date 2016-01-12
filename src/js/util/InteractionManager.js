@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 20/12/2015.
+ * @ignore Created by Edwin Gamboa on 20/12/2015.
  */
 
 var VerticalLayoutPopUp = require('../util/VerticalLayoutPopUp');

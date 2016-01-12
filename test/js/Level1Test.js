@@ -1,4 +1,4 @@
-QUnit.module("Level One")
+QUnit.module("Level One");
 
 var game = new Phaser.Game(1000, 500, Phaser.AUTO, 'WOPIC');
 var LevelOne = new LevelOne(game);
@@ -26,7 +26,7 @@ QUnit.test("Run", function( assert ) {
     assert.equal(LevelOne.player.body.velocity.x, expectedX);
   }
 
-  var XKey = LevelOne.game.input.keyboard.addKey(Phaser.Keyboard.X)
+  var XKey = LevelOne.game.input.keyboard.addKey(Phaser.Keyboard.X);
   LevelOne.create();
   //Run to left of screen
   LevelOne.cursors.left.isDown = true;

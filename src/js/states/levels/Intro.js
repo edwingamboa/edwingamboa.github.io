@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 29/08/2015.
+ * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
 
 var Button = require('../../util/Button');
@@ -74,8 +74,6 @@ Intro.prototype.create = function() {
  */
 Intro.prototype.continue = function() {
     this.game.state.start('levelOne');
-    //this.game.state.start('levelTwo');
-    //this.game.state.start('levelThree');
 };
 
 /**

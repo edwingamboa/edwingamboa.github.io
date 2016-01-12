@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 13/10/2015.
+ * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
 
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -28,6 +28,7 @@ var DragAndDropChallenge = function(iconKey, challengeName, description,
         description,
         score
     );
+    this.vocabularyItems = [];
     this.destinations = [];
     this.elements = [];
     this.dragAndDropControl = new DragAndDropController(this);
@@ -55,13 +56,17 @@ DragAndDropChallenge.prototype.confirm = function() {
         return;
     }
     this.englishChallenge.success();
+    var i;
+    for (i in this.vocabularyItems) {
+        level.myVocabulary.markAsLearned(this.vocabularyItems[i]);
+    }
     this.close();
 };
 
 /**
  * Clear all the containers and elements of the challenge, so that a new
  * challenge can be created.
- * @method DragAndDropChallenge.
+ * @method DragAndDropChallenge.clearChallenge
  */
 DragAndDropChallenge.prototype.clearChallenge = function() {
     if (this.mainPanel.children.length > 0) {

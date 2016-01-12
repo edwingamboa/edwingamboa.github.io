@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 17/07/2015.
+ * @ignore Created by Edwin Gamboa on 17/07/2015.
  */
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 var Button = require('../util/Button');

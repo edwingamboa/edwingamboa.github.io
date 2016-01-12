@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 10/01/2016.
+ * @ignore Created by Edwin Gamboa on 10/01/2016.
  */
 var VerticalLayoutPanel = require('../util/VerticalLayoutPanel');
 /**

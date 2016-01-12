@@ -1,3 +1,7 @@
+/**
+ * @ignore Created by Edwin Gamboa
+ */
+
 var Item = require('../Item');
 var Bullet = require('./Bullet');
 

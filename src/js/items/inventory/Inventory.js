@@ -1,11 +1,12 @@
 /**
- * Created by Edwin Gamboa on 22/06/2015.
+ * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
 var ItemsPopUp = require('../ItemsPopUp');
 var InventoryItem = require ('./InventoryItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 var MachineGun = require('../weapons/MachineGun');
+var Button = require('../../util/Button');
 
 /**
  * Ui and control for the game Inventory.
@@ -17,6 +18,10 @@ var Inventory = function() {
     var tabsLabels = ['Weapons', 'Health Packs', 'Vehicles'];
     var categories = ['weapons', 'healthPacks', 'transport'];
     ItemsPopUp.call(this, tabsLabels, categories, 'Inventory');
+    this.button = new Button('Add Items', level.store.open, level.store);
+    this.button.x = this.width - 140;
+    this.button.y = 60;
+    this.addChild(this.button);
     this.loadInventory();
 };
 
@@ -41,7 +46,7 @@ Inventory.prototype.addItem = function(item) {
 /**
  * Loads an item to the inventory to be displayed for the player.
  * @method Inventory.loadItem
- * @param {Item} item - Item to be added to the inventory.
+ * @param {Item} item - Item to be loaded to the inventory.
  */
 Inventory.prototype.loadItem = function(item) {
     this.items[item.category][item.key] = new InventoryItem(item, this);

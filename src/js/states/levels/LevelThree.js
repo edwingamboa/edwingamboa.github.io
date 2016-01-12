@@ -1,15 +1,16 @@
 /**
- * Created by Edwin Gamboa on 19/11/2015.
+ * @ignore Created by Edwin Gamboa on 19/11/2015.
  */
 var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
-var ClueItem = require('../../items/ClueItem');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
 var Wife = require('../../character/Wife');
 var Friend = require('../../character/Friend');
-var VocabularyItem = require('../../items/VocabularyItem');
+var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
+var InteractionManager = require('../../util/InteractionManager');
 
 /**
  * Number of fights that player will have during this level.
@@ -37,7 +38,8 @@ LevelThree.prototype.constructor = LevelThree;
  */
 LevelThree.prototype.create = function() {
     Level.prototype.create.call(this);
-    this.nextState = 'intro';
+    localStorage.setItem('level', 'levelThree');
+    this.nextState = 'menu';
     this.game.stage.backgroundColor = '#09061F';
     this.firstCheckPointX = this.game.camera.width * 1.5;
     this.checkPointsDistance = this.WORLD_WIDTH /
@@ -46,11 +48,12 @@ LevelThree.prototype.create = function() {
     this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
     this.numberOfEnemies = 2;
     this.numberOfStrongEnemies = 3;
-    //this.addEnemies();
+    this.createPlaces();
+    this.addStaticBuildings();
+    this.addEnemies();
     this.addWife();
     this.addFriend(this.WORLD_WIDTH - 100);
-    this.addObjects();
-    this.createPlaces();
+    this.addClueItems();
     this.createWeapons();
     this.addHealthPacks();
 };
@@ -74,54 +77,45 @@ LevelThree.prototype.createPlaces = function() {
     this.housesKeys = ['yellowHouse', 'greenHouse', 'orangeHouse',
         'whiteHouse'];
     this.placesKeys = ['policeStation', 'fireStation', 'superMarket', 'hotel'];
-    this.placesNames = ['Police Station', 'Fire Station', 'Super Market',
-        'Hotel'];
-    this.placesDescriptions = ['A place where local \n police officers work',
-        'a building in which the members of a fire' +
-        '\n department and the equipment used to' +
-        '\nput out fires are located',
-        'a store where customers can buy a variety' +
-        '\nof foods and usually household items',
-        'a place that has rooms in which people' +
-        '\ncan stay especially when they are traveling'];
     this.addPlaces();
 };
 
 /**
  * Add ClueItems, InteractiveCar and InteractiveHouses for this level.
- * @method LevelThree.addObjects
+ * @method LevelThree.addClueItems
  */
-LevelThree.prototype.addObjects = function() {
-    var messages = ['Oh Great, that is our son\'s cap!'];
-    var titles = ['Our son\'s cap'];
-    var imagesKeys = ['cap'];
+LevelThree.prototype.addClueItems = function() {
+    var messages = ['Our daughter\'s drawing!'];
+    var titles = ['We are closer to our kids!'];
+    var imagesKeys = ['family'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'kid', false);
+    vocabularyItems.push(vocabularyItem);
     var interactionManager = new InteractionManager(messages, titles,
-        imagesKeys);
-    var cap = new ClueItem(300, this.GROUND_HEIGHT,
-        'cap',
-        'Cap',
-        'A small, soft hat that often has a hard curved part' +
-        '\n(called a visor) that extends out over your eyes',
-        3,
-        interactionManager
-    );
-    this.addVocabularyItem(cap);
+        imagesKeys, vocabularyItems);
+    this.addClueItem(300, 'family', interactionManager);
 
-    messages = ['Oh Great, that is our daughtere\'s bracelet!'];
+    messages = ['Oh Great, that is our son\'s cap!'];
+    titles = ['Our son\'s cap'];
+    imagesKeys = ['cap'];
+    vocabularyItems = [];
+    vocabularyItem = new VocabularyItem(0, 0, 'son', false);
+    vocabularyItems.push(vocabularyItem);
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys, vocabularyItems);
+    this.addClueItem(this.WORLD_WIDTH / 2 - 400, 'cap',
+        interactionManager);
+
+    messages = ['Oh Great, that is our daughter\'s bracelet!'];
     titles = ['My wife\'s bracelet'];
     imagesKeys = ['bracelet'];
+    vocabularyItems = [];
+    vocabularyItem = new VocabularyItem(0, 0, 'daughter', false);
+    vocabularyItems.push(vocabularyItem);
     interactionManager = new InteractionManager(messages, titles,
-        imagesKeys);
-    var bracelet = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
-        'bracelet',
-        'Bracelet',
-        'A piece of jewelry worn on the wrist',
-        3,
-        interactionManager
-    );
-    this.addVocabularyItem(bracelet);
-
-    //this.addCar(3.7 * this.checkPointsDistance, 'Taxi1', 'taxi', 200, 500, 100);
+        imagesKeys, vocabularyItems);
+    this.addClueItem(this.WORLD_WIDTH / 2 + 400, 'bracelet',
+        interactionManager);
 };
 
 /**
@@ -135,14 +129,6 @@ LevelThree.prototype.addWife = function() {
 };
 
 /**
- * Determines whether the player has won
- * @returns {boolean}
- */
-LevelThree.prototype.playerWins = function() {
-    return this.lastGoalAimed;
-};
-
-/**
  * Adds the Friend (as Enemy) to enemies group.
  * @method LevelThree.addFriend
  * @param {number} x - X coordinate within the world where the enemy should
@@ -150,6 +136,52 @@ LevelThree.prototype.playerWins = function() {
  */
 LevelThree.prototype.addFriend = function(x) {
     this.enemies.add(new Friend(x, this.GROUND_HEIGHT - 100));
+};
+
+/**
+ * Adds static buildings to this level.
+ * @method LevelThree.addInteractiveBuildings
+ */
+LevelThree.prototype.addStaticBuildings = function() {
+    var house = this.addStaticBuilding(400, 'redHouse');
+    this.addNeighbors(house, 'whiteHouse', 'blueHouse');
+    this.addStaticBuilding(this.WORLD_WIDTH - 300, 'whiteHouse');
+};
+
+/**
+ * Adds character's wife to the level scene.
+ * @method LevelThree.liberateFamilyMember
+ */
+LevelThree.prototype.liberateFamilyMember = function() {
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'parent', false);
+    vocabularyItems.push(vocabularyItem);
+    var messages = ['Thank you dear parents.'];
+    var titles = ['Thank you!'];
+    var imagesKeys = ['parent'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys,
+        vocabularyItems);
+    this.son = this.addNPC(
+        this.WORLD_WIDTH - 250,
+        'son',
+        intManager
+    );
+
+    vocabularyItems = [];
+    vocabularyItem = new VocabularyItem(0, 0, 'mother', false);
+    vocabularyItems.push(vocabularyItem);
+    vocabularyItem = new VocabularyItem(0, 0, 'father', false);
+    vocabularyItems.push(vocabularyItem);
+    messages = ['Mother and Father we are so happy to see you again.'];
+    titles = ['Thank you!'];
+    imagesKeys = ['parent'];
+    intManager = new InteractionManager(messages, titles, imagesKeys,
+        vocabularyItems);
+    this.son = this.addNPC(
+        this.WORLD_WIDTH - 200,
+        'daughter',
+        intManager
+    );
 };
 
 module.exports = LevelThree;

@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/07/2015.
+ * @ignore Created by Edwin Gamboa on 08/07/2015.
  */
 /**
  * Default speed for any character
@@ -306,6 +306,7 @@ Character.prototype.relocate = function(x, y) {
 Character.prototype.useWeapon = function(weapon) {
     if (this.weapons[weapon.key] === undefined) {
         this.addWeapon(weapon);
+        this.currentWeaponIndex = this.weaponsKeys.indexOf(weapon.key);
         this.updateCurrentWeapon(weapon.key);
         if (level.xDirection > 0) {
             this.currentWeapon.pointToRight();

@@ -1,13 +1,13 @@
 /**
- * Created by Edwin Gamboa on 05/11/2015.
+ * @ignore Created by Edwin Gamboa on 05/11/2015.
  */
 var Level = require ('./Level');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
-var ClueItem = require('../../items/ClueItem');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
 var InteractionManager = require('../../util/InteractionManager');
-var VocabularyItem = require('../../items/VocabularyItem');
+var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
 
 /**
  * Number of fights that player will have during this level.
@@ -35,6 +35,7 @@ LevelTwo.prototype.constructor = LevelTwo;
  */
 LevelTwo.prototype.create = function() {
     Level.prototype.create.call(this);
+    localStorage.setItem('level', 'levelTwo');
     this.nextState = 'levelThree';
     this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
@@ -45,11 +46,14 @@ LevelTwo.prototype.create = function() {
     this.numberOfEnemies = 2;
     this.numberOfStrongEnemies = 2;
     this.metWife = false;
-    //this.addEnemies();
-    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
-    this.addObjects();
     this.createPlaces();
+    this.addStaticBuildings();
+    this.addEnemies();
+    this.addStrongestEnemy(this.WORLD_WIDTH - 100);
+    this.addClueItems();
+    this.addLevelCar('bus', 3.4 * this.checkPointsDistance);
     this.addHealthPacks();
+    this.createWeapons();
 };
 
 /**
@@ -66,68 +70,50 @@ LevelTwo.prototype.createWeapons = function() {
 
 /**
  * Add ClueItems, InteractiveCar and InteractiveHouses for this level.
- * @method LevelTwo.addObjects
+ * @method LevelTwo.addClueItems
  */
-LevelTwo.prototype.addObjects = function() {
+LevelTwo.prototype.addClueItems = function() {
     var messages = ['Oh Great, that is my wife\'s necklace!'];
     var titles = ['My wife\'s necklace'];
     var imagesKeys = ['necklace'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    var necklace = new ClueItem(300, this.GROUND_HEIGHT,
-        'necklace',
-        'Necklace',
-        'A piece of jewelry that is worn around your neck',
-        3,
-        interactionManager
-    );
-    this.addVocabularyItem(necklace);
+    this.addClueItem(300, 'necklace', interactionManager);
 
     messages = ['Oh Great, that is my wife\'s ring!'];
     titles = ['My wife\'s ring'];
     imagesKeys = ['ring'];
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    var ring = new ClueItem(this.WORLD_WIDTH / 2, this.GROUND_HEIGHT,
-        'ring',
-        'Ring',
-        'A piece of jewelry that is worn usually on a finger',
-        3,
-        interactionManager
-    );
-    this.addVocabularyItem(ring);
-
-    //this.addCar(3.7 * this.checkPointsDistance, 'Bus', 'bus', 300, 350, 200);
+    this.addClueItem(this.WORLD_WIDTH / 2, 'ring', interactionManager);
 };
 
 /**
  * Adds character's wife to the level scene.
- * @method LevelTwo.addWife
+ * @method LevelTwo.liberateFamilyMember
  */
-LevelTwo.prototype.addWife = function() {
+LevelTwo.prototype.liberateFamilyMember = function() {
     var vocabularyItems = [];
-    var vocabularyItem = new VocabularyItem(0, 0,
-        'child',
-        'Child',
-        'A young person; a son or daughter',
-        1,
-        false
-    );
+    var vocabularyItem = new VocabularyItem(0, 0, 'husband', false);
     vocabularyItems.push(vocabularyItem);
-    vocabularyItem = new VocabularyItem(0, 0,
-        'child',
-        'Child',
-        'A young person; a son or daughter',
-        1,
-        false
-    );
+    vocabularyItem = new VocabularyItem(0, 0, 'child', false);
+    vocabularyItems.push(vocabularyItem);
+    vocabularyItem = new VocabularyItem(0, 0, 'friend', false);
     vocabularyItems.push(vocabularyItem);
 
-    var message = 'Hello my husband. I am so happy to see you again.' +
-        '\nBut our children are not here.' +
-        '\nYor friend has kidnapped \n our daughter and our son.';
-    this.wife = this.addNPC(this.checkPointsDistance *
-        (NUMBER_OF_FIGHTING_POINTS), 'wife', message);
+    var messages = [
+        'Hello my husband. I am so happy to see you again.',
+        'Yor friend has kidnapped \n our daughter and our son.'
+    ];
+    var titles = ['Hello!', 'Our children are not here'];
+    var imagesKeys = ['wife', 'friend'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys,
+        vocabularyItems);
+    this.wife = this.addNPC(
+        this.WORLD_WIDTH - 200,
+        'wife',
+        intManager
+    );
 };
 
 /**
@@ -138,20 +124,17 @@ LevelTwo.prototype.createPlaces = function() {
     this.housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse',
         'orangeHouse'];
     this.placesKeys = ['bank', 'coffeeShop', 'hospital', 'school', 'factory'];
-    this.placesNames = ['Bank', 'Coffee Shop', 'Hospital', 'School',
-        'Old Factory'];
-    this.placesDescriptions = [
-        'An organization that keeps and lends money',
-        'A small restaurant that serves coffee and' +
-        '\nother drinks as well as simple foods',
-        'A place where sick or injured people' +
-        '\nare given medical care',
-        'A place for education; a place where' +
-        '\npeople go to learn',
-        'A building or group of buildings' +
-        '\nwhere products are made'
-    ];
     this.addPlaces();
+};
+
+/**
+ * Adds static buildings to this level.
+ * @method LevelTwo.addInteractiveBuildings
+ */
+LevelTwo.prototype.addStaticBuildings = function() {
+    var house = this.addStaticBuilding(400, 'trees');
+    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
+    this.addStaticBuilding(this.WORLD_WIDTH - 300, 'yellowHouse');
 };
 
 module.exports = LevelTwo;

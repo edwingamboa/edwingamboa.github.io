@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/10/2015.
+ * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
 
 var DragAndDropChallenge = require('./dragAndDrop/DragAndDropChallenge');
@@ -84,6 +84,7 @@ ContextGroups.prototype.newChallenge = function() {
         contextsPanels.addElement(context);
 
         for (j = 0; j < numberOfWords; j++) {
+            this.vocabularyItems.push(vocabularyItems[i][j]);
             word = level.game.make.text(0, 0, vocabularyItems[i][j].name);
             //Font style
             word.font = level.font;

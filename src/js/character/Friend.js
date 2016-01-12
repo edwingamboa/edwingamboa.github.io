@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 06/12/2015.
+ * @ignore Created by Edwin Gamboa on 06/12/2015.
  */
 var InteractionEnemy = require('./InteractionEnemy');
 var MachineGun = require('../items/weapons/MachineGun');
@@ -52,9 +52,13 @@ var MAX_RANGE_ATTACK = 800;
  * @constructor
  */
 var Friend = function(x, y) {
-    var messages = ['Message 1', 'Message 2'];
-    var titles = ['Title 1', 'Title 2'];
-    var imagesKeys = ['Key 1', 'Key 2'];
+    var messages = ['I did not know what I was doing.' +
+    '\nI just wanted to have your life',
+        'But now I have realised that I made suffer too ' +
+        '\nmany people',
+        'I will surrender to the police'];
+    var titles = ['Forgive me!', 'I am sorry!', 'I give up!'];
+    var imagesKeys = ['forgive', 'forgive', 'surrender'];
     var intManager = new InteractionManager(messages, titles, imagesKeys);
     InteractionEnemy.call(
         this,

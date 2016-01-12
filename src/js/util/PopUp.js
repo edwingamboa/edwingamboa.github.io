@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 16/07/2015.
+ * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
 /**
  * Represents a pop up window.

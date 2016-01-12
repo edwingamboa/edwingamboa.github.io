@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 22/06/2015.
+ * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
 var ItemsPopUp = require('../ItemsPopUp');
 var StoreItem = require ('./StoreItem');
@@ -10,7 +10,7 @@ var MachineGun = require('../weapons/MachineGun');
 /**
  * View and control of the game store
  * @class Store
- * @extends StoreItem
+ * @extends ItemsPopUp
  * @constructor
  */
 var Store = function() {
@@ -25,14 +25,13 @@ var Store = function() {
     cashIcon.anchor.set(1, 0);
     this.addChild(cashIcon);
 
-    this.cash = level.game.make.text(this.width - 70, 60,
+    this.cash = level.game.make.text(this.width - 180, 60,
         'Money: $ ' + level.player.score);
     this.cash.font = level.font;
     this.cash.fontSize = 20;
     this.cash.fill = '#FFFFFF';
     this.cash.stroke = '#000';
     this.cash.strokeThickness = 3;
-    this.cash.anchor.set(1, 0);
     this.addChild(this.cash);
     this.createItems();
 };

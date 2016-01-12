@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 22/06/2015.
+ * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
 var Inventory = require('../../items/inventory/Inventory');
 var Store = require('../../items/store/Store');
@@ -13,16 +13,18 @@ var StrongestEnemy = require('../../character/StrongestEnemy');
 var StrongEnemy = require('../../character/StrongEnemy');
 var NPC = require('../../character/NPC');
 var PopUp = require('../../util/PopUp');
-var InteractiveCar = require ('../../items/InteractiveCar');
+var InteractiveCar = require ('../../items/vocabularyItems/InteractiveCar');
 var Dialog = require('../../util/Dialog');
 var EnglishChallengesMenu =
     require('../../englishChallenges/menu/EnglishChallengesMenu');
 var ResourceBar = require('../../util/ResourceBar');
 var NameBoard = require('../../worldElements/NameBoard');
-var WorldItem = require('../../items/WorldItem');
+var WorldItem = require('../../items/vocabularyItems/WorldItem');
 var InteractionManager = require('../../util/InteractionManager');
 var IconButton = require('../../util/IconButton');
 var HorizontalLayoutPanel = require('../../util/HorizontalLayoutPanel');
+var InteractiveHouse = require('../../worldElements/InteractiveHouse');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
 
 /**
  * Represents a game level.
@@ -74,10 +76,10 @@ Level.prototype.create = function() {
     this.addHealthBar();
     this.addControls();
     this.addCamera();
+    this.createStore();
     this.createInventory();
     this.createMyVocabulary ();
     this.createEnglishChallengesMenu();
-    this.createStore();
     this.updateHealthLevel();
     this.createToolsBar();
 };
@@ -142,6 +144,7 @@ Level.prototype.updateNpcs = function() {
  */
 Level.prototype.update = function() {
     if (this.playerWins()) {
+        this.increaseScore(50);
         this.nextLevel();
     }
     this.updateEnemies();
@@ -279,42 +282,66 @@ Level.prototype.addStrongEnemy = function(x) {
  * @param {number} x - X coordinate within the world where the character should
  * appear.
  * @param {string} key - NPC texture key.
- * @param {Array} messages - Messages that this NPC has to interact with the
- * player.
- * @param {Array} titles - Title associated to each message.
- * @param {Array} imagesKeys - Icon associated to each message.
+ * @param {InteractionManager} interactionManager - Interaction manager that
  * @return {NPC} - Added NPC;
  */
-Level.prototype.addNPC = function(x, key, messages, titles, imagesKeys) {
-    var intManager = new InteractionManager(messages, titles, imagesKeys);
-    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, intManager);
+Level.prototype.addNPC = function(x, key, interactionManager) {
+    var npc = new NPC(x, this.GROUND_HEIGHT - 100, key, interactionManager);
     this.npcs.add(npc);
     return npc;
 };
 
 /**
- * Adds a new InteractiveCar to enemies group.
- * @method Level.addCar
- * @param {number} x - X coordinate within the world where the car should
- * appear.
- * @param {string} name - Car name.
- * @param {string} key - Car texture key.
- * @param {number} price - Car price
- * @param {number} speed - Car speed
- * @param {number} gasoline - Car max gasoline
-
-Level.prototype.addCar = function(x, name, key, price, speed,  gasoline) {
-    this.cars.add(new InteractiveCar(x, this.GROUND_HEIGHT, name, key, price,
-    speed, gasoline));
-};*/
-
-/**
- * Adds a new InteractiveCar to enemies group.
+ * Adds a new InteractiveCar to cars group.
  * @method Level.addCar
  * @param {InteractiveCar} car - car to be added.
  */
 Level.prototype.addCar = function(car) {
     this.cars.add(car);
+};
+
+/**
+ * Adds the car that corresponds to this level.
+ * @method Level.addLevelCar
+ * @param {string} key - Car texture key.
+ * @param {number} x - X coordinate within the world where the car should
+ * appear.
+ */
+Level.prototype.addLevelCar = function(key, x) {
+    var car = this.createInteractiveCar(key);
+    car.x = x;
+    car.y = this.GROUND_HEIGHT;
+    this.cars.add(car);
+};
+
+/**
+ * Adds a new InteractiveHouse to the level.
+ * @method Level.addInteractiveHouse
+ * @param {number} x - X coordinate within the world where the house should
+ * appear.
+ * @param {string} key - House texture key.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player.
+ */
+Level.prototype.addInteractiveHouse = function(x, key, interactionManager) {
+    var house = new InteractiveHouse(x, this.GROUND_HEIGHT, key,
+        interactionManager);
+    this.addVocabularyItem(house);
+    this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+};
+
+/**
+ * Adds a new ClueItem to the level.
+ * @method Level.addClueItem
+ * @param {number} x - X coordinate within the world where the item should
+ * appear.
+ * @param {string} key - Item's texture key.
+ * @param {InteractionManager} interactionManager - Interaction manager that
+ * allows interaction with the player.
+ */
+Level.prototype.addClueItem = function(x, key, interactionManager) {
+    this.addVocabularyItem(new ClueItem (x, this.GROUND_HEIGHT + 5, key,
+        interactionManager));
 };
 
 /**
@@ -818,12 +845,6 @@ Level.prototype.addNameBoard = function(x, text) {
 };
 
 /**
- * Determines whether the player has won
- * @returns {boolean}
- */
-Level.prototype.playerWins = function() {};
-
-/**
  * Adds this level enemies.
  * @method Level.addEnemies
  */
@@ -840,8 +861,7 @@ Level.prototype.addEnemies = function() {
             x += 50;
             this.addStrongEnemy(x);
         }
-        numberOfEnemies ++;
-        x += this.checkPointsDistance;
+        x += this.checkPointsDistance - 200;
     }
 };
 
@@ -850,7 +870,7 @@ Level.prototype.addEnemies = function() {
  * @method LevelT.addPlaces
  */
 Level.prototype.addPlaces = function() {
-    var x = this.WORLD_WIDTH / (this.placesKeys.length + 2);
+    var x = this.WORLD_WIDTH / (this.placesKeys.length + 1);
     var i;
     var houseIndex = 0;
     var place;
@@ -862,16 +882,13 @@ Level.prototype.addPlaces = function() {
         place = new WorldItem(
             x * (i + 1),
             this.GROUND_HEIGHT,
-            this.placesKeys[i],
-            this.placesNames[i],
-            this.placesDescriptions[i],
-            0);
+            this.placesKeys[i]
+        );
         this.addVocabularyItem(place);
         this.addNeighbors(place, this.housesKeys[houseIndex],
             this.housesKeys[houseIndex + 1]);
-
         houseIndex += 2;
-        this.addNameBoard(place.x - 70, this.placesNames[i] + ' Street');
+        this.addNameBoard(place.x - 70, place.name + ' Street');
     }
 };
 
@@ -883,7 +900,8 @@ Level.prototype.addHealthPacks = function() {
     var heathPacksDistance = this.WORLD_WIDTH / this.numberOfFightingPoints;
     var i;
     for (i = 1; i <= this.numberOfFightingPoints; i++) {
-        this.addHealthPack(new HealthPack(heathPacksDistance * i, 10, 5, this));
+        this.addHealthPack(new HealthPack(heathPacksDistance * i - 200, 10, 5,
+            this));
     }
 };
 
@@ -892,21 +910,7 @@ Level.prototype.addHealthPacks = function() {
  * @method Level.nextLevel
  */
 Level.prototype.nextLevel = function() {
-    /*if (this.wife === undefined) {
-        this.wife.moveRight();
-    }else if (this.wife.hadContactWithPlayer && this.activePopUps === 0) {
-        this.game.state.start(this.nextSate);
-    }*/
-    this.game.state.start(this.nextSate);
-};
-
-/**
- * Determines whether the player has won
- * @method Level.playerWins
- * @returns {boolean}
- */
-Level.prototype.playerWins = function() {
-    return this.lastGoalAimed;
+    this.game.state.start(this.nextState);
 };
 
 /**
@@ -918,37 +922,27 @@ Level.prototype.playerWins = function() {
 Level.prototype.createInteractiveCar = function(carKey) {
     switch (carKey) {
         case 'car':
-            return new InteractiveCar(0, 0, 'Car', carKey, 60, 300, 200,
-                'A vehicle that has four wheels and an engine and ' +
-                '\nthat is used for carrying passengers on roads'
-            );
+            return new InteractiveCar(0, 0, carKey, 60, 300, 200);
         case 'jeep':
-            return new InteractiveCar(0, 0, 'Jeep', carKey, 100, 350, 400,
-                'Used for a small truck that can be driven over' +
-                '\nvery rough surfaces'
-            );
+            return new InteractiveCar(0, 0, carKey, 100, 350, 400);
         case 'bus':
-            return new InteractiveCar(0, 0, 'Bus', carKey, 300, 400, 450,
-                'A large vehicle that is used for carrying passengers ' +
-                '\nespecially along a particular route at particular times'
-            );
+            return new InteractiveCar(0, 0, carKey, 300, 400, 450);
         case 'truck':
-            return new InteractiveCar(0, 0, 'Truck', carKey, 200, 70, 90,
-                'A very large, heavy vehicle that is used to move ' +
-                '\mlarge or numerous objects'
-            );
+            return new InteractiveCar(0, 0, carKey, 200, 70, 90);
         case 'taxi':
-            return new InteractiveCar(0, 0, 'Taxi', carKey, 450, 200, 400,
-                'A car that carries passengers to a place for an ' +
-                '\namount of money that is based on the distance ' +
-                '\ntravelled'
-            );
+            return new InteractiveCar(0, 0, carKey, 450, 200, 400);
         case 'ambulance':
-            return new InteractiveCar(0, 0, 'Ambulance', carKey, 400, 150, 500,
-                'A vehicle used for taking hurt or sick people to' +
-                '\nthe hospital especially in emergencies'
-            );
+            return new InteractiveCar(0, 0, carKey, 400, 150, 500);
     }
+};
+
+/**
+ * Determines whether the player has won
+ * @returns {boolean}
+ */
+Level.prototype.playerWins = function() {
+    return (this.player.x >= (this.WORLD_WIDTH - this.player.width - 5) &&
+    this.enemies.children.length <= 0);
 };
 
 module.exports = Level;

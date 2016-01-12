@@ -1,5 +1,5 @@
 /**
- * Created by Edwin Gamboa on 08/07/2015.
+ * @ignore Created by Edwin Gamboa on 08/07/2015.
  */
 /**
  * Phaser state to load all assets.
@@ -79,6 +79,11 @@ Preloader.prototype.loadAssets = function() {
         64, 96);
     this.game.load.spritesheet('friend', 'assets/sprites/npc.png',
         64, 96);
+    this.game.load.spritesheet('daughter', 'assets/sprites/daughter.png',
+        40, 60);
+    this.game.load.spritesheet('son', 'assets/sprites/son.png',
+        40, 60);
+
     this.game.load.spritesheet('simple_enemy',
         'assets/sprites/simple_enemy.png', 64, 64);
     this.game.load.spritesheet('strong_enemy',
@@ -118,12 +123,6 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('iconButton', 'assets/images/iconButton.png');
     this.game.load.image('toolsBar', 'assets/images/toolsBar.png');
 
-    this.game.load.image('mother', 'assets/images/mother.png');
-    this.game.load.image('father', 'assets/images/father.png');
-    this.game.load.image('daughter', 'assets/images/daughter.png');
-    this.game.load.image('son', 'assets/images/son.png');
-    this.game.load.image('son', 'assets/images/friend.png');
-
     this.game.load.image('lettersBg', 'assets/images/lettersBg.png');
     this.game.load.image('wordsBg', 'assets/images/wordsBg.png');
     this.game.load.image('wordBg', 'assets/images/wordBg.png');
@@ -146,6 +145,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('health', 'assets/icons/health.png');
     this.game.load.image('ammo', 'assets/icons/ammo.png');
     this.game.load.image('money', 'assets/icons/money.png');
+    this.game.load.image('learned', 'assets/icons/learned.png');
 
     this.game.load.image('popUpPanelBg',
         'assets/images/popUpPanelBg.png');
@@ -178,6 +178,8 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('superMarket',
         'assets/images/vocabulary/superMarket.png');
 
+    this.game.load.image('trees', 'assets/images/trees.png');
+    this.game.load.image('surrender', 'assets/images/surrender.png');
     this.game.load.image('orangeHouse',
         'assets/images/vocabulary/orangeHouse.png');
     this.game.load.image('greenHouse',
@@ -199,23 +201,12 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('cap', 'assets/images/vocabulary/cap.png');
     this.game.load.image('bracelet', 'assets/images/vocabulary/bracelet.png');
     this.game.load.image('family', 'assets/images/vocabulary/family.png');
-
-    this.game.load.image('sisterMom',
-        'assets/images/vocabulary/sisterMom.png');
-    this.game.load.image('sisterMomBig',
-        'assets/images/vocabulary/sisterMomBig.png');
-    this.game.load.image('sisterMomIcon', 'assets/icons/sisterMomIcon.png');
-    this.game.load.image('brother',
-        'assets/images/vocabulary/brother.png');
-    this.game.load.image('brotherBig',
-        'assets/images/vocabulary/brotherBig.png');
-    this.game.load.image('brotherIcon', 'assets/icons/brotherIcon.png');
-    this.game.load.image('dad',
-        'assets/images/vocabulary/dad.png');
-    this.game.load.image('dadBig',
-        'assets/images/vocabulary/dadBig.png');
-    this.game.load.image('dadIcon', 'assets/icons/dadIcon.png');
-
+    this.game.load.image('mother', 'assets/images/vocabulary/mother.png');
+    this.game.load.image('father', 'assets/images/vocabulary/father.png');
+    this.game.load.image('husband', 'assets/images/vocabulary/father.png');
+    this.game.load.image('child', 'assets/images/vocabulary/child.png');
+    this.game.load.image('kid', 'assets/images/vocabulary/child.png');
+    this.game.load.image('parent', 'assets/images/vocabulary/parent.png');
     this.game.load.image('comicBg', 'assets/images/comics/comicBg.png');
     var key;
     for (i = 1; i <= 7; i++) {
@@ -225,9 +216,6 @@ Preloader.prototype.loadAssets = function() {
 
     this.game.load.image('mediumPopUpBg', 'assets/images/mediumPopUpBg.png');
     this.game.load.image('emptyRoom', 'assets/images/emptyRoom.png');
-
-    this.game.load.script('webfont',
-        '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 };
 
 /**
@@ -236,9 +224,9 @@ Preloader.prototype.loadAssets = function() {
  */
 Preloader.prototype.update = function() {
     if (!!this.ready) {
-        //this.game.state.start('menu');
-        this.game.state.start('intro');
+        this.game.state.start('menu');
         level = this.game.state.states.levelOne;
+
     }
 };
 

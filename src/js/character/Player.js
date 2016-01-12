@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * @ignore Created by Edwin Gamboa
  */
 var Character = require('./Character');
 var Revolver = require('../items/weapons/Revolver');
@@ -216,7 +214,18 @@ Player.prototype.loadPlayer = function() {
         this.score = parseInt(localStorage.getItem('score'));
     }
     if (localStorage.getItem('healthLevel') !== null) {
-        this.healthLevel = parseInt(localStorage.getItem('healthLevel'));
+        var health = parseInt(localStorage.getItem('healthLevel'));
+        if (health > 0) {
+            this.healthLevel = health;
+        }else {
+            this.healthLevel = 100;
+            if (this.score > 5) {
+                this.score -= 5;
+            }else {
+                this.score = 0;
+            }
+            localStorage.setItem('score', this.score);
+        }
     }
     this.loadWeapons();
     if (localStorage.getItem('currentWeapon') !== null) {

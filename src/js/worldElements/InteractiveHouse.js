@@ -1,7 +1,7 @@
 /**
- * Created by Edwin Gamboa on 29/08/2015.
+ * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
-var VocabularyItem = require('../items/VocabularyItem');
+var VocabularyItem = require('../items/vocabularyItems/VocabularyItem');
 var Button = require('../util/Button');
 
 /**
@@ -12,20 +12,11 @@ var Button = require('../util/Button');
  * @param {number} x - House x coordinate within the world.
  * @param {number} y - House y coordinate within the world.
  * @param {string} backgroundKey - House texture key.
- * @param {string} vocabularyMessage - Message to be displayed on this item's
- * dialog.
- * @param {string} vocabularyName - VocabularyItem's name.
- * @param {string} vocabularyDescription - VocabularyItem's name.
- * @param {number} categoryIndex - Index of the category to which this item
- * belongs.
  * @param {InteractionManager} interactionManager - Interaction manager that
- * allows interaction with the player the house.
+ * allows interaction with the player.
  */
-var InteractiveHouse = function(x, y, backgroundKey, vocabularyName,
-                                vocabularyDescription, categoryIndex,
-                                interactionManager) {
-    VocabularyItem.call(this, x, y, backgroundKey, vocabularyName,
-        vocabularyDescription, categoryIndex, true);
+var InteractiveHouse = function(x, y, backgroundKey, interactionManager) {
+    VocabularyItem.call(this, x, y, backgroundKey, true);
     this.interactionManager = interactionManager;
 };
 
