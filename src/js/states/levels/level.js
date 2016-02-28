@@ -849,7 +849,7 @@ Level.prototype.addNameBoard = function(x, text) {
  * @method Level.addEnemies
  */
 Level.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
+    var x = this.firstCheckPointX * 0.80;
     var i;
     var j;
     for (i = 0; i < this.numberOfFightingPoints; i++) {
@@ -910,6 +910,7 @@ Level.prototype.addHealthPacks = function() {
  * @method Level.nextLevel
  */
 Level.prototype.nextLevel = function() {
+    localStorage.setItem('level', this.nextState);
     this.game.state.start(this.nextState);
 };
 

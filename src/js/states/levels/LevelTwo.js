@@ -35,7 +35,7 @@ LevelTwo.prototype.constructor = LevelTwo;
  */
 LevelTwo.prototype.create = function() {
     Level.prototype.create.call(this);
-    localStorage.setItem('level', 'levelTwo');
+    //localStorage.setItem('level', 'levelTwo');
     this.nextState = 'levelThree';
     this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
@@ -51,7 +51,7 @@ LevelTwo.prototype.create = function() {
     this.addEnemies();
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     this.addClueItems();
-    this.addLevelCar('bus', 4.3 * this.checkPointsDistance);
+    this.addLevelCar('bus', 3.9 * this.checkPointsDistance);
     this.addHealthPacks();
     this.createWeapons();
 };
@@ -103,7 +103,7 @@ LevelTwo.prototype.liberateFamilyMember = function() {
 
     var messages = [
         'Hello my husband. I am so happy to see you again.',
-        'Yor friend has kidnapped \n our daughter and our son.'
+        'Your friend has kidnapped \n our daughter and our son.'
     ];
     var titles = ['Hello!', 'Our children are not here'];
     var imagesKeys = ['wife', 'friend'];

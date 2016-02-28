@@ -60,6 +60,7 @@ DragAndDropChallenge.prototype.confirm = function() {
     for (i in this.vocabularyItems) {
         level.myVocabulary.markAsLearned(this.vocabularyItems[i]);
     }
+    //this.clearChallenge();
     this.close();
 };
 
@@ -73,9 +74,17 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
         this.mainPanel.removeAllElements();
     }
     if (this.elements.length > 0) {
+        var ie;
+        for (ie in this.elements) {
+            this.elements[ie].kill();
+        }
         this.elements.splice(0, this.elements.length);
     }
     if (this.destinations.length > 0) {
+        var id;
+        for (id in this.elements) {
+            this.elements[id].kill();
+        }
         this.destinations.splice(0, this.destinations.length);
     }
 };

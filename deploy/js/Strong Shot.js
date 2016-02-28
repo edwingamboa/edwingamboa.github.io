@@ -1274,7 +1274,7 @@ var ContextGroups = function() {
         'contexts',
         'Contexts',
         'Match the words \nwith their category',
-        10,
+        50,
         dimensions
     );
 };
@@ -1455,7 +1455,7 @@ var ImageWordMatch = function() {
         'imageWord',
         'Image Match',
         'Match the words \nwith their images',
-        10,
+        30,
         dimensions
     );
 };
@@ -1715,6 +1715,7 @@ DragAndDropChallenge.prototype.confirm = function() {
     for (i in this.vocabularyItems) {
         level.myVocabulary.markAsLearned(this.vocabularyItems[i]);
     }
+    //this.clearChallenge();
     this.close();
 };
 
@@ -1728,9 +1729,17 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
         this.mainPanel.removeAllElements();
     }
     if (this.elements.length > 0) {
+        var ie;
+        for (ie in this.elements) {
+            this.elements[ie].kill();
+        }
         this.elements.splice(0, this.elements.length);
     }
     if (this.destinations.length > 0) {
+        var id;
+        for (id in this.elements) {
+            this.elements[id].kill();
+        }
         this.destinations.splice(0, this.destinations.length);
     }
 };
@@ -2501,6 +2510,14 @@ Store.prototype.createItems = function() {
     }
 };
 
+/**
+ * Opens the store, before that updates the current money
+ * @method Enemy.killCharacter
+ */
+Store.prototype.open = function() {
+    this.updateMoney();
+    ItemsPopUp.prototype.open.call(this);
+};
 module.exports = Store;
 
 },{"../HealthPack":19,"../ItemsPopUp":22,"../weapons/MachineGun":34,"../weapons/Revolver":35,"./StoreItem":26}],26:[function(require,module,exports){
@@ -5035,7 +5052,7 @@ Level.prototype.addNameBoard = function(x, text) {
  * @method Level.addEnemies
  */
 Level.prototype.addEnemies = function() {
-    var x = this.firstCheckPointX * 0.75;
+    var x = this.firstCheckPointX * 0.80;
     var i;
     var j;
     for (i = 0; i < this.numberOfFightingPoints; i++) {
@@ -5096,6 +5113,7 @@ Level.prototype.addHealthPacks = function() {
  * @method Level.nextLevel
  */
 Level.prototype.nextLevel = function() {
+    localStorage.setItem('level', this.nextState);
     this.game.state.start(this.nextState);
 };
 
@@ -5189,7 +5207,7 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.createWeapons();
     this.addClueItems();
-    this.addLevelCar('jeep', 3.7 * this.checkPointsDistance);
+    this.addLevelCar('jeep', 3.5 * this.checkPointsDistance);
     this.addHealthPacks();
 };
 
@@ -5329,7 +5347,7 @@ LevelThree.prototype.constructor = LevelThree;
  */
 LevelThree.prototype.create = function() {
     Level.prototype.create.call(this);
-    localStorage.setItem('level', 'levelThree');
+    //localStorage.setItem('level', 'levelThree');
     this.nextState = 'menu';
     this.game.stage.backgroundColor = '#09061F';
     this.firstCheckPointX = this.game.camera.width * 1.5;
@@ -5516,7 +5534,7 @@ LevelTwo.prototype.constructor = LevelTwo;
  */
 LevelTwo.prototype.create = function() {
     Level.prototype.create.call(this);
-    localStorage.setItem('level', 'levelTwo');
+    //localStorage.setItem('level', 'levelTwo');
     this.nextState = 'levelThree';
     this.game.stage.backgroundColor = '#C2501B';
     this.firstCheckPointX = this.game.camera.width * 1.5;
@@ -5532,7 +5550,7 @@ LevelTwo.prototype.create = function() {
     this.addEnemies();
     this.addStrongestEnemy(this.WORLD_WIDTH - 100);
     this.addClueItems();
-    this.addLevelCar('bus', 4.3 * this.checkPointsDistance);
+    this.addLevelCar('bus', 3.9 * this.checkPointsDistance);
     this.addHealthPacks();
     this.createWeapons();
 };
@@ -5584,7 +5602,7 @@ LevelTwo.prototype.liberateFamilyMember = function() {
 
     var messages = [
         'Hello my husband. I am so happy to see you again.',
-        'Yor friend has kidnapped \n our daughter and our son.'
+        'Your friend has kidnapped \n our daughter and our son.'
     ];
     var titles = ['Hello!', 'Our children are not here'];
     var imagesKeys = ['wife', 'friend'];

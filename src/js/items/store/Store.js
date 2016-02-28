@@ -83,4 +83,12 @@ Store.prototype.createItems = function() {
     }
 };
 
+/**
+ * Opens the store, before that updates the current money
+ * @method Enemy.killCharacter
+ */
+Store.prototype.open = function() {
+    this.updateMoney();
+    ItemsPopUp.prototype.open.call(this);
+};
 module.exports = Store;

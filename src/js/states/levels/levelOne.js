@@ -53,7 +53,7 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.createWeapons();
     this.addClueItems();
-    this.addLevelCar('jeep', 3.7 * this.checkPointsDistance);
+    this.addLevelCar('jeep', 3.5 * this.checkPointsDistance);
     this.addHealthPacks();
 };
 

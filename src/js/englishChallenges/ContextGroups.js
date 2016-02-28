@@ -26,7 +26,7 @@ var ContextGroups = function() {
         'contexts',
         'Contexts',
         'Match the words \nwith their category',
-        10,
+        50,
         dimensions
     );
 };

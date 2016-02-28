@@ -19,7 +19,7 @@ var ImageWordMatch = function() {
         'imageWord',
         'Image Match',
         'Match the words \nwith their images',
-        10,
+        30,
         dimensions
     );
 };

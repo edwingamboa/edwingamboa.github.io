@@ -38,7 +38,7 @@ LevelThree.prototype.constructor = LevelThree;
  */
 LevelThree.prototype.create = function() {
     Level.prototype.create.call(this);
-    localStorage.setItem('level', 'levelThree');
+    //localStorage.setItem('level', 'levelThree');
     this.nextState = 'menu';
     this.game.stage.backgroundColor = '#09061F';
     this.firstCheckPointX = this.game.camera.width * 1.5;
