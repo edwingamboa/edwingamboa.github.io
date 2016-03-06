@@ -37,7 +37,7 @@ StoreItem.prototype.updatePriceText = function() {
 StoreItem.prototype.buttonAction = function() {
     var successfulPurchase = level.player.buyItem(this.item);
     if (successfulPurchase) {
-        level.inventory.addItem(this.item);
+        this.item.use();
         level.showSuccessMessage('Successful Purchase!', this.parent);
         this.parentView.updateMoney();
     }else {

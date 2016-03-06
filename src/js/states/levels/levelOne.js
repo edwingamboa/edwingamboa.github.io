@@ -9,6 +9,7 @@ var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var InteractionManager = require('../../util/InteractionManager');
 var ClueItem = require('../../items/vocabularyItems/ClueItem');
 var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
+var NonPauseDialog = require('../../util/NonPauseDialog');
 
 /**
  * Number of fights that player will have during this level.
@@ -53,12 +54,36 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.createWeapons();
     this.addClueItems();
-    this.addLevelCar('jeep', 3.5 * this.checkPointsDistance);
+    this.addLevelCar('jeep', 4.4 * this.checkPointsDistance);
     this.addHealthPacks();
+    this.addTutorialInstructions();
+};
+
+/**
+ * Add instructions to guide the player
+ * @method LevelOne.addTutorialInstructions
+ */
+LevelOne.prototype.addTutorialInstructions = function() {
+    var howToMoveDialog = new NonPauseDialog(50, 70, 'dialogBgSmall', null,
+        '', 8, 'Move using arrow keys', 'arrowKeysMove', true, false);
+    howToMoveDialog.open();
+    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH, 70, 'dialogBgSmall',
+        null, '', 8, 'Shoot using the Space Bar', 'spaceBar', true, false);
+    howToShoot.open();
+    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 3, 70,
+        'dialogBgSmall', null, '', 8, 'Run using X and arrow keys',
+        'arrowKeysRun',
+        true, false);
+    howToRun.open();
+    var howToJump = new NonPauseDialog(this.CAMERA_WIDTH * 4, 70,
+        'dialogBgSmall', null, '', 8, 'Jump using Up key', 'arrowKeysJump',
+        true, false);
+    howToJump.open();
 };
 
 /**
  * Creates the needed arrays to add level weapons
+ * @method LevelOne.createWeapons
  */
 LevelOne.prototype.createWeapons = function() {
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
@@ -67,7 +92,7 @@ LevelOne.prototype.createWeapons = function() {
 
 /**
  * Add ClueItems for this level.
- * @method LevelOne.createWeapons
+ * @method LevelOne.addClueItems
  */
 LevelOne.prototype.addClueItems = function() {
     var messages = ['Oh Great, those are my wife\'s glasses!'];
@@ -85,7 +110,7 @@ LevelOne.prototype.addClueItems = function() {
     imagesKeys = ['watch'];
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(this.WORLD_WIDTH / 2, 'watch', interactionManager);
+    this.addClueItem(this.WORLD_WIDTH / 1.5, 'watch', interactionManager);
 };
 
 /**
@@ -100,6 +125,12 @@ LevelOne.prototype.addInteractiveBuildings = function() {
         imagesKeys);
     this.addInteractiveHouse(this.firstCheckPointX * 1.55, 'store',
         interactionManager);
+    var storeArrow = this.game.make.sprite(-90,
+        interactionManager.dialogs[0].height - 20 , 'arrowDown');
+    storeArrow.anchor.set(0, 1);
+    storeArrow.animations.add('animation', [0, 1], 1, true);
+    storeArrow.animations.play('animation');
+    interactionManager.dialogs[0].addChild(storeArrow);
 
     messages = ['Your family is now somewhere else.',
         'Continue trying, because this game is just starting!'];

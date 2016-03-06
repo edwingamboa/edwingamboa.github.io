@@ -32,7 +32,7 @@ var REVOLVER_NEXT_FIRE = 1;
  * @constant
  * @type {number}
  */
-var REVOLVER_BULLET_SPEED = 300;
+var REVOLVER_BULLET_SPEED = 600;
 /**
  * Rate at which this weapon fires, the lower the number, the higher the firing
  * rate.

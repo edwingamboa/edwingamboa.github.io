@@ -51,7 +51,17 @@ Preloader.prototype.displayLoadScreen = function() {
  * @method Preloader.loadAssets
  */
 Preloader.prototype.loadAssets = function() {
-    //Menu assets
+    //UI assets
+    this.game.load.spritesheet('arrowKeysJump',
+        'assets/sprites/arrowKeysJump.png', 122, 80);
+    this.game.load.spritesheet('arrowKeysMove',
+        'assets/sprites/arrowKeysMove.png', 122, 80);
+    this.game.load.spritesheet('arrowKeysRun',
+        'assets/sprites/arrowKeysRun.png', 190, 80);
+    this.game.load.spritesheet('spaceBar', 'assets/sprites/spaceBar.png',
+        138, 80);
+    this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
+        80, 80);
     //Level assets
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
@@ -67,6 +77,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
     this.game.load.image('myVocabularyItemBg',
         'assets/images/myVocabularyItemBg.png');
+    this.game.load.image('dialogBgSmall', 'assets/images/dialogBgSmall.png');
     this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
     this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
     this.game.load.image('successIcon', 'assets/images/successIcon.png');
@@ -100,9 +111,15 @@ Preloader.prototype.loadAssets = function() {
         144);
 
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
-        30, 16);
+        54, 30);
     this.game.load.spritesheet('machineGun',
-        'assets/sprites/machineGun.png', 60, 42);
+        'assets/sprites/machineGun.png', 43, 40);
+    this.game.load.spritesheet('pistol',
+        'assets/sprites/pistol.png', 47, 30);
+    this.game.load.spritesheet('carbine',
+        'assets/sprites/carbine.png', 119, 30);
+    this.game.load.spritesheet('rifle',
+        'assets/sprites/rifle.png', 137, 35);
 
     var i;
     for (i = 1; i <= 2; i++) {

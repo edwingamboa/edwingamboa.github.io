@@ -8,7 +8,7 @@ var Weapon = require('./Weapon');
  * @constant
  * @type {number}
  */
-var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
+var MACHINE_GUN_NUMBER_OF_BULLETS = 40;
 /**
  * Texture's key for this weapon.
  * @constant
@@ -51,7 +51,7 @@ var MACHINE_GUN_BULLET_POWER = 2;
  * @constant
  * @type {number}
  */
-var PRICE = 30;
+var PRICE = 50;
 
 /**
  * Represents a MachineGun, which is a  kind of a Weapon.

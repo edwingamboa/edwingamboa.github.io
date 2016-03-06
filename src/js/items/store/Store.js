@@ -6,6 +6,9 @@ var StoreItem = require ('./StoreItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 var MachineGun = require('../weapons/MachineGun');
+var Pistol = require('../weapons/Pistol');
+var Rifle = require('../weapons/Rifle');
+var Carbine = require('../weapons/Carbine');
 
 /**
  * View and control of the game store
@@ -64,17 +67,15 @@ Store.prototype.updateMoney = function() {
  * @method Store.createItemGroups
  */
 Store.prototype.createItems = function() {
-    var revolverItem = new Revolver(0, 0, false);
-    this.addItem(revolverItem);
-    var machineGunItem = new MachineGun(0, 0, false);
-    this.addItem(machineGunItem);
+    this.addItem(new Revolver(0, 0, false));
+    this.addItem(new Pistol(0, 0, false));
+    this.addItem(new MachineGun(0, 0, false));
+    this.addItem(new Carbine(0, 0, false));
+    this.addItem(new Rifle(0, 0, false));
 
-    var healthPackItem = new HealthPack(0, 0, 5);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 20);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 50);
-    this.addItem(healthPackItem);
+    this.addItem(new HealthPack(0, 0, 5));
+    this.addItem(new HealthPack(0, 0, 20));
+    this.addItem(new HealthPack(0, 0, 50));
 
     var carsKey = ['car', 'jeep', 'bus', 'truck', 'taxi', 'ambulance'];
     var i;

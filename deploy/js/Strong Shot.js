@@ -465,7 +465,7 @@ Enemy.prototype.stop = function() {
 
 module.exports = Enemy;
 
-},{"./../util/ResourceBar":62,"./Character":1}],3:[function(require,module,exports){
+},{"./../util/ResourceBar":66,"./Character":1}],3:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 06/12/2015.
  */
@@ -548,7 +548,7 @@ Friend.prototype.constructor = Friend;
 
 module.exports = Friend;
 
-},{"../items/weapons/MachineGun":34,"../util/InteractionManager":60,"../util/VerticalLayoutPopUp":66,"./InteractionEnemy":4}],4:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../util/InteractionManager":63,"../util/VerticalLayoutPopUp":70,"./InteractionEnemy":4}],4:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
@@ -626,7 +626,7 @@ InteractionEnemy.prototype.openDialogs = function() {
 module.exports = InteractionEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"./Enemy":2}],5:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"./Enemy":2}],5:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
@@ -672,7 +672,7 @@ NPC.prototype.openDialogs = function() {
 
 module.exports = NPC;
 
-},{"../util/Dialog":52,"./Character":1}],6:[function(require,module,exports){
+},{"../util/Dialog":55,"./Character":1}],6:[function(require,module,exports){
 /*
  * @ignore Created by Edwin Gamboa
  */
@@ -930,7 +930,7 @@ Player.prototype.loadWeapons = function() {
 
 module.exports = Player;
 
-},{"../items/weapons/MachineGun":34,"../items/weapons/Revolver":35,"./Character":1}],7:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../items/weapons/Revolver":37,"./Character":1}],7:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1001,7 +1001,7 @@ SimpleEnemy.prototype.constructor = SimpleEnemy;
 
 module.exports = SimpleEnemy;
 
-},{"../items/weapons/Revolver":35,"./Enemy":2}],8:[function(require,module,exports){
+},{"../items/weapons/Revolver":37,"./Enemy":2}],8:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
@@ -1074,7 +1074,7 @@ StrongEnemy.prototype.constructor = StrongEnemy;
 
 module.exports = StrongEnemy;
 
-},{"../items/weapons/MachineGun":34,"./Enemy":2}],9:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"./Enemy":2}],9:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/11/2015.
  */
@@ -1158,7 +1158,7 @@ StrongestEnemy.prototype.constructor = StrongestEnemy;
 module.exports = StrongestEnemy;
 
 
-},{"../items/weapons/MachineGun":34,"../util/InteractionManager":60,"../util/VerticalLayoutPopUp":66,"./InteractionEnemy":4}],10:[function(require,module,exports){
+},{"../items/weapons/MachineGun":35,"../util/InteractionManager":63,"../util/VerticalLayoutPopUp":70,"./InteractionEnemy":4}],10:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/11/2015.
  */
@@ -1245,7 +1245,7 @@ Wife.prototype.killCharacter = function() {
 
 module.exports = Wife;
 
-},{"./../util/ResourceBar":62,"./Character":1}],11:[function(require,module,exports){
+},{"./../util/ResourceBar":66,"./Character":1}],11:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1375,7 +1375,7 @@ ContextGroups.prototype.bringItemToTop = function(item) {
 
 module.exports = ContextGroups;
 
-},{"../util/GridLayoutPanel":54,"../util/VerticalLayoutPanel":65,"./dragAndDrop/DragAndDropChallenge":15}],12:[function(require,module,exports){
+},{"../util/GridLayoutPanel":57,"../util/VerticalLayoutPanel":69,"./dragAndDrop/DragAndDropChallenge":15}],12:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1546,7 +1546,7 @@ ImageWordMatch.prototype.bringItemToTop = function(element) {
 
 module.exports = ImageWordMatch;
 
-},{"../util/GridLayoutPanel":54,"../util/VerticalLayoutPanel":65,"./dragAndDrop/DragAndDropChallenge":15}],14:[function(require,module,exports){
+},{"../util/GridLayoutPanel":57,"../util/VerticalLayoutPanel":69,"./dragAndDrop/DragAndDropChallenge":15}],14:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 08/10/2015.
  */
@@ -1652,7 +1652,7 @@ WordUnscramble.prototype.bringItemToTop = function(item) {
 
 module.exports = WordUnscramble;
 
-},{"../util/GridLayoutPanel":54,"../util/VerticalLayoutPanel":65,"./dragAndDrop/DragAndDropChallenge":15}],15:[function(require,module,exports){
+},{"../util/GridLayoutPanel":57,"../util/VerticalLayoutPanel":69,"./dragAndDrop/DragAndDropChallenge":15}],15:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1746,7 +1746,7 @@ DragAndDropChallenge.prototype.clearChallenge = function() {
 
 module.exports = DragAndDropChallenge;
 
-},{"../../englishChallenges/EnglishChallenge":12,"../../util/Button":51,"../../util/VerticalLayoutPanel":65,"../../util/VerticalLayoutPopUp":66,"./DragAndDropController":16}],16:[function(require,module,exports){
+},{"../../englishChallenges/EnglishChallenge":12,"../../util/Button":54,"../../util/VerticalLayoutPanel":69,"../../util/VerticalLayoutPopUp":70,"./DragAndDropController":16}],16:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -1857,7 +1857,7 @@ DragAndDropController.prototype.addElementsToSourceRandomly = function() {
 };
 module.exports = DragAndDropController;
 
-},{"../../util/Utilities":63}],17:[function(require,module,exports){
+},{"../../util/Utilities":67}],17:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 10/10/2015.
  */
@@ -1911,7 +1911,7 @@ EnglishChallengesMenu.prototype.createGames = function() {
 
 module.exports = EnglishChallengesMenu;
 
-},{"../../util/GridLayoutPanel":54,"../../util/PopUp":61,"../ContextGroups":11,"../ImageWordMatch":13,"../WordUnscramble":14,"./MenuItem":18}],18:[function(require,module,exports){
+},{"../../util/GridLayoutPanel":57,"../../util/PopUp":65,"../ContextGroups":11,"../ImageWordMatch":13,"../WordUnscramble":14,"./MenuItem":18}],18:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
@@ -2107,11 +2107,20 @@ var ItemGroupView = function(iconKey, buttonText, parentView) {
     VerticalLayoutPanel.call(this, 'itemGroupBg', 2);
 
     this.icon = level.game.make.sprite(0, 0, iconKey);
-    var scale = 50 / this.icon.height;
-    this.icon.scale.x = scale;
-    this.icon.scale.y = scale;
+    if (this.icon.height > 50 || this.icon.width > 140) {
+        var scaleY = 50 / this.icon.height;
+        var scaleX = 140 / this.icon.width;
+        if (scaleX > scaleY) {
+            this.icon.scale.x = scaleY;
+            this.icon.scale.y = scaleY;
+        }else {
+            this.icon.scale.x = scaleX;
+            this.icon.scale.y = scaleX;
+        }
+    }
 
-    this.auxText = level.game.make.text(this.width - 20, this.height / 2, '');
+    this.auxText = level.game.make.text(this.width - 20, this.height / 2 - 20,
+        '');
     this.auxText.font = level.font;
     this.auxText.fontSize = 20;
     this.auxText.fill = '#FFF12B';
@@ -2182,7 +2191,7 @@ ItemGroupView.prototype.setAuxText = function(auxText) {
 
 module.exports = ItemGroupView;
 
-},{"../util/Button":51,"../util/VerticalLayoutPanel":65}],22:[function(require,module,exports){
+},{"../util/Button":54,"../util/VerticalLayoutPanel":69}],22:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 19/10/2015.
  */
@@ -2276,7 +2285,7 @@ ItemsPopUp.prototype.open = function() {
 
 module.exports = ItemsPopUp;
 
-},{"../util/Button":51,"../util/GridLayoutPanel":54,"../util/PopUp":61}],23:[function(require,module,exports){
+},{"../util/Button":54,"../util/GridLayoutPanel":57,"../util/PopUp":65}],23:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
@@ -2371,7 +2380,7 @@ Inventory.prototype.loadInventory = function() {
 
 module.exports = Inventory;
 
-},{"../../util/Button":51,"../HealthPack":19,"../ItemsPopUp":22,"../weapons/MachineGun":34,"../weapons/Revolver":35,"./InventoryItem":24}],24:[function(require,module,exports){
+},{"../../util/Button":54,"../HealthPack":19,"../ItemsPopUp":22,"../weapons/MachineGun":35,"../weapons/Revolver":37,"./InventoryItem":24}],24:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2433,6 +2442,9 @@ var StoreItem = require ('./StoreItem');
 var HealthPack = require('../HealthPack');
 var Revolver = require('../weapons/Revolver');
 var MachineGun = require('../weapons/MachineGun');
+var Pistol = require('../weapons/Pistol');
+var Rifle = require('../weapons/Rifle');
+var Carbine = require('../weapons/Carbine');
 
 /**
  * View and control of the game store
@@ -2491,17 +2503,15 @@ Store.prototype.updateMoney = function() {
  * @method Store.createItemGroups
  */
 Store.prototype.createItems = function() {
-    var revolverItem = new Revolver(0, 0, false);
-    this.addItem(revolverItem);
-    var machineGunItem = new MachineGun(0, 0, false);
-    this.addItem(machineGunItem);
+    this.addItem(new Revolver(0, 0, false));
+    this.addItem(new Pistol(0, 0, false));
+    this.addItem(new MachineGun(0, 0, false));
+    this.addItem(new Carbine(0, 0, false));
+    this.addItem(new Rifle(0, 0, false));
 
-    var healthPackItem = new HealthPack(0, 0, 5);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 20);
-    this.addItem(healthPackItem);
-    healthPackItem = new HealthPack(0, 0, 50);
-    this.addItem(healthPackItem);
+    this.addItem(new HealthPack(0, 0, 5));
+    this.addItem(new HealthPack(0, 0, 20));
+    this.addItem(new HealthPack(0, 0, 50));
 
     var carsKey = ['car', 'jeep', 'bus', 'truck', 'taxi', 'ambulance'];
     var i;
@@ -2520,7 +2530,7 @@ Store.prototype.open = function() {
 };
 module.exports = Store;
 
-},{"../HealthPack":19,"../ItemsPopUp":22,"../weapons/MachineGun":34,"../weapons/Revolver":35,"./StoreItem":26}],26:[function(require,module,exports){
+},{"../HealthPack":19,"../ItemsPopUp":22,"../weapons/Carbine":34,"../weapons/MachineGun":35,"../weapons/Pistol":36,"../weapons/Revolver":37,"../weapons/Rifle":38,"./StoreItem":26}],26:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 17/07/2015.
  */
@@ -2560,7 +2570,7 @@ StoreItem.prototype.updatePriceText = function() {
 StoreItem.prototype.buttonAction = function() {
     var successfulPurchase = level.player.buyItem(this.item);
     if (successfulPurchase) {
-        level.inventory.addItem(this.item);
+        this.item.use();
         level.showSuccessMessage('Successful Purchase!', this.parent);
         this.parentView.updateMoney();
     }else {
@@ -2788,7 +2798,7 @@ InteractiveCar.prototype.use = function() {
 
 module.exports = InteractiveCar;
 
-},{"../../util/Button":51,"../../util/ResourceBar":62,"./VocabularyItem":29}],29:[function(require,module,exports){
+},{"../../util/Button":54,"../../util/ResourceBar":66,"./VocabularyItem":29}],29:[function(require,module,exports){
 
 /**
  * @ignore Created by Edwin Gamboa on 06/11/2015.
@@ -3085,7 +3095,7 @@ VocabularyItem.prototype.setProperties = function(key) {
 module.exports = VocabularyItem;
 
 
-},{"../../util/VerticalLayoutPopUp":66,"./../Item":20}],30:[function(require,module,exports){
+},{"../../util/VerticalLayoutPopUp":70,"./../Item":20}],30:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 08/12/2015.
  */
@@ -3259,7 +3269,7 @@ MyVocabulary.prototype.loadVocabulary = function() {
 
 module.exports = MyVocabulary;
 
-},{"../../util/Utilities":63,"../ItemsPopUp":22,"../vocabularyItems/VocabularyItem":29,"./MyVocabularyItem":32}],32:[function(require,module,exports){
+},{"../../util/Utilities":67,"../ItemsPopUp":22,"../vocabularyItems/VocabularyItem":29,"./MyVocabularyItem":32}],32:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 29/11/2015.
  */
@@ -3325,7 +3335,7 @@ MyVocabularyItem.prototype.addLearnedIcon = function() {
 
 module.exports = MyVocabularyItem;
 
-},{"../../util/Button":51,"../../util/VerticalLayoutPanel":65}],33:[function(require,module,exports){
+},{"../../util/Button":54,"../../util/VerticalLayoutPanel":69}],33:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 10/07/2015.
  */
@@ -3356,6 +3366,96 @@ module.exports = Bullet;
 
 },{}],34:[function(require,module,exports){
 /**
+ * @ignore Created by Edwin Gamboa on 06/03/2016.
+ */
+
+var Weapon = require('./Weapon');
+
+/**
+ * Default number of bullets for this weapon.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_NUMBER_OF_BULLETS = 30;
+/**
+ * Texture's key for this weapon.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_KEY = 'carbine';
+/**
+ * Texture's key for this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_BULLET_KEY = 'bullet2';
+/**
+ * The time player is allowed to shoot again.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_NEXT_FIRE = 1;
+/**
+ * This weapon bullets' speed
+ * @constant
+ * @type {number}
+ */
+var CARBINE_BULLET_SPEED = 400;
+/**
+ * Rate at which this weapon fires, the lower the number, the higher the firing
+ * rate.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_FIRE_RATE = 270;
+/**
+ * Damage that can cause this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var CARBINE_BULLET_POWER = 3;
+/**
+ * The price that this weapon costs.
+ * @constant
+ * @type {number}
+ */
+var PRICE = 90;
+
+/**
+ * Represents a Carbine, which is a  kind of a Weapon.
+ * @class Carbine
+ * @extends Weapon
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ */
+var Carbine = function(x, y, infinite) {
+    Weapon.call(
+        this,
+        x,
+        y,
+        CARBINE_NUMBER_OF_BULLETS,
+        CARBINE_KEY,
+        CARBINE_BULLET_KEY,
+        CARBINE_NEXT_FIRE,
+        CARBINE_BULLET_SPEED,
+        CARBINE_FIRE_RATE,
+        CARBINE_BULLET_POWER,
+        infinite,
+        PRICE
+    );
+    this.name = 'Carbine';
+};
+
+Carbine.prototype = Object.create(Weapon.prototype);
+Carbine.prototype.constructor = Carbine;
+
+module.exports = Carbine;
+
+},{"./Weapon":39}],35:[function(require,module,exports){
+/**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
 var Weapon = require('./Weapon');
@@ -3365,7 +3465,7 @@ var Weapon = require('./Weapon');
  * @constant
  * @type {number}
  */
-var MACHINE_GUN_NUMBER_OF_BULLETS = 30;
+var MACHINE_GUN_NUMBER_OF_BULLETS = 40;
 /**
  * Texture's key for this weapon.
  * @constant
@@ -3408,7 +3508,7 @@ var MACHINE_GUN_BULLET_POWER = 2;
  * @constant
  * @type {number}
  */
-var PRICE = 30;
+var PRICE = 50;
 
 /**
  * Represents a MachineGun, which is a  kind of a Weapon.
@@ -3443,7 +3543,97 @@ MachineGun.prototype.constructor = MachineGun;
 
 module.exports = MachineGun;
 
-},{"./Weapon":36}],35:[function(require,module,exports){
+},{"./Weapon":39}],36:[function(require,module,exports){
+/**
+ * @ignore Created by Edwin Gamboa on 06/03/2016.
+ */
+
+var Weapon = require('./Weapon');
+
+/**
+ * Default number of bullets for this weapon.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_NUMBER_OF_BULLETS = 20;
+/**
+ * Texture's key for this weapon.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_KEY = 'pistol';
+/**
+ * Texture's key for this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_BULLET_KEY = 'bullet2';
+/**
+ * The time player is allowed to shoot again.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_NEXT_FIRE = 1;
+/**
+ * This weapon bullets' speed
+ * @constant
+ * @type {number}
+ */
+var PISTOL_BULLET_SPEED = 400;
+/**
+ * Rate at which this weapon fires, the lower the number, the higher the firing
+ * rate.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_FIRE_RATE = 250;
+/**
+ * Damage that can cause this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var PISTOL_BULLET_POWER = 2;
+/**
+ * The price that this weapon costs.
+ * @constant
+ * @type {number}
+ */
+var PRICE = 30;
+
+/**
+ * Represents a Pistol, which is a  kind of a Weapon.
+ * @class Pistol
+ * @extends Weapon
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ */
+var Pistol = function(x, y, infinite) {
+    Weapon.call(
+        this,
+        x,
+        y,
+        PISTOL_NUMBER_OF_BULLETS,
+        PISTOL_KEY,
+        PISTOL_BULLET_KEY,
+        PISTOL_NEXT_FIRE,
+        PISTOL_BULLET_SPEED,
+        PISTOL_FIRE_RATE,
+        PISTOL_BULLET_POWER,
+        infinite,
+        PRICE
+    );
+    this.name = 'Pistol';
+};
+
+Pistol.prototype = Object.create(Weapon.prototype);
+Pistol.prototype.constructor = Pistol;
+
+module.exports = Pistol;
+
+},{"./Weapon":39}],37:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
@@ -3478,7 +3668,7 @@ var REVOLVER_NEXT_FIRE = 1;
  * @constant
  * @type {number}
  */
-var REVOLVER_BULLET_SPEED = 300;
+var REVOLVER_BULLET_SPEED = 600;
 /**
  * Rate at which this weapon fires, the lower the number, the higher the firing
  * rate.
@@ -3532,7 +3722,97 @@ Revolver.prototype.constructor = Revolver;
 
 module.exports = Revolver;
 
-},{"./Weapon":36}],36:[function(require,module,exports){
+},{"./Weapon":39}],38:[function(require,module,exports){
+/**
+ * @ignore Created by Edwin Gamboa on 06/03/2016.
+ */
+
+var Weapon = require('./Weapon');
+
+/**
+ * Default number of bullets for this weapon.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_NUMBER_OF_BULLETS = 30;
+/**
+ * Texture's key for this weapon.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_KEY = 'rifle';
+/**
+ * Texture's key for this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_BULLET_KEY = 'bullet1';
+/**
+ * The time player is allowed to shoot again.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_NEXT_FIRE = 1;
+/**
+ * This weapon bullets' speed
+ * @constant
+ * @type {number}
+ */
+var RIFLE_BULLET_SPEED = 400;
+/**
+ * Rate at which this weapon fires, the lower the number, the higher the firing
+ * rate.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_FIRE_RATE = 270;
+/**
+ * Damage that can cause this weapon bullets.
+ * @constant
+ * @type {number}
+ */
+var RIFLE_BULLET_POWER = 4;
+/**
+ * The price that this weapon costs.
+ * @constant
+ * @type {number}
+ */
+var PRICE = 120;
+
+/**
+ * Represents a Rifle, which is a  kind of a Weapon.
+ * @class Rifle
+ * @extends Weapon
+ * @constructor
+ * @param {number} x - Weapon's x coordinate within the game world.
+ * @param {number} y - Weapon's y coordinate within the game world.
+ * @param {boolean} infinite - Indicates weather this weapon has infinite
+ * bullets or not.
+ */
+var Rifle = function(x, y, infinite) {
+    Weapon.call(
+        this,
+        x,
+        y,
+        RIFLE_NUMBER_OF_BULLETS,
+        RIFLE_KEY,
+        RIFLE_BULLET_KEY,
+        RIFLE_NEXT_FIRE,
+        RIFLE_BULLET_SPEED,
+        RIFLE_FIRE_RATE,
+        RIFLE_BULLET_POWER,
+        infinite,
+        PRICE
+    );
+    this.name = 'Rifle';
+};
+
+Rifle.prototype = Object.create(Weapon.prototype);
+Rifle.prototype.constructor = Rifle;
+
+module.exports = Rifle;
+
+},{"./Weapon":39}],39:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa
  */
@@ -3700,7 +3980,7 @@ Weapon.prototype.saveWeapon = function() {
 
 module.exports = Weapon;
 
-},{"../Item":20,"./Bullet":33}],37:[function(require,module,exports){
+},{"../Item":20,"./Bullet":33}],40:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 25/10/2015.
  */
@@ -3728,7 +4008,7 @@ game.state.add('levelThree', LevelThree);
 game.state.add('intro', Intro);
 game.state.start('boot');
 
-},{"./states/Boot":38,"./states/Menu":39,"./states/Preloader":40,"./states/levels/Intro":42,"./states/levels/LevelOne":44,"./states/levels/LevelThree":45,"./states/levels/LevelTwo":46}],38:[function(require,module,exports){
+},{"./states/Boot":41,"./states/Menu":42,"./states/Preloader":43,"./states/levels/Intro":45,"./states/levels/LevelOne":47,"./states/levels/LevelThree":48,"./states/levels/LevelTwo":49}],41:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 07/07/2015.
  */
@@ -3764,7 +4044,7 @@ Boot.prototype.create = function() {
 
 module.exports = Boot;
 
-},{}],39:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 08/07/2015.
  */
@@ -3820,7 +4100,7 @@ Menu.prototype.continuePlaying = function() {
 
 module.exports = Menu;
 
-},{"../util/Button":51}],40:[function(require,module,exports){
+},{"../util/Button":54}],43:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 08/07/2015.
  */
@@ -3874,7 +4154,17 @@ Preloader.prototype.displayLoadScreen = function() {
  * @method Preloader.loadAssets
  */
 Preloader.prototype.loadAssets = function() {
-    //Menu assets
+    //UI assets
+    this.game.load.spritesheet('arrowKeysJump',
+        'assets/sprites/arrowKeysJump.png', 122, 80);
+    this.game.load.spritesheet('arrowKeysMove',
+        'assets/sprites/arrowKeysMove.png', 122, 80);
+    this.game.load.spritesheet('arrowKeysRun',
+        'assets/sprites/arrowKeysRun.png', 190, 80);
+    this.game.load.spritesheet('spaceBar', 'assets/sprites/spaceBar.png',
+        138, 80);
+    this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
+        80, 80);
     //Level assets
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
@@ -3890,6 +4180,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('itemGroupBg', 'assets/images/itemGroupBg.png');
     this.game.load.image('myVocabularyItemBg',
         'assets/images/myVocabularyItemBg.png');
+    this.game.load.image('dialogBgSmall', 'assets/images/dialogBgSmall.png');
     this.game.load.image('dialogBg', 'assets/images/dialogBg.png');
     this.game.load.image('errorIcon', 'assets/images/errorIcon.png');
     this.game.load.image('successIcon', 'assets/images/successIcon.png');
@@ -3923,9 +4214,15 @@ Preloader.prototype.loadAssets = function() {
         144);
 
     this.game.load.spritesheet('revolver', 'assets/sprites/revolver.png',
-        30, 16);
+        54, 30);
     this.game.load.spritesheet('machineGun',
-        'assets/sprites/machineGun.png', 60, 42);
+        'assets/sprites/machineGun.png', 43, 40);
+    this.game.load.spritesheet('pistol',
+        'assets/sprites/pistol.png', 47, 30);
+    this.game.load.spritesheet('carbine',
+        'assets/sprites/carbine.png', 119, 30);
+    this.game.load.spritesheet('rifle',
+        'assets/sprites/rifle.png', 137, 35);
 
     var i;
     for (i = 1; i <= 2; i++) {
@@ -4063,9 +4360,9 @@ Preloader.prototype.onLoadComplete = function() {
 
 module.exports = Preloader;
 
-},{}],41:[function(require,module,exports){
-arguments[4][38][0].apply(exports,arguments)
-},{"dup":38}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
+arguments[4][41][0].apply(exports,arguments)
+},{"dup":41}],45:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
@@ -4200,7 +4497,7 @@ Intro.prototype.nextWord = function() {
 
 module.exports = Intro;
 
-},{"../../util/Button":51}],43:[function(require,module,exports){
+},{"../../util/Button":54}],46:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 22/06/2015.
  */
@@ -4249,6 +4546,7 @@ Level.prototype.preload = function() {
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    this.CAMERA_WIDTH = this.game.camera.width;
     this.font = level.font;
     level = this;
 };
@@ -5128,7 +5426,7 @@ Level.prototype.createInteractiveCar = function(carKey) {
         case 'car':
             return new InteractiveCar(0, 0, carKey, 60, 300, 200);
         case 'jeep':
-            return new InteractiveCar(0, 0, carKey, 100, 350, 400);
+            return new InteractiveCar(0, 0, carKey, 100, 350, 180);
         case 'bus':
             return new InteractiveCar(0, 0, carKey, 300, 400, 450);
         case 'truck':
@@ -5151,7 +5449,7 @@ Level.prototype.playerWins = function() {
 
 module.exports = Level;
 
-},{"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../character/StrongestEnemy":9,"../../englishChallenges/menu/EnglishChallengesMenu":17,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":31,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/InteractiveCar":28,"../../items/vocabularyItems/WorldItem":30,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":52,"../../util/HorizontalLayoutPanel":57,"../../util/IconButton":59,"../../util/InteractionManager":60,"../../util/PopUp":61,"../../util/ResourceBar":62,"../../worldElements/InteractiveHouse":67,"../../worldElements/NameBoard":68}],44:[function(require,module,exports){
+},{"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../character/StrongestEnemy":9,"../../englishChallenges/menu/EnglishChallengesMenu":17,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":31,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/InteractiveCar":28,"../../items/vocabularyItems/WorldItem":30,"../../items/weapons/MachineGun":35,"../../items/weapons/Revolver":37,"../../util/Dialog":55,"../../util/HorizontalLayoutPanel":60,"../../util/IconButton":62,"../../util/InteractionManager":63,"../../util/PopUp":65,"../../util/ResourceBar":66,"../../worldElements/InteractiveHouse":71,"../../worldElements/NameBoard":72}],47:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 22/07/2015.
  */
@@ -5163,6 +5461,7 @@ var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
 var InteractionManager = require('../../util/InteractionManager');
 var ClueItem = require('../../items/vocabularyItems/ClueItem');
 var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
+var NonPauseDialog = require('../../util/NonPauseDialog');
 
 /**
  * Number of fights that player will have during this level.
@@ -5207,12 +5506,36 @@ LevelOne.prototype.create = function() {
     this.addEnemies();
     this.createWeapons();
     this.addClueItems();
-    this.addLevelCar('jeep', 3.5 * this.checkPointsDistance);
+    this.addLevelCar('jeep', 4.4 * this.checkPointsDistance);
     this.addHealthPacks();
+    this.addTutorialInstructions();
+};
+
+/**
+ * Add instructions to guide the player
+ * @method LevelOne.addTutorialInstructions
+ */
+LevelOne.prototype.addTutorialInstructions = function() {
+    var howToMoveDialog = new NonPauseDialog(50, 70, 'dialogBgSmall', null,
+        '', 8, 'Move using arrow keys', 'arrowKeysMove', true, false);
+    howToMoveDialog.open();
+    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH, 70, 'dialogBgSmall',
+        null, '', 8, 'Shoot using the Space Bar', 'spaceBar', true, false);
+    howToShoot.open();
+    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 3, 70,
+        'dialogBgSmall', null, '', 8, 'Run using X and arrow keys',
+        'arrowKeysRun',
+        true, false);
+    howToRun.open();
+    var howToJump = new NonPauseDialog(this.CAMERA_WIDTH * 4, 70,
+        'dialogBgSmall', null, '', 8, 'Jump using Up key', 'arrowKeysJump',
+        true, false);
+    howToJump.open();
 };
 
 /**
  * Creates the needed arrays to add level weapons
+ * @method LevelOne.createWeapons
  */
 LevelOne.prototype.createWeapons = function() {
     this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
@@ -5221,7 +5544,7 @@ LevelOne.prototype.createWeapons = function() {
 
 /**
  * Add ClueItems for this level.
- * @method LevelOne.createWeapons
+ * @method LevelOne.addClueItems
  */
 LevelOne.prototype.addClueItems = function() {
     var messages = ['Oh Great, those are my wife\'s glasses!'];
@@ -5239,7 +5562,7 @@ LevelOne.prototype.addClueItems = function() {
     imagesKeys = ['watch'];
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addClueItem(this.WORLD_WIDTH / 2, 'watch', interactionManager);
+    this.addClueItem(this.WORLD_WIDTH / 1.5, 'watch', interactionManager);
 };
 
 /**
@@ -5254,6 +5577,12 @@ LevelOne.prototype.addInteractiveBuildings = function() {
         imagesKeys);
     this.addInteractiveHouse(this.firstCheckPointX * 1.55, 'store',
         interactionManager);
+    var storeArrow = this.game.make.sprite(-90,
+        interactionManager.dialogs[0].height - 20 , 'arrowDown');
+    storeArrow.anchor.set(0, 1);
+    storeArrow.animations.add('animation', [0, 1], 1, true);
+    storeArrow.animations.play('animation');
+    interactionManager.dialogs[0].addChild(storeArrow);
 
     messages = ['Your family is now somewhere else.',
         'Continue trying, because this game is just starting!'];
@@ -5306,7 +5635,7 @@ LevelOne.prototype.createPlaces = function() {
 
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":52,"../../util/InteractionManager":60,"../../util/VerticalLayoutPopUp":66,"../../worldElements/InteractiveHouse":67,"./Level":43}],45:[function(require,module,exports){
+},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"./Level":46}],48:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 19/11/2015.
  */
@@ -5496,7 +5825,7 @@ LevelThree.prototype.liberateFamilyMember = function() {
 
 module.exports = LevelThree;
 
-},{"../../character/Friend":3,"../../character/Wife":10,"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":52,"../../util/InteractionManager":60,"../../util/VerticalLayoutPopUp":66,"../../worldElements/InteractiveHouse":67,"./Level":43}],46:[function(require,module,exports){
+},{"../../character/Friend":3,"../../character/Wife":10,"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"./Level":46}],49:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 05/11/2015.
  */
@@ -5638,15 +5967,15 @@ LevelTwo.prototype.addStaticBuildings = function() {
 
 module.exports = LevelTwo;
 
-},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":52,"../../util/InteractionManager":60,"../../util/VerticalLayoutPopUp":66,"./Level":43}],47:[function(require,module,exports){
+},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/VerticalLayoutPopUp":70,"./Level":46}],50:[function(require,module,exports){
+arguments[4][46][0].apply(exports,arguments)
+},{"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../character/StrongestEnemy":9,"../../englishChallenges/menu/EnglishChallengesMenu":17,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":31,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/InteractiveCar":28,"../../items/vocabularyItems/WorldItem":30,"../../items/weapons/MachineGun":35,"../../items/weapons/Revolver":37,"../../util/Dialog":55,"../../util/HorizontalLayoutPanel":60,"../../util/IconButton":62,"../../util/InteractionManager":63,"../../util/PopUp":65,"../../util/ResourceBar":66,"../../worldElements/InteractiveHouse":71,"../../worldElements/NameBoard":72,"dup":46}],51:[function(require,module,exports){
+arguments[4][47][0].apply(exports,arguments)
+},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"./Level":46,"dup":47}],52:[function(require,module,exports){
+arguments[4][42][0].apply(exports,arguments)
+},{"../util/Button":54,"dup":42}],53:[function(require,module,exports){
 arguments[4][43][0].apply(exports,arguments)
-},{"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../character/StrongestEnemy":9,"../../englishChallenges/menu/EnglishChallengesMenu":17,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":31,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/InteractiveCar":28,"../../items/vocabularyItems/WorldItem":30,"../../items/weapons/MachineGun":34,"../../items/weapons/Revolver":35,"../../util/Dialog":52,"../../util/HorizontalLayoutPanel":57,"../../util/IconButton":59,"../../util/InteractionManager":60,"../../util/PopUp":61,"../../util/ResourceBar":62,"../../worldElements/InteractiveHouse":67,"../../worldElements/NameBoard":68,"dup":43}],48:[function(require,module,exports){
-arguments[4][44][0].apply(exports,arguments)
-},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":52,"../../util/InteractionManager":60,"../../util/VerticalLayoutPopUp":66,"../../worldElements/InteractiveHouse":67,"./Level":43,"dup":44}],49:[function(require,module,exports){
-arguments[4][39][0].apply(exports,arguments)
-},{"../util/Button":51,"dup":39}],50:[function(require,module,exports){
-arguments[4][40][0].apply(exports,arguments)
-},{"dup":40}],51:[function(require,module,exports){
+},{"dup":43}],54:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 10/10/2015.
  */
@@ -5687,7 +6016,7 @@ Button.prototype.constructor = Button;
 
 module.exports = Button;
 
-},{}],52:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
@@ -5738,7 +6067,7 @@ Dialog.prototype.setText = function(text) {
 
 module.exports = Dialog;
 
-},{"./HorizontalLayoutPopUp":58}],53:[function(require,module,exports){
+},{"./HorizontalLayoutPopUp":61}],56:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5821,7 +6150,7 @@ GridLayout.prototype.restartIndexes = function() {
 
 module.exports = GridLayout;
 
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5891,7 +6220,7 @@ GridLayoutPanel.prototype.removeAllElements = function() {
 
 module.exports = GridLayoutPanel;
 
-},{"./GridLayout":53}],55:[function(require,module,exports){
+},{"./GridLayout":56}],58:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
@@ -5959,7 +6288,7 @@ GridLayoutPopUp.prototype.restartPositions = function() {
 
 module.exports = GridLayoutPopUp;
 
-},{"./GridLayout":53,"./PopUp":61}],56:[function(require,module,exports){
+},{"./GridLayout":56,"./PopUp":65}],59:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
@@ -6012,7 +6341,7 @@ HorizontalLayout.prototype.restartPosition = function() {
 
 module.exports = HorizontalLayout;
 
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
@@ -6052,7 +6381,7 @@ HorizontalLayoutPanel.prototype.addElement = function(element) {
 
 module.exports = HorizontalLayoutPanel;
 
-},{"./HorizontalLayout":56}],58:[function(require,module,exports){
+},{"./HorizontalLayout":59}],61:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 11/10/2015.
  */
@@ -6098,7 +6427,7 @@ HorizontalLayoutPopUP.prototype.restartPositions = function() {
 module.exports = HorizontalLayoutPopUP;
 
 
-},{"./HorizontalLayout":56,"./PopUp":61}],59:[function(require,module,exports){
+},{"./HorizontalLayout":59,"./PopUp":65}],62:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 10/01/2016.
  */
@@ -6137,7 +6466,7 @@ IconButton.prototype.constructor = IconButton;
 
 module.exports = IconButton;
 
-},{"../util/VerticalLayoutPanel":65}],60:[function(require,module,exports){
+},{"../util/VerticalLayoutPanel":69}],63:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 20/12/2015.
  */
@@ -6191,7 +6520,61 @@ InteractionManager.prototype.openDialogs = function() {
 
 module.exports = InteractionManager;
 
-},{"../util/VerticalLayoutPopUp":66}],61:[function(require,module,exports){
+},{"../util/VerticalLayoutPopUp":70}],64:[function(require,module,exports){
+/**
+ * @ignore Created by Edwin Gamboa on 06/03/2016.
+ */
+
+var VerticalLayoutPopUp = require('./VerticalLayoutPopUp');
+
+var NonPauseDialog = function(x, y, backgroundKey, parent, title, margin, text,
+                              iconKey, animated, fixedToCamera) {
+    VerticalLayoutPopUp.call(this, backgroundKey, parent, title, margin);
+    this.x = x;
+    this.y = y;
+    this.icon = level.game.make.sprite(0, 0, iconKey);
+    var dialogText = level.game.make.text(0, 0, text);
+    dialogText.font = level.font;
+    dialogText.fontSize = 16;
+    dialogText.fill = '#000000';
+    dialogText.align = 'center';
+    this.addElement(this.icon);
+    this.addElement(dialogText);
+    if (animated) {
+        this.icon.animations.add('animation', [0, 1], 1, true);
+        this.icon.animations.play('animation');
+    }
+    this.fixedToCamera = fixedToCamera;
+    level.game.add.existing(this);
+};
+
+NonPauseDialog.prototype = Object.create(VerticalLayoutPopUp.prototype);
+NonPauseDialog.prototype.constructor = NonPauseDialog;
+
+/**
+ * Closes or disposes this PopUp window.
+ * @method NonPauseDialog.close
+ */
+NonPauseDialog.prototype.close = function() {
+    this.visible = false;
+    this.kill();
+};
+
+/**
+ * Opens or displays this PopUp window.
+ * @method NonPauseDialog.open
+ */
+NonPauseDialog.prototype.open = function() {
+    if (!this.alive) {
+        this.revive();
+    }
+    this.bringToTop();
+    this.visible = true;
+};
+
+module.exports = NonPauseDialog;
+
+},{"./VerticalLayoutPopUp":70}],65:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 16/07/2015.
  */
@@ -6288,7 +6671,7 @@ PopUp.prototype.removeAllElements = function() {
 
 module.exports = PopUp;
 
-},{}],62:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 15/10/2015.
  */
@@ -6329,7 +6712,7 @@ ResourceBar.prototype.updateResourceBarLevel = function(barLevel) {
 
 module.exports = ResourceBar;
 
-},{}],63:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -6366,7 +6749,7 @@ Utilities.prototype.randomIndexesArray = function(size) {
 
 module.exports = Utilities;
 
-},{}],64:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -6419,7 +6802,7 @@ VerticalLayout.prototype.restartPosition = function() {
 
 module.exports = VerticalLayout;
 
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 13/10/2015.
  */
@@ -6473,7 +6856,7 @@ VerticalLayoutPanel.prototype.restartPosition = function() {
 module.exports = VerticalLayoutPanel;
 
 
-},{"./VerticalLayout":64}],66:[function(require,module,exports){
+},{"./VerticalLayout":68}],70:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 21/10/2015.
  */
@@ -6492,7 +6875,10 @@ var VerticalLayout = require('./VerticalLayout');
  */
 var VerticalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
-    var yOrigin = this.title.y + this.title.height || 0;
+    var yOrigin = 0;
+    if (title !== '') {
+        yOrigin = this.title.y + this.title.height;
+    }
     this.layout = new VerticalLayout(this, margin, yOrigin);
 };
 
@@ -6519,7 +6905,7 @@ VerticalLayoutPopUP.prototype.restartPositions = function() {
 
 module.exports = VerticalLayoutPopUP;
 
-},{"./PopUp":61,"./VerticalLayout":64}],67:[function(require,module,exports){
+},{"./PopUp":65,"./VerticalLayout":68}],71:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
@@ -6565,7 +6951,7 @@ InteractiveHouse.prototype.pickUp = function() {
 
 module.exports = InteractiveHouse;
 
-},{"../items/vocabularyItems/VocabularyItem":29,"../util/Button":51}],68:[function(require,module,exports){
+},{"../items/vocabularyItems/VocabularyItem":29,"../util/Button":54}],72:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 25/10/2015.
  */
@@ -6597,4 +6983,4 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,31,32,27,28,29,30,33,34,35,36,37,41,42,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68]);
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,31,32,27,28,29,30,33,34,35,36,37,38,39,40,44,45,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72]);

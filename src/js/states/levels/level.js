@@ -46,6 +46,7 @@ Level.prototype.preload = function() {
     this.WORLD_WIDTH = 8000;
     this.WORLD_HEIGHT = 500;
     this.GROUND_HEIGHT = this.WORLD_HEIGHT - 100;
+    this.CAMERA_WIDTH = this.game.camera.width;
     this.font = level.font;
     level = this;
 };
@@ -925,7 +926,7 @@ Level.prototype.createInteractiveCar = function(carKey) {
         case 'car':
             return new InteractiveCar(0, 0, carKey, 60, 300, 200);
         case 'jeep':
-            return new InteractiveCar(0, 0, carKey, 100, 350, 400);
+            return new InteractiveCar(0, 0, carKey, 100, 350, 180);
         case 'bus':
             return new InteractiveCar(0, 0, carKey, 300, 400, 450);
         case 'truck':

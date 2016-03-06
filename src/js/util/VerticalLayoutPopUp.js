@@ -16,7 +16,10 @@ var VerticalLayout = require('./VerticalLayout');
  */
 var VerticalLayoutPopUP = function(backgroundKey, parent, title, margin) {
     PopUp.call(this, backgroundKey, parent, title);
-    var yOrigin = this.title.y + this.title.height || 0;
+    var yOrigin = 0;
+    if (title !== '') {
+        yOrigin = this.title.y + this.title.height;
+    }
     this.layout = new VerticalLayout(this, margin, yOrigin);
 };
 
