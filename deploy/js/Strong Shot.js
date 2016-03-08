@@ -679,6 +679,9 @@ module.exports = NPC;
 var Character = require('./Character');
 var Revolver = require('../items/weapons/Revolver');
 var MachineGun = require('../items/weapons/MachineGun');
+var Rifle = require('../items/weapons/Rifle');
+var Carbine = require('../items/weapons/Carbine');
+var Pistol = require('../items/weapons/Pistol');
 
 /**
  * Default player speed
@@ -921,16 +924,31 @@ Player.prototype.loadWeapons = function() {
         weapon.numberOfBullets = parseInt(localStorage.getItem('revolver'));
         this.loadWeapon(weapon);
     }
+    if (localStorage.getItem('pistol') !== null) {
+        weapon = new Pistol(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('pistol'));
+        this.loadWeapon(weapon);
+    }
     if (localStorage.getItem('machineGun') !== null) {
         weapon = new MachineGun(700, 100, false);
         weapon.numberOfBullets = parseInt(localStorage.getItem('machineGun'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('carbine') !== null) {
+        weapon = new Carbine(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('carbine'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('rifle') !== null) {
+        weapon = new Rifle(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('rifle'));
         this.loadWeapon(weapon);
     }
 };
 
 module.exports = Player;
 
-},{"../items/weapons/MachineGun":35,"../items/weapons/Revolver":37,"./Character":1}],7:[function(require,module,exports){
+},{"../items/weapons/Carbine":34,"../items/weapons/MachineGun":35,"../items/weapons/Pistol":36,"../items/weapons/Revolver":37,"../items/weapons/Rifle":38,"./Character":1}],7:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 23/07/2015.
  */
@@ -6527,6 +6545,23 @@ module.exports = InteractionManager;
 
 var VerticalLayoutPopUp = require('./VerticalLayoutPopUp');
 
+/**
+ * Represents a game weapon for characters.
+ * @class NonPauseDialog
+ * @extends VerticalLayoutPopUp
+ * @constructor
+ * @param {number} x - X coordinate to locate the dialog.
+ * @param {number} y - Y coordinate to locate the dialog.
+ * @param {string} backgroundKey - Texture key for the dialog's background.
+ * @param {Sprite} parent - Parent view of this dialog.
+ * @param {string} title - Title of this dialog.
+ * @param {number} margin - Margin between the elements of this dialog.
+ * @param {string} text - Message of this dialog.
+ * @param {string} iconKey - Texture key for the image or icon of this dialog.
+ * @param {boolean} animated - Indicates if the icon should be animated.
+ * @param {boolean} fixedToCamera - Indicates if the dialog should be fixed to
+ * the camera.
+ */
 var NonPauseDialog = function(x, y, backgroundKey, parent, title, margin, text,
                               iconKey, animated, fixedToCamera) {
     VerticalLayoutPopUp.call(this, backgroundKey, parent, title, margin);

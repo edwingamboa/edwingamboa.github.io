@@ -4,6 +4,9 @@
 var Character = require('./Character');
 var Revolver = require('../items/weapons/Revolver');
 var MachineGun = require('../items/weapons/MachineGun');
+var Rifle = require('../items/weapons/Rifle');
+var Carbine = require('../items/weapons/Carbine');
+var Pistol = require('../items/weapons/Pistol');
 
 /**
  * Default player speed
@@ -246,9 +249,24 @@ Player.prototype.loadWeapons = function() {
         weapon.numberOfBullets = parseInt(localStorage.getItem('revolver'));
         this.loadWeapon(weapon);
     }
+    if (localStorage.getItem('pistol') !== null) {
+        weapon = new Pistol(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('pistol'));
+        this.loadWeapon(weapon);
+    }
     if (localStorage.getItem('machineGun') !== null) {
         weapon = new MachineGun(700, 100, false);
         weapon.numberOfBullets = parseInt(localStorage.getItem('machineGun'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('carbine') !== null) {
+        weapon = new Carbine(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('carbine'));
+        this.loadWeapon(weapon);
+    }
+    if (localStorage.getItem('rifle') !== null) {
+        weapon = new Rifle(700, 100, false);
+        weapon.numberOfBullets = parseInt(localStorage.getItem('rifle'));
         this.loadWeapon(weapon);
     }
 };
