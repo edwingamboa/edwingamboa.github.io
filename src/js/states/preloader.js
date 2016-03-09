@@ -61,7 +61,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('spaceBar', 'assets/sprites/spaceBar.png',
         138, 80);
     this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
-        80, 80);
+        77, 90);
     //Level assets
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
@@ -134,6 +134,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('openDoor', 'assets/images/openDoor.png');
     this.game.load.image('working', 'assets/images/working.png');
     this.game.load.image('addCashButton', 'assets/images/addCash.png');
+    this.game.load.image('addCashBig', 'assets/images/addCashBig.png');
     this.game.load.image('myVocabularyButton',
         'assets/images/myVocabulary.png');
     this.game.load.image('button', 'assets/images/button.png');

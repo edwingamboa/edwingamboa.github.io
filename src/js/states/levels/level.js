@@ -67,7 +67,9 @@ Level.prototype.create = function() {
     this.addPlatforms();
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
-    this.createOtherItemsGroup();
+    this.createVocabularyItemsGroup();
+    this.createInteractiveBuildingsGroup();
+    this.createTriggerSpritesGroup();
     this.createCarsGroup();
     this.createNpcsGroup();
     this.createEnemiesGroup();
@@ -161,6 +163,10 @@ Level.prototype.update = function() {
         this.crashEnemy, null, this);
     this.game.physics.arcade.overlap(this.player, this.vocabularyItems,
         this.collectVocabularyItem, null, this);
+    this.game.physics.arcade.overlap(this.player, this.interactiveBuldings,
+        this.openActivity, null, this);
+    this.game.physics.arcade.overlap(this.player, this.triggerSprites,
+        this.triggerAction, null, this);
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
             this.enemies,
@@ -318,17 +324,24 @@ Level.prototype.addLevelCar = function(key, x) {
 /**
  * Adds a new InteractiveHouse to the level.
  * @method Level.addInteractiveHouse
- * @param {number} x - X coordinate within the world where the house should
- * appear.
- * @param {string} key - House texture key.
- * @param {InteractionManager} interactionManager - Interaction manager that
- * allows interaction with the player.
+ * @param {InteractiveHouse} house - Interactive house to be added.
+ * @param {boolean} withNeighbors - Indicates whether the building should have
+ * neighbors or not.
  */
-Level.prototype.addInteractiveHouse = function(x, key, interactionManager) {
-    var house = new InteractiveHouse(x, this.GROUND_HEIGHT, key,
-        interactionManager);
-    this.addVocabularyItem(house);
-    this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+Level.prototype.addInteractiveHouse = function(house, withNeighbors) {
+    this.interactiveBuldings.add(house);
+    if (withNeighbors) {
+        this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+    }
+};
+
+/**
+ * Adds a new TriggerSprite to the level.
+ * @method Level.addTriggerSprite
+ * @param {TriggerSprite} house - Trigger Sprite to be added.
+ */
+Level.prototype.addTriggerSprite = function(sprite) {
+    this.triggerSprites.add(sprite);
 };
 
 /**
@@ -486,12 +499,30 @@ Level.prototype.createHealthPacksGroup = function() {
 };
 
 /**
- * Creates a Phaser group to manage other items.
- * @method Level.createOtherItemsGroup
+ * Creates a Phaser group to manage vocabulary items.
+ * @method Level.createVocabularyItemsGroup
  */
-Level.prototype.createOtherItemsGroup = function() {
+Level.prototype.createVocabularyItemsGroup = function() {
     this.vocabularyItems = this.game.add.group();
     this.gameObjects.push(this.vocabularyItems);
+};
+
+/**
+ * Creates a Phaser group to manage interactive buildings group.
+ * @method Level.createVocabularyItemsGroup
+ */
+Level.prototype.createInteractiveBuildingsGroup = function() {
+    this.interactiveBuldings = this.game.add.group();
+    this.gameObjects.push(this.interactiveBuldings);
+};
+
+/**
+ * Creates a Phaser group to manage trigger sprites group.
+ * @method Level.createTriggerSpritesGroup
+ */
+Level.prototype.createTriggerSpritesGroup = function() {
+    this.triggerSprites = this.game.add.group();
+    this.gameObjects.push(this.triggerSprites);
 };
 
 /**
@@ -654,6 +685,26 @@ Level.prototype.collectItem = function(player, item) {
 Level.prototype.collectVocabularyItem = function(player, vocabularyItem) {
     this.myVocabulary.addItem(vocabularyItem);
     vocabularyItem.pickUp();
+};
+
+/**
+ * Allows the player to interact with an Interactive building.
+ * @method Level.openActivity
+ * @param {Player} player - Game main player.
+ * @param {InteractiveHouse} interactiveBuilding - Bouilding to interact with.
+ */
+Level.prototype.openActivity = function(player, interactiveBuilding) {
+    interactiveBuilding.openActivity();
+};
+
+/**
+ * Trigger the action associated with the sprite.
+ * @method Level.triggerAction
+ * @param {Player} player - Game main player.
+ * @param {TriggerSprite} sprite - Sprite tht triggers the action.
+ */
+Level.prototype.triggerAction = function(player, sprite) {
+    sprite.triggerAction();
 };
 
 /**

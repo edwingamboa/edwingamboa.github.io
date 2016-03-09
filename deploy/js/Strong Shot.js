@@ -4182,7 +4182,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('spaceBar', 'assets/sprites/spaceBar.png',
         138, 80);
     this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
-        80, 80);
+        77, 90);
     //Level assets
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
@@ -4255,6 +4255,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.image('openDoor', 'assets/images/openDoor.png');
     this.game.load.image('working', 'assets/images/working.png');
     this.game.load.image('addCashButton', 'assets/images/addCash.png');
+    this.game.load.image('addCashBig', 'assets/images/addCashBig.png');
     this.game.load.image('myVocabularyButton',
         'assets/images/myVocabulary.png');
     this.game.load.image('button', 'assets/images/button.png');
@@ -4585,7 +4586,9 @@ Level.prototype.create = function() {
     this.addPlatforms();
     this.createBackObjectsGroup();
     this.createHealthPacksGroup();
-    this.createOtherItemsGroup();
+    this.createVocabularyItemsGroup();
+    this.createInteractiveBuildingsGroup();
+    this.createTriggerSpritesGroup();
     this.createCarsGroup();
     this.createNpcsGroup();
     this.createEnemiesGroup();
@@ -4679,6 +4682,10 @@ Level.prototype.update = function() {
         this.crashEnemy, null, this);
     this.game.physics.arcade.overlap(this.player, this.vocabularyItems,
         this.collectVocabularyItem, null, this);
+    this.game.physics.arcade.overlap(this.player, this.interactiveBuldings,
+        this.openActivity, null, this);
+    this.game.physics.arcade.overlap(this.player, this.triggerSprites,
+        this.triggerAction, null, this);
     for (var playerWeaponKey in this.player.weapons) {
         this.game.physics.arcade.overlap(
             this.enemies,
@@ -4836,17 +4843,24 @@ Level.prototype.addLevelCar = function(key, x) {
 /**
  * Adds a new InteractiveHouse to the level.
  * @method Level.addInteractiveHouse
- * @param {number} x - X coordinate within the world where the house should
- * appear.
- * @param {string} key - House texture key.
- * @param {InteractionManager} interactionManager - Interaction manager that
- * allows interaction with the player.
+ * @param {InteractiveHouse} house - Interactive house to be added.
+ * @param {boolean} withNeighbors - Indicates whether the building should have
+ * neighbors or not.
  */
-Level.prototype.addInteractiveHouse = function(x, key, interactionManager) {
-    var house = new InteractiveHouse(x, this.GROUND_HEIGHT, key,
-        interactionManager);
-    this.addVocabularyItem(house);
-    this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+Level.prototype.addInteractiveHouse = function(house, withNeighbors) {
+    this.interactiveBuldings.add(house);
+    if (withNeighbors) {
+        this.addNeighbors(house, 'orangeHouse', 'yellowHouse');
+    }
+};
+
+/**
+ * Adds a new TriggerSprite to the level.
+ * @method Level.addTriggerSprite
+ * @param {TriggerSprite} house - Trigger Sprite to be added.
+ */
+Level.prototype.addTriggerSprite = function(sprite) {
+    this.triggerSprites.add(sprite);
 };
 
 /**
@@ -5004,12 +5018,30 @@ Level.prototype.createHealthPacksGroup = function() {
 };
 
 /**
- * Creates a Phaser group to manage other items.
- * @method Level.createOtherItemsGroup
+ * Creates a Phaser group to manage vocabulary items.
+ * @method Level.createVocabularyItemsGroup
  */
-Level.prototype.createOtherItemsGroup = function() {
+Level.prototype.createVocabularyItemsGroup = function() {
     this.vocabularyItems = this.game.add.group();
     this.gameObjects.push(this.vocabularyItems);
+};
+
+/**
+ * Creates a Phaser group to manage interactive buildings group.
+ * @method Level.createVocabularyItemsGroup
+ */
+Level.prototype.createInteractiveBuildingsGroup = function() {
+    this.interactiveBuldings = this.game.add.group();
+    this.gameObjects.push(this.interactiveBuldings);
+};
+
+/**
+ * Creates a Phaser group to manage trigger sprites group.
+ * @method Level.createTriggerSpritesGroup
+ */
+Level.prototype.createTriggerSpritesGroup = function() {
+    this.triggerSprites = this.game.add.group();
+    this.gameObjects.push(this.triggerSprites);
 };
 
 /**
@@ -5172,6 +5204,26 @@ Level.prototype.collectItem = function(player, item) {
 Level.prototype.collectVocabularyItem = function(player, vocabularyItem) {
     this.myVocabulary.addItem(vocabularyItem);
     vocabularyItem.pickUp();
+};
+
+/**
+ * Allows the player to interact with an Interactive building.
+ * @method Level.openActivity
+ * @param {Player} player - Game main player.
+ * @param {InteractiveHouse} interactiveBuilding - Bouilding to interact with.
+ */
+Level.prototype.openActivity = function(player, interactiveBuilding) {
+    interactiveBuilding.openActivity();
+};
+
+/**
+ * Trigger the action associated with the sprite.
+ * @method Level.triggerAction
+ * @param {Player} player - Game main player.
+ * @param {TriggerSprite} sprite - Sprite tht triggers the action.
+ */
+Level.prototype.triggerAction = function(player, sprite) {
+    sprite.triggerAction();
 };
 
 /**
@@ -5473,6 +5525,7 @@ module.exports = Level;
  */
 var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var TriggerSprite = require ('../../worldElements/TriggerSprite');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -5537,18 +5590,28 @@ LevelOne.prototype.addTutorialInstructions = function() {
     var howToMoveDialog = new NonPauseDialog(50, 70, 'dialogBgSmall', null,
         '', 8, 'Move using arrow keys', 'arrowKeysMove', true, false);
     howToMoveDialog.open();
-    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH, 70, 'dialogBgSmall',
-        null, '', 8, 'Shoot using the Space Bar', 'spaceBar', true, false);
-    howToShoot.open();
-    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 3, 70,
+
+    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH - 100, 70,
+        'dialogBgSmall', null, '', 8, 'Shoot using the Space Bar', 'spaceBar',
+        true, false);
+    var triggerHouse = new TriggerSprite(howToShoot.x, this.GROUND_HEIGHT,
+        'greenHouse', howToShoot.open, howToShoot);
+    this.addTriggerSprite(triggerHouse);
+
+    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 2.8, 70,
         'dialogBgSmall', null, '', 8, 'Run using X and arrow keys',
         'arrowKeysRun',
         true, false);
-    howToRun.open();
+    triggerHouse = new TriggerSprite(howToRun.x, this.GROUND_HEIGHT,
+        'whiteHouse', howToRun.open, howToRun);
+    this.addTriggerSprite(triggerHouse);
+
     var howToJump = new NonPauseDialog(this.CAMERA_WIDTH * 4, 70,
         'dialogBgSmall', null, '', 8, 'Jump using Up key', 'arrowKeysJump',
         true, false);
-    howToJump.open();
+    triggerHouse = new TriggerSprite(howToJump.x, this.GROUND_HEIGHT,
+        'redHouse', howToJump.open, howToJump);
+    this.addTriggerSprite(triggerHouse);
 };
 
 /**
@@ -5593,14 +5656,11 @@ LevelOne.prototype.addInteractiveBuildings = function() {
     var imagesKeys = ['store'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addInteractiveHouse(this.firstCheckPointX * 1.55, 'store',
-        interactionManager);
-    var storeArrow = this.game.make.sprite(-90,
-        interactionManager.dialogs[0].height - 20 , 'arrowDown');
-    storeArrow.anchor.set(0, 1);
-    storeArrow.animations.add('animation', [0, 1], 1, true);
-    storeArrow.animations.play('animation');
-    interactionManager.dialogs[0].addChild(storeArrow);
+    var interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 1.55,
+        this.GROUND_HEIGHT, 'store', interactionManager);
+    interactiveHouse.createAnimatedArrow(-90,
+        interactionManager.dialogs[0].height);
+    this.addInteractiveHouse(interactiveHouse, true);
 
     messages = ['Your family is now somewhere else.',
         'Continue trying, because this game is just starting!'];
@@ -5611,8 +5671,20 @@ LevelOne.prototype.addInteractiveBuildings = function() {
     vocabularyItems.push(vocabularyItem);
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys, vocabularyItems);
-    this.addInteractiveHouse(5.5 * this.checkPointsDistance, 'blueHouse',
-        interactionManager);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 4.85,
+        this.GROUND_HEIGHT, 'blueHouse', interactionManager);
+    this.addInteractiveHouse(interactiveHouse, true);
+
+    messages = ['You can add money playing the English Challenges'];
+    titles = ['Add money'];
+    imagesKeys = ['addCashBig'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 5.5,
+        this.GROUND_HEIGHT, 'greenHouse', interactionManager);
+    interactiveHouse.createAnimatedArrow(-10,
+        interactionManager.dialogs[0].height);
+    this.addInteractiveHouse(interactiveHouse, false);
 };
 
 /**
@@ -5653,7 +5725,7 @@ LevelOne.prototype.createPlaces = function() {
 
 module.exports = LevelOne;
 
-},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"./Level":46}],48:[function(require,module,exports){
+},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"../../worldElements/TriggerSprite":73,"./Level":46}],48:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 19/11/2015.
  */
@@ -5988,8 +6060,212 @@ module.exports = LevelTwo;
 },{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/VerticalLayoutPopUp":70,"./Level":46}],50:[function(require,module,exports){
 arguments[4][46][0].apply(exports,arguments)
 },{"../../character/NPC":5,"../../character/Player":6,"../../character/SimpleEnemy":7,"../../character/StrongEnemy":8,"../../character/StrongestEnemy":9,"../../englishChallenges/menu/EnglishChallengesMenu":17,"../../items/HealthPack":19,"../../items/inventory/Inventory":23,"../../items/store/Store":25,"../../items/vocabulary/MyVocabulary":31,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/InteractiveCar":28,"../../items/vocabularyItems/WorldItem":30,"../../items/weapons/MachineGun":35,"../../items/weapons/Revolver":37,"../../util/Dialog":55,"../../util/HorizontalLayoutPanel":60,"../../util/IconButton":62,"../../util/InteractionManager":63,"../../util/PopUp":65,"../../util/ResourceBar":66,"../../worldElements/InteractiveHouse":71,"../../worldElements/NameBoard":72,"dup":46}],51:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"./Level":46,"dup":47}],52:[function(require,module,exports){
+/**
+ * @ignore Created by Edwin Gamboa on 22/07/2015.
+ */
+var Level = require ('./Level');
+var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var TriggerSprite = require ('../../worldElements/TriggerSprite');
+var HealthPack = require('../../items/HealthPack');
+var Dialog = require('../../util/Dialog');
+var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
+var InteractionManager = require('../../util/InteractionManager');
+var ClueItem = require('../../items/vocabularyItems/ClueItem');
+var VocabularyItem = require('../../items/vocabularyItems/VocabularyItem');
+var NonPauseDialog = require('../../util/NonPauseDialog');
+
+/**
+ * Number of fights that player will have during this level.
+ * @type {number}
+ */
+var NUMBER_OF_FIGHTING_POINTS = 5;
+
+/**
+ * Manages LevelOne.
+ * @class LevelOne
+ * @constructor
+ * @extends Level
+ * @param {Phaser.Game} game - Pahser Game object.
+ */
+var LevelOne = function(game) {
+    Level.call(this, game);
+};
+
+LevelOne.prototype = Object.create(Level.prototype);
+LevelOne.prototype.constructor = LevelOne;
+
+/**
+ * Creates level one specific objects and elements.
+ * @method LevelOne.create
+ */
+LevelOne.prototype.create = function() {
+    Level.prototype.create.call(this);
+    localStorage.setItem('level', 'levelOne');
+    this.nextState = 'levelTwo';
+    this.game.stage.backgroundColor = '#C7D2FC';
+    this.firstCheckPointX = this.game.camera.width * 1.5;
+    this.checkPointsDistance = this.WORLD_WIDTH /
+        (NUMBER_OF_FIGHTING_POINTS + 1);
+    this.lastGoalAimed = false;
+    this.numberOfFightingPoints = NUMBER_OF_FIGHTING_POINTS;
+    this.numberOfEnemies = 3;
+    this.numberOfStrongEnemies = 0;
+    this.createPlaces();
+    this.addInteractiveBuildings();
+    this.addStaticBuildings();
+    this.addNPCs();
+    this.addEnemies();
+    this.createWeapons();
+    this.addClueItems();
+    this.addLevelCar('jeep', 4.4 * this.checkPointsDistance);
+    this.addHealthPacks();
+    this.addTutorialInstructions();
+};
+
+/**
+ * Add instructions to guide the player
+ * @method LevelOne.addTutorialInstructions
+ */
+LevelOne.prototype.addTutorialInstructions = function() {
+    var howToMoveDialog = new NonPauseDialog(50, 70, 'dialogBgSmall', null,
+        '', 8, 'Move using arrow keys', 'arrowKeysMove', true, false);
+    howToMoveDialog.open();
+
+    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH - 100, 70,
+        'dialogBgSmall', null, '', 8, 'Shoot using the Space Bar', 'spaceBar',
+        true, false);
+    var triggerHouse = new TriggerSprite(howToShoot.x, this.GROUND_HEIGHT,
+        'greenHouse', howToShoot.open, howToShoot);
+    this.addTriggerSprite(triggerHouse);
+
+    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 2.8, 70,
+        'dialogBgSmall', null, '', 8, 'Run using X and arrow keys',
+        'arrowKeysRun',
+        true, false);
+    triggerHouse = new TriggerSprite(howToRun.x, this.GROUND_HEIGHT,
+        'whiteHouse', howToRun.open, howToRun);
+    this.addTriggerSprite(triggerHouse);
+
+    var howToJump = new NonPauseDialog(this.CAMERA_WIDTH * 4, 70,
+        'dialogBgSmall', null, '', 8, 'Jump using Up key', 'arrowKeysJump',
+        true, false);
+    triggerHouse = new TriggerSprite(howToJump.x, this.GROUND_HEIGHT,
+        'redHouse', howToJump.open, howToJump);
+    this.addTriggerSprite(triggerHouse);
+};
+
+/**
+ * Creates the needed arrays to add level weapons
+ * @method LevelOne.createWeapons
+ */
+LevelOne.prototype.createWeapons = function() {
+    this.addRevolver(3000, this.GROUND_HEIGHT - 40, false);
+    this.addRevolver(6000, this.GROUND_HEIGHT - 40, false);
+};
+
+/**
+ * Add ClueItems for this level.
+ * @method LevelOne.addClueItems
+ */
+LevelOne.prototype.addClueItems = function() {
+    var messages = ['Oh Great, those are my wife\'s glasses!'];
+    var titles = ['My wife\'s glasses'];
+    var imagesKeys = ['glasses'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'wife', false);
+    vocabularyItems.push(vocabularyItem);
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys, vocabularyItems);
+    this.addClueItem(300, 'glasses', interactionManager);
+
+    messages = ['Oh Great, that is my wife\'s watch!'];
+    titles = ['My wife\'s watch'];
+    imagesKeys = ['watch'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    this.addClueItem(this.WORLD_WIDTH / 1.5, 'watch', interactionManager);
+};
+
+/**
+ * Adds interactive buildings to this level.
+ * @method LevelOne.addInteractiveBuildings
+ */
+LevelOne.prototype.addInteractiveBuildings = function() {
+    var messages = ['You can buy a weapon using the store'];
+    var titles = ['Buying weapons'];
+    var imagesKeys = ['store'];
+    var interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    var interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 1.55,
+        this.GROUND_HEIGHT, 'store', interactionManager);
+    interactiveHouse.createAnimatedArrow(-90,
+        interactionManager.dialogs[0].height - 20);
+    this.addInteractiveHouse(interactiveHouse, true);
+
+    messages = ['Your family is now somewhere else.',
+        'Continue trying, because this game is just starting!'];
+    titles = ['Continue trying', 'Continue trying'];
+    imagesKeys = ['emptyRoom', 'emptyRoom'];
+    var vocabularyItems = [];
+    var vocabularyItem = new VocabularyItem(0, 0, 'family', false);
+    vocabularyItems.push(vocabularyItem);
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys, vocabularyItems);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 4.85,
+        this.GROUND_HEIGHT, 'blueHouse', interactionManager);
+    this.addInteractiveHouse(interactiveHouse, true);
+
+    messages = ['You can add money playing the English Challenges'];
+    titles = ['Add money'];
+    imagesKeys = ['addCashBig'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 5.5,
+        this.GROUND_HEIGHT, 'greenHouse', interactionManager);
+    interactiveHouse.createAnimatedArrow(-10,
+        interactionManager.dialogs[0].height);
+    this.addInteractiveHouse(interactiveHouse, false);
+};
+
+/**
+ * Adds static buildings to this level.
+ * @method LevelOne.addInteractiveBuildings
+ */
+LevelOne.prototype.addStaticBuildings = function() {
+    this.addStaticBuilding(5, 'orangeHouse');
+    var house = this.addStaticBuilding(500, 'whiteHouse');
+    this.addNeighbors(house, 'greenHouse', 'yellowHouse');
+};
+
+/**
+ * Adds level one non player characters.
+ * @method LevelOne.addNPCs
+ */
+LevelOne.prototype.addNPCs = function() {
+    var messages = [
+        'Are you looking for Carlos? \n Be careful, he is so dangerous',
+        'Your wife and children are in \nthe Big Blue House after the Zoo'
+    ];
+    var titles = ['I can help you', 'Go to Big Blue House'];
+    var imagesKeys = ['npc', 'blueHouse'];
+    var intManager = new InteractionManager(messages, titles, imagesKeys);
+    this.addNPC(this.game.camera.width / 2, 'npc', intManager);
+};
+
+/**
+ * Creates the needed arrays to add this level places
+ * @method LevelOne.createPlaces
+ */
+LevelOne.prototype.createPlaces = function() {
+    this.housesKeys = ['whiteHouse', 'greenHouse', 'yellowHouse',
+        'orangeHouse'];
+    this.placesKeys = ['bookStore', 'playground', 'gasStation', 'zoo'];
+    this.addPlaces();
+};
+
+module.exports = LevelOne;
+
+},{"../../items/HealthPack":19,"../../items/vocabularyItems/ClueItem":27,"../../items/vocabularyItems/VocabularyItem":29,"../../util/Dialog":55,"../../util/InteractionManager":63,"../../util/NonPauseDialog":64,"../../util/VerticalLayoutPopUp":70,"../../worldElements/InteractiveHouse":71,"../../worldElements/TriggerSprite":73,"./Level":46}],52:[function(require,module,exports){
 arguments[4][42][0].apply(exports,arguments)
 },{"../util/Button":54,"dup":42}],53:[function(require,module,exports){
 arguments[4][43][0].apply(exports,arguments)
@@ -6580,6 +6856,7 @@ var NonPauseDialog = function(x, y, backgroundKey, parent, title, margin, text,
         this.icon.animations.play('animation');
     }
     this.fixedToCamera = fixedToCamera;
+    this.visible = false;
     level.game.add.existing(this);
 };
 
@@ -6944,8 +7221,6 @@ module.exports = VerticalLayoutPopUP;
 /**
  * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
-var VocabularyItem = require('../items/vocabularyItems/VocabularyItem');
-var Button = require('../util/Button');
 
 /**
  * Represents a House, which player can interact with.
@@ -6959,11 +7234,14 @@ var Button = require('../util/Button');
  * allows interaction with the player.
  */
 var InteractiveHouse = function(x, y, backgroundKey, interactionManager) {
-    VocabularyItem.call(this, x, y, backgroundKey, true);
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.anchor.set(0, 1);
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
     this.interactionManager = interactionManager;
 };
 
-InteractiveHouse.prototype = Object.create(VocabularyItem.prototype);
+InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
@@ -6971,22 +7249,29 @@ InteractiveHouse.prototype.constructor = InteractiveHouse;
  * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
+    level.interactiveBuldings.remove(this);
+    level.addObject(this);
     this.interactionManager.openDialogs();
 };
 
 /**
- * Kills this item when player picks it up.
- * @method WorldItem.pickUp
+ * Creates an animated arrow to show when the pop up displays. It can be used
+ * to indicate or point something to the user
+ * @param {number} x - Arrow x coordinate within the world.
+ * @param {number} y - Arrow y coordinate within the world.
  */
-InteractiveHouse.prototype.pickUp = function() {
-    this.openActivity();
-    level.vocabularyItems.remove(this);
-    level.addObject(this);
+InteractiveHouse.prototype.createAnimatedArrow = function(x, y) {
+    var animatedArrow = level.game.make.sprite(x, y, 'arrowDown');
+    animatedArrow.anchor.set(0, 1);
+    animatedArrow.animations.add('animation', [0, 1, 2, 3, 4, 5], 4, true);
+    animatedArrow.animations.play('animation');
+    var lastDialogIndex = this.interactionManager.dialogs.length - 1;
+    this.interactionManager.dialogs[lastDialogIndex].addChild(animatedArrow);
 };
 
 module.exports = InteractiveHouse;
 
-},{"../items/vocabularyItems/VocabularyItem":29,"../util/Button":54}],72:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 /**
  * @ignore Created by Edwin Gamboa on 25/10/2015.
  */
@@ -7018,4 +7303,41 @@ NameBoard.prototype.constructor = NameBoard;
 
 module.exports = NameBoard;
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,31,32,27,28,29,30,33,34,35,36,37,38,39,40,44,45,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72]);
+},{}],73:[function(require,module,exports){
+/**
+ * Created by Edwin Gamboa on 09/03/2016.
+ */
+/**
+ * Represents a Sprite that triggers an action when player overlaps it.
+ * @class TriggerSprite
+ * @extends Phaser.Sprite
+ * @constructor
+ * @param {number} x - X coordinate within the world.
+ * @param {number} y - Y coordinate within the world.
+ * @param {string} backgroundKey - House texture key.
+ * @param {function} action - Action to be triggered.
+ * @param {object} parent - Object that has the action as function
+ */
+var TriggerSprite = function(x, y, backgroundKey, action, parent) {
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.anchor.set(0, 1);
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    this.action = action;
+    this.parentObject = parent;
+};
+
+TriggerSprite.prototype = Object.create(Phaser.Sprite.prototype);
+TriggerSprite.prototype.constructor = TriggerSprite;
+
+/**
+ * Triggers the action related to this Sprite
+ * @method TriggerSprite.triggerAction
+ */
+TriggerSprite.prototype.triggerAction = function() {
+    this.action.call(this.parentObject);
+};
+
+module.exports = TriggerSprite;
+
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,31,32,27,28,29,30,33,34,35,36,37,38,39,40,44,45,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73]);

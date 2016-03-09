@@ -3,6 +3,7 @@
  */
 var Level = require ('./Level');
 var InteractiveHouse = require ('../../worldElements/InteractiveHouse');
+var TriggerSprite = require ('../../worldElements/TriggerSprite');
 var HealthPack = require('../../items/HealthPack');
 var Dialog = require('../../util/Dialog');
 var VerticalLayoutPopUp = require('../../util/VerticalLayoutPopUp');
@@ -67,18 +68,28 @@ LevelOne.prototype.addTutorialInstructions = function() {
     var howToMoveDialog = new NonPauseDialog(50, 70, 'dialogBgSmall', null,
         '', 8, 'Move using arrow keys', 'arrowKeysMove', true, false);
     howToMoveDialog.open();
-    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH, 70, 'dialogBgSmall',
-        null, '', 8, 'Shoot using the Space Bar', 'spaceBar', true, false);
-    howToShoot.open();
-    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 3, 70,
+
+    var howToShoot = new NonPauseDialog(this.CAMERA_WIDTH - 100, 70,
+        'dialogBgSmall', null, '', 8, 'Shoot using the Space Bar', 'spaceBar',
+        true, false);
+    var triggerHouse = new TriggerSprite(howToShoot.x, this.GROUND_HEIGHT,
+        'greenHouse', howToShoot.open, howToShoot);
+    this.addTriggerSprite(triggerHouse);
+
+    var howToRun = new NonPauseDialog(this.CAMERA_WIDTH * 2.8, 70,
         'dialogBgSmall', null, '', 8, 'Run using X and arrow keys',
         'arrowKeysRun',
         true, false);
-    howToRun.open();
+    triggerHouse = new TriggerSprite(howToRun.x, this.GROUND_HEIGHT,
+        'whiteHouse', howToRun.open, howToRun);
+    this.addTriggerSprite(triggerHouse);
+
     var howToJump = new NonPauseDialog(this.CAMERA_WIDTH * 4, 70,
         'dialogBgSmall', null, '', 8, 'Jump using Up key', 'arrowKeysJump',
         true, false);
-    howToJump.open();
+    triggerHouse = new TriggerSprite(howToJump.x, this.GROUND_HEIGHT,
+        'redHouse', howToJump.open, howToJump);
+    this.addTriggerSprite(triggerHouse);
 };
 
 /**
@@ -123,14 +134,11 @@ LevelOne.prototype.addInteractiveBuildings = function() {
     var imagesKeys = ['store'];
     var interactionManager = new InteractionManager(messages, titles,
         imagesKeys);
-    this.addInteractiveHouse(this.firstCheckPointX * 1.55, 'store',
-        interactionManager);
-    var storeArrow = this.game.make.sprite(-90,
-        interactionManager.dialogs[0].height - 20 , 'arrowDown');
-    storeArrow.anchor.set(0, 1);
-    storeArrow.animations.add('animation', [0, 1], 1, true);
-    storeArrow.animations.play('animation');
-    interactionManager.dialogs[0].addChild(storeArrow);
+    var interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 1.55,
+        this.GROUND_HEIGHT, 'store', interactionManager);
+    interactiveHouse.createAnimatedArrow(-90,
+        interactionManager.dialogs[0].height);
+    this.addInteractiveHouse(interactiveHouse, true);
 
     messages = ['Your family is now somewhere else.',
         'Continue trying, because this game is just starting!'];
@@ -141,8 +149,20 @@ LevelOne.prototype.addInteractiveBuildings = function() {
     vocabularyItems.push(vocabularyItem);
     interactionManager = new InteractionManager(messages, titles,
         imagesKeys, vocabularyItems);
-    this.addInteractiveHouse(5.5 * this.checkPointsDistance, 'blueHouse',
-        interactionManager);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 4.85,
+        this.GROUND_HEIGHT, 'blueHouse', interactionManager);
+    this.addInteractiveHouse(interactiveHouse, true);
+
+    messages = ['You can add money playing the English Challenges'];
+    titles = ['Add money'];
+    imagesKeys = ['addCashBig'];
+    interactionManager = new InteractionManager(messages, titles,
+        imagesKeys);
+    interactiveHouse = new InteractiveHouse(this.firstCheckPointX * 5.5,
+        this.GROUND_HEIGHT, 'greenHouse', interactionManager);
+    interactiveHouse.createAnimatedArrow(-10,
+        interactionManager.dialogs[0].height);
+    this.addInteractiveHouse(interactiveHouse, false);
 };
 
 /**

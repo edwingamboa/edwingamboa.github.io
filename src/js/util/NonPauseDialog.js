@@ -39,6 +39,7 @@ var NonPauseDialog = function(x, y, backgroundKey, parent, title, margin, text,
         this.icon.animations.play('animation');
     }
     this.fixedToCamera = fixedToCamera;
+    this.visible = false;
     level.game.add.existing(this);
 };
 

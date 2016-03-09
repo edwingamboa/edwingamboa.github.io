@@ -1,8 +1,6 @@
 /**
  * @ignore Created by Edwin Gamboa on 29/08/2015.
  */
-var VocabularyItem = require('../items/vocabularyItems/VocabularyItem');
-var Button = require('../util/Button');
 
 /**
  * Represents a House, which player can interact with.
@@ -16,11 +14,14 @@ var Button = require('../util/Button');
  * allows interaction with the player.
  */
 var InteractiveHouse = function(x, y, backgroundKey, interactionManager) {
-    VocabularyItem.call(this, x, y, backgroundKey, true);
+    Phaser.Sprite.call(this, level.game, x, y, backgroundKey);
+    this.anchor.set(0, 1);
+    level.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
     this.interactionManager = interactionManager;
 };
 
-InteractiveHouse.prototype = Object.create(VocabularyItem.prototype);
+InteractiveHouse.prototype = Object.create(Phaser.Sprite.prototype);
 InteractiveHouse.prototype.constructor = InteractiveHouse;
 
 /**
@@ -28,17 +29,24 @@ InteractiveHouse.prototype.constructor = InteractiveHouse;
  * @method InteractiveHouse.openActivity
  */
 InteractiveHouse.prototype.openActivity = function() {
+    level.interactiveBuldings.remove(this);
+    level.addObject(this);
     this.interactionManager.openDialogs();
 };
 
 /**
- * Kills this item when player picks it up.
- * @method WorldItem.pickUp
+ * Creates an animated arrow to show when the pop up displays. It can be used
+ * to indicate or point something to the user
+ * @param {number} x - Arrow x coordinate within the world.
+ * @param {number} y - Arrow y coordinate within the world.
  */
-InteractiveHouse.prototype.pickUp = function() {
-    this.openActivity();
-    level.vocabularyItems.remove(this);
-    level.addObject(this);
+InteractiveHouse.prototype.createAnimatedArrow = function(x, y) {
+    var animatedArrow = level.game.make.sprite(x, y, 'arrowDown');
+    animatedArrow.anchor.set(0, 1);
+    animatedArrow.animations.add('animation', [0, 1, 2, 3, 4, 5], 4, true);
+    animatedArrow.animations.play('animation');
+    var lastDialogIndex = this.interactionManager.dialogs.length - 1;
+    this.interactionManager.dialogs[lastDialogIndex].addChild(animatedArrow);
 };
 
 module.exports = InteractiveHouse;
