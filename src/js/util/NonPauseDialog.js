@@ -40,7 +40,7 @@ var NonPauseDialog = function(x, y, backgroundKey, parent, title, margin, text,
     }
     this.fixedToCamera = fixedToCamera;
     this.visible = false;
-    level.game.add.existing(this);
+    level.addObject(this);
 };
 
 NonPauseDialog.prototype = Object.create(VerticalLayoutPopUp.prototype);
