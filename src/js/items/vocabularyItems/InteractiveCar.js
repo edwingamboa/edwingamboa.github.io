@@ -63,6 +63,9 @@ var InteractiveCar = function(x,
 
     this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
         -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
+    var fuelIcon = level.game.make.sprite(0, 0, 'gas');
+    fuelIcon.anchor.set(1, 0.5);
+    this.gasBar.addChild(fuelIcon);
     this.gasBar.visible = false;
     this.addChild(this.gasBar);
 

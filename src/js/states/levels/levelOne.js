@@ -90,6 +90,15 @@ LevelOne.prototype.addTutorialInstructions = function() {
     triggerHouse = new TriggerSprite(howToJump.x, this.GROUND_HEIGHT,
         'redHouse', howToJump.open, howToJump);
     this.addTriggerSprite(triggerHouse);
+
+    //Car tutorial
+    var animatedArrow = level.game.make.sprite(10, 0, 'arrowDown');
+    animatedArrow.anchor.set(0, 1);
+    animatedArrow.scale.x = 70 / animatedArrow.width;
+    animatedArrow.scale.y = 60 / animatedArrow.height;
+    animatedArrow.animations.add('animation', [0, 1, 2, 3, 4, 5], 4, true);
+    animatedArrow.animations.play('animation');
+    this.cars.children[0].getOnButton.addChild(animatedArrow);
 };
 
 /**

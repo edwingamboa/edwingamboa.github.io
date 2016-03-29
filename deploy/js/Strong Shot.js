@@ -2715,6 +2715,9 @@ var InteractiveCar = function(x,
 
     this.gasBar = new ResourceBar(-(this.width - BAR_WIDTH) / 2,
         -this.height - 30, {width: BAR_WIDTH, height: BAR_HEIGHT});
+    var fuelIcon = level.game.make.sprite(0, 0, 'gas');
+    fuelIcon.anchor.set(1, 0.5);
+    this.gasBar.addChild(fuelIcon);
     this.gasBar.visible = false;
     this.addChild(this.gasBar);
 
@@ -4184,6 +4187,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
         77, 90);
     //Level assets
+    this.game.load.image('gas', 'assets/images/gas.png');
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
     this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
@@ -5612,6 +5616,15 @@ LevelOne.prototype.addTutorialInstructions = function() {
     triggerHouse = new TriggerSprite(howToJump.x, this.GROUND_HEIGHT,
         'redHouse', howToJump.open, howToJump);
     this.addTriggerSprite(triggerHouse);
+
+    //Car tutorial
+    var animatedArrow = level.game.make.sprite(10, 0, 'arrowDown');
+    animatedArrow.anchor.set(0, 1);
+    animatedArrow.scale.x = 70 / animatedArrow.width;
+    animatedArrow.scale.y = 60 / animatedArrow.height;
+    animatedArrow.animations.add('animation', [0, 1, 2, 3, 4, 5], 4, true);
+    animatedArrow.animations.play('animation');
+    this.cars.children[0].getOnButton.addChild(animatedArrow);
 };
 
 /**

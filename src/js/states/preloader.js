@@ -63,6 +63,7 @@ Preloader.prototype.loadAssets = function() {
     this.game.load.spritesheet('arrowDown', 'assets/sprites/arrowDown.png',
         77, 90);
     //Level assets
+    this.game.load.image('gas', 'assets/images/gas.png');
     this.game.load.image('worldBg', 'assets/images/worldBg.png');
     this.game.load.image('ground', 'assets/images/platform.png');
     this.game.load.image('healthPack5', 'assets/images/healthPack5.png');
