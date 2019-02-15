@@ -1,0 +1,57 @@
+<html>
+
+<head>
+    <title>EPOC PMs Viewer</title>
+</head>
+
+
+<body>
+    <div class="container-fluid">
+        <h2>Load files</h2>
+        <div class="row">
+            <div class="form-group col">
+                <label for="pmFileUrl" class="custom-file-label">Performance measures log files:</label>
+                <input type="file" class="custom-file-input" id="pmFileUrl">
+                <small id="pmFileUrlHelp" class="form-text text-muted">Hint: itemBuilder_YYYY.MM.DD_HH.MM.SS.pm.csv</small>
+            </div>
+            <div class="form-group col">
+                <label for="userTraceFileUrl" class="custom-file-label">User trace log files:</label>
+                <input type="file" class="custom-file-input" id="userTraceFileUrl">
+                <small id="userTraceFileUrlHelp" class="form-text text-muted">Hint: Trace_userID.csv</small>
+            </div>
+        </div>
+        <div class="form-text">
+            <strong>Loaded files:</strong> <span id="loadedFilesText"></span>
+        </div>
+
+        <div id="mainContent">
+            <h2>Overview</h2>
+            <div class="row">
+                <div id="measuresViewer" class="chart-viewer col"></div>
+            </div>
+            
+            <h2>Trend per performance measure</h2>
+            <div class="row">
+                <div class="form-group col">
+                    <p>Select the desired performance measure:</p>
+                    <div id="trendChartPmRBtnsDiv"></div>
+                </div>
+            </div>
+            <div class="row form-inline">
+                <div id="toleranceElapTimeEvents" class="col form-group"></div>
+            </div>
+            <div class="row">
+                <div id="trendsViewer" class="chart-viewer col"></div>
+            </div>
+        </div>
+        <div id="progressSpinner">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="vendors~app.js"></script><script type="text/javascript" src="app.js"></script></body>
+
+</html>
