@@ -10,13 +10,13 @@
         <h2>Load files</h2>
         <div class="row">
             <div class="form-group col">
-                <label for="pmFileUrl" class="custom-file-label">Performance measures log files:</label>
-                <input type="file" class="custom-file-input" id="pmFileUrl">
-                <small id="pmFileUrlHelp" class="form-text text-muted">Hint: itemBuilder_YYYY.MM.DD_HH.MM.SS.pm.csv</small>
+                <label for="pmFileUrl">Performance measures log files:</label>
+                <input type="file" class="form-control-file" id="pmFileUrl" accept=".csv">
+                <small id="pmFileUrlHelp" class="form-text text-muted">Hint: itemBuilder_YYYY.MM.DD_HH.MM.SS.pm.csv or Pm_UserID.csv</small>
             </div>
             <div class="form-group col">
-                <label for="userTraceFileUrl" class="custom-file-label">User trace log files:</label>
-                <input type="file" class="custom-file-input" id="userTraceFileUrl">
+                <label for="userTraceFileUrl">User trace log files:</label>
+                <input type="file" class="form-control-file" id="userTraceFileUrl" accept=".csv">
                 <small id="userTraceFileUrlHelp" class="form-text text-muted">Hint: Trace_userID.csv</small>
             </div>
         </div>
@@ -52,6 +52,6 @@
             </div>
         </div>
     </div>
-<script type="text/javascript" src="vendors~app.js"></script><script type="text/javascript" src="app.js"></script></body>
+<script type="text/javascript" src="app.js"></script></body>
 
 </html>
