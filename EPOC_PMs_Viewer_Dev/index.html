@@ -24,10 +24,12 @@
             <strong>Loaded files:</strong> <span id="loadedFilesText"></span>
         </div>
 
-        <div id="mainContent">
+        <div id="mainContent" class="hidden">
             <h2>Overview</h2>
             <div class="row">
-                <div id="measuresViewer" class="chart-viewer col"></div>
+                <div class="col-sm-12">
+                    <div id="measuresViewer" class="chart-viewer"></div>
+                </div>
             </div>
             
             <h2>Trend per performance measure</h2>
@@ -41,13 +43,15 @@
                 <div id="toleranceElapTimeEvents" class="col form-group"></div>
             </div>
             <div class="row">
-                <div id="trendsViewer" class="chart-viewer col"></div>
+                <div class="col-sm-12">
+                    <div id="trendsViewer" class="chart-viewer"></div>
+                </div>
             </div>
-        </div>
-        <div id="progressSpinner">
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
+            <div id="progressSpinner">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
             </div>
         </div>
