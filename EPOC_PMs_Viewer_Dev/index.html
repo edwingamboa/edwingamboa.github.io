@@ -7,7 +7,15 @@
 
 <body>
     <div class="container-fluid">
-        <h2>Load files</h2>
+        <div class="d-flex justify-content-between">
+            <div>
+                <h2>Individual Analysis</h2>
+            </div>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-secondary btn-sm" href="./collective.html">Collective</a>
+            </div>
+        </div>
+        <h4>Load files</h4>
         <div class="row">
             <div class="form-group col">
                 <label for="pmFileUrl">Performance measures log files:</label>
@@ -24,7 +32,7 @@
             <strong>Loaded files:</strong> <span id="loadedFilesText"></span>
         </div>
 
-        <div id="mainContent" class="hidden">
+        <div id="mainContent" class="hidden spinner-container">
             <h2>Overview</h2>
             <div class="row">
                 <div class="col-sm-12">
@@ -43,17 +51,32 @@
                 <div id="toleranceElapTimeEvents" class="col form-group"></div>
             </div>
             <div class="row">
-                <div class="col-sm-12">
-                    <div id="trendsViewer" class="chart-viewer"></div>
+                <div class="col">
+                    <input type="button" value="Set" id="setUpSubmitBtn" class="btn btn-primary">
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-sm-12">
-                    <div id="segmentsViewer"></div>
+            <hr>
+            <div class="spinner-container">
+                <div id="trendProgressSpinner" class="progress-spinner hidden">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="trendsViewer" class="chart-viewer"></div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="segmentsViewer"></div>
+                    </div>
                 </div>
             </div>
-            <div id="progressSpinner">
+            <div id="mainProgressSpinner" class="progress-spinner">
                 <div class="d-flex justify-content-center">
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">Loading...</span>

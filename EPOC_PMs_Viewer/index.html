@@ -7,16 +7,24 @@
 
 <body>
     <div class="container-fluid">
-        <h2>Load files</h2>
+        <div class="d-flex justify-content-between">
+            <div>
+                <h2>Individual Analysis</h2>
+            </div>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-secondary btn-sm" href="./collective.html">Collective</a>
+            </div>
+        </div>
+        <h4>Load files</h4>
         <div class="row">
             <div class="form-group col">
-                <label for="pmFileUrl" class="custom-file-label">Performance measures log files:</label>
-                <input type="file" class="custom-file-input" id="pmFileUrl">
-                <small id="pmFileUrlHelp" class="form-text text-muted">Hint: itemBuilder_YYYY.MM.DD_HH.MM.SS.pm.csv</small>
+                <label for="pmFileUrl">Performance measures log files:</label>
+                <input type="file" class="form-control-file" id="pmFileUrl" accept=".csv">
+                <small id="pmFileUrlHelp" class="form-text text-muted">Hint: itemBuilder_YYYY.MM.DD_HH.MM.SS.pm.csv or Pm_UserID.csv</small>
             </div>
             <div class="form-group col">
-                <label for="userTraceFileUrl" class="custom-file-label">User trace log files:</label>
-                <input type="file" class="custom-file-input" id="userTraceFileUrl">
+                <label for="userTraceFileUrl">User trace log files:</label>
+                <input type="file" class="form-control-file" id="userTraceFileUrl" accept=".csv">
                 <small id="userTraceFileUrlHelp" class="form-text text-muted">Hint: Trace_userID.csv</small>
             </div>
         </div>
@@ -24,10 +32,12 @@
             <strong>Loaded files:</strong> <span id="loadedFilesText"></span>
         </div>
 
-        <div id="mainContent">
+        <div id="mainContent" class="hidden spinner-container">
             <h2>Overview</h2>
             <div class="row">
-                <div id="measuresViewer" class="chart-viewer col"></div>
+                <div class="col-sm-12">
+                    <div id="measuresViewer" class="chart-viewer"></div>
+                </div>
             </div>
             
             <h2>Trend per performance measure</h2>
@@ -41,17 +51,40 @@
                 <div id="toleranceElapTimeEvents" class="col form-group"></div>
             </div>
             <div class="row">
-                <div id="trendsViewer" class="chart-viewer col"></div>
+                <div class="col">
+                    <input type="button" value="Set" id="setUpSubmitBtn" class="btn btn-primary">
+                </div>
             </div>
-        </div>
-        <div id="progressSpinner">
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
+            <hr>
+            <div class="spinner-container">
+                <div id="trendProgressSpinner" class="progress-spinner hidden">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="trendsViewer" class="chart-viewer"></div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="segmentsViewer"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="mainProgressSpinner" class="progress-spinner">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-<script type="text/javascript" src="vendors~app.js"></script><script type="text/javascript" src="app.js"></script></body>
+<script type="text/javascript" src="app.js"></script></body>
 
 </html>
